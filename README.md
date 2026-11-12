@@ -2,9 +2,24 @@
 
 This repository contains a **self-contained, static evidence-review workbench** (`index.html`) and an **optional localhost-only adapter** (`lab_proxy.py`) for an OpenAI-compatible campus model server. It does **not** modify the team's separate private application repository or its Vercel deployment.
 
+## Guided live demo (no PowerPoint)
+
+Open `index.html`, then click **Start live tour** in the top right or **Guided demo** in the sidebar. The tour opens **six real interactive screens**, rather than presenting a slide deck:
+
+1. **Overview:** why evidence needs to be separated from guesses.
+2. **Case review:** inspect the DataWedge web-scanning case, source links, unknowns, and next check.
+3. **Lab API:** explain that an approved live model trial is optional and requires a local proxy and campus VPN.
+4. **Model comparison:** paste real A/B answers; compare with manual reviewer scores.
+5. **Evaluation rubric:** explain the five 0–2 criteria and why a score is not a benchmark.
+6. **Export & share:** export a portable JSON workspace or case CSV/Markdown.
+
+The bottom guidance bar shows a short **Say** and **On screen** prompt; click **Next feature** while demonstrating the real interface. You can also jump straight to any feature from the Guided demo page. The site's review data stays in the current browser until exported.
+
+**Opening line for a faculty demo:** “This is an evidence-first workflow. We take a real Zebra developer question, check what the official docs support, record what is still unknown, and evaluate any model answer before sharing it.”
+
 ## Start the demo
 
-- **Offline / no server:** download the folder, open `index.html` in a browser. The case library, manual comparison, presentation mode, and local exports are available. No model is called.
+- **Offline / no server:** download the folder, open `index.html` in a browser. The case library, guided live feature tour, manual comparison, and local exports are available. No model is called.
 - **Live adapter / Northwestern eduroam or VPN required:** set `ZEBRA_LAB_API_BASE` to your approved lab endpoint and optionally `ZEBRA_LAB_MODEL` to the model ID. Run `python lab_proxy.py` with Python 3. Open **http://127.0.0.1:8765** and select **Lab API**. Use **Check connection**, **Discover models**, then explicitly **Run selected case**. A captured answer is a **model output, not validated documentation**.
 
 Example on macOS/Linux, from this folder:
@@ -35,7 +50,7 @@ Replace `LAB_HOST:PORT` with the currently authorized, working address. Harper's
 
 ## Files
 
-- `index.html` — self-contained UI (searchable cases, evidence review, manual A/B rubric, presentation, imports/exports, optional lab panel).
+- `index.html` — self-contained UI (searchable cases, evidence review, manual A/B rubric, six-step live tour, imports/exports, optional lab panel).
 - `lab_proxy.py` — Python standard-library-only local HTTP bridge.
 - `README.md` — setup and limitations.
 - `test_lab_proxy.py` — unit tests for prompt freezing and API bridge boundaries.
