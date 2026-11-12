@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.env
+.env.*
+!*.example
+*_lab_runs.csv
+_lab_fixture.json
+_lab_test.png
+*.log
