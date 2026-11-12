@@ -16,3 +16,12 @@
 - No entire-document retrieval, knowledge index, automated source verification or production security audit.
 
 The bridge performs real HTTP requests **only on an authorized user's computer** when it is started with environment configuration and the explicit Run button is pressed. The mock tests verify code paths without implying deployed availability.
+
+## 2026-11-12 guided website introduction
+
+- Replaced the old slide-style “Present” screen with a six-step **Guided demo** screen that links to real application features.
+- Added a persistent live tour bar, English **Say** and **On screen** prompts, navigation buttons, and inline explanations on each working view.
+- JavaScript parsed successfully from the committed `index.html`. All `$('id')` references matched existing DOM IDs, with no duplicate IDs or invalid view references in a static cross-check.
+- Extended `tests/test_lab_ui.py` with Playwright checks for start, next, exit, direct jump, and finish behavior; **this updated browser test has not yet been executed in this environment**.
+- GitHub Pages publication and a live Northwestern lab inference run are **not yet verified**. No actual device-tested fixes or automatic model rankings are claimed.
+
