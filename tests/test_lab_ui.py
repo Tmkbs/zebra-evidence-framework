@@ -27,6 +27,27 @@ async def main():
     html=html.replace('<head>','<head><base href="http://127.0.0.1:8765/">',1)
     await page.set_content(html,wait_until='load')
     assert await page.locator('#stat-cases').inner_text()=='3'
+
+    # Guided live demo replaces the previous slide showcase.
+    assert await page.locator('#view-guide').count()==1
+    assert await page.locator('#view-present').count()==0
+    await page.locator('#header-tour').click()
+    assert await page.locator('#tour-dock').is_visible()
+    assert 'STEP 1 OF 6' in await page.locator('#tour-count').inner_text()
+    await page.locator('#tour-next').click()
+    assert await page.locator('#view-cases').is_visible()
+    assert 'STEP 2 OF 6' in await page.locator('#tour-count').inner_text()
+    await page.locator('#tour-next').click()
+    assert await page.locator('#view-lab').is_visible()
+    await page.locator('#tour-exit').click()
+    assert await page.locator('#view-guide').is_visible()
+    assert await page.locator('#tour-dock').is_hidden()
+    await page.locator('[data-tour-step="5"]').click()
+    assert await page.locator('#view-export').is_visible()
+    assert 'STEP 6 OF 6' in await page.locator('#tour-count').inner_text()
+    await page.locator('#tour-next').click()
+    assert await page.locator('#view-guide').is_visible()
+    assert await page.locator('#tour-dock').is_hidden()
     await page.locator('[data-view=lab]').click()
     assert await page.locator('#lab-run').is_disabled()
     await page.locator('#lab-check').click()
