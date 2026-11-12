@@ -40,6 +40,12 @@ py lab_proxy.py
 
 Replace `LAB_HOST:PORT` with the currently authorized, working address. Harper's November 2026 examples referenced **both 8000 and 8080**, so do not assume the port. The server can be stopped with Ctrl+C. If a credential is later required, set `ZEBRA_LAB_API_KEY` in the local process environment; **never commit credentials**.
 
+## Publish a shareable website (optional)
+
+The GitHub repository contains working HTML source, but **the repository URL is not the live website**. For a browser-accessible demo, the repository owner can enable [GitHub Pages](https://github.com/Tmkbs/zebra-evidence-framework/settings/pages): choose **Deploy from a branch**, select **main** and **/(root)**, then save. The intended public site URL is `https://tmkbs.github.io/zebra-evidence-framework/` once GitHub confirms successful publishing; do not assume it is online before then.
+
+GitHub Pages hosts only the **offline/static features and guided tour**. Live lab requests still require the separately configured local bridge on an authorized Northwestern connection. No API secrets belong in the webpage or repository.
+
 ## Research safeguards
 
 1. The initial case details are editorial summaries of public forum questions and official-guide reviews, **not complete frozen source-document bytes**. Verify the source, version, and quotations independently.
