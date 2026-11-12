@@ -1,0 +1,14 @@
+{
+  "id": "CASE-NEW-001",
+  "title": "Replace with a short case title",
+  "category": "Device / product / API",
+  "status": "notreviewed",
+  "date": "2026-11-11",
+  "question": "Describe the exact reported developer problem without adding unstated facts.",
+  "sourceUrl": "",
+  "docUrl": "",
+  "evidence": "What a versioned official source explicitly supports, with scope.",
+  "gap": "Missing device / software versions, attachments, reproduction steps, or other unknowns.",
+  "next": "One specific human review or reproducible verification step.",
+  "provenance": "Where the original text, source snapshot, or review record came from."
+}
