@@ -201,7 +201,8 @@ let guideChoice="b",guideFeedback="not_recorded";
 let answers={a:"",b:""},failureMode="unassessed",diagnosisNote="",revision={},riskAcknowledged=false,previewCopy=null,previewStatus="not_run",holdout={},holdoutNote="";
 let docSource=null,sourceBlocks=[],sourceBlockIndex=0;
 function resetSource(){
- const d=DOCS[idx];docSource={name:"fictional-document-"+(idx+1)+".txt",extension:".txt",kind:"synthetic",text:d.before};
+ const d=DOCS[idx],c=EXAMPLES[idx];
+ docSource={name:c.synthetic?"fictional-document-"+(idx+1)+".txt":"public-case-review-note-"+c.id.toLowerCase()+".md",extension:c.synthetic?".txt":".md",kind:c.synthetic?"synthetic":"public_review_note",text:d.before};
  sourceBlocks=[d.before];sourceBlockIndex=0;
 }
 function paragraphs(text){
@@ -218,13 +219,13 @@ function sourceHits(part){
 function freshRevision(){
  const d=DOCS[idx],imported=docSource?.kind==="local_import";
  return{
-  schema:"documentation-revision/v1",revision_id:"SYN-REV-"+(idx+1),case_id:EXAMPLES[idx].id,
+  schema:"documentation-revision/v1",revision_id:(EXAMPLES[idx].synthetic?"SYN-REV-":"REVIEW-REV-")+(idx+1),case_id:EXAMPLES[idx].id,
   document_id:imported?"LOCAL-DOC-"+(idx+1):d.id,
   source_label:imported?docSource.name:d.label,source_version:imported?"unverified local text":d.version,
   section:imported?"Selected paragraph "+(sourceBlockIndex+1):d.section,
   before:imported?sourceBlocks[sourceBlockIndex]:d.before,
   after:imported?sourceBlocks[sourceBlockIndex]:d.after,
-  rationale:imported?"":d.rationale,origin:imported?"local_text_document":"synthetic_local_draft",status:"proposed"
+  rationale:imported?"":d.rationale,origin:imported?"local_text_document":(EXAMPLES[idx].synthetic?"synthetic_local_draft":"public_research_note_proposal"),status:"proposed"
  }
 }
 function resetRetest(){previewCopy=null;previewStatus="not_run";holdout={H01:"not_run",H02:"not_run"};holdoutNote=""}
@@ -232,7 +233,8 @@ function revokeApproval(){if(revision.status==="approved_for_retest")revision.st
 function gateReasons(){const reasons=[];
  if(failureMode!=="clarity")reasons.push("select a suspected documentation clarity gap");
  if(!chosen.size)reasons.push("select supporting evidence");
- if(decision==="not_decided")reasons.push("record the human answer review decision");
+ if(decision==="not_decided")reasons.push("record the human review decision");
+ if(!EXAMPLES[idx].synthetic&&["prefer_a","prefer_b"].includes(decision)&&!answers[decision==="prefer_a"?"a":"b"].trim())reasons.push("cannot prefer an unrun model response; select documentation-only review");
  if(revision.status==="rejected")reasons.push("restore or edit the rejected draft");
  if(!revision.after?.trim()||revision.after.trim()===revision.before.trim())reasons.push("propose a substantive, nonempty change");
  if(revision.after?.length>20000||revision.before?.length>20000)reasons.push("keep replacement text below 20,000 characters");
@@ -240,7 +242,7 @@ function gateReasons(){const reasons=[];
  if(!riskAcknowledged)reasons.push("acknowledge copy-only testing");
  return reasons}
 function renderSource(){
- const d=DOCS[idx];by("doc-source-info").textContent=(docSource.kind==="synthetic"?"Built-in fictional source: ":"Local offline file: ")+docSource.name+" · "+docSource.text.length+" characters · "+sourceBlocks.length+" candidate paragraphs.";
+ const d=DOCS[idx];by("doc-source-info").textContent=(docSource.kind==="synthetic"?"Built-in fictional source: ":docSource.kind==="public_review_note"?"Public-case editorial review-note draft (NOT official product documentation): ":"Local offline file: ")+docSource.name+" · "+docSource.text.length+" characters · "+sourceBlocks.length+" candidate paragraphs.";
  const select=by("doc-blocks");select.replaceChildren();
  sourceBlocks.forEach((t,i)=>{const o=node("option",(i+1)+". "+t.replace(/\s+/g," ").slice(0,110));o.value=String(i);select.append(o)});
  select.value=String(sourceBlockIndex);
@@ -272,17 +274,38 @@ async function importDocument(file){
 }
 function restoreSource(){
  resetSource();revision=freshRevision();riskAcknowledged=false;resetRetest();
- by("doc-import-status").textContent="Synthetic source restored. No local file retained.";
+ by("doc-import-status").textContent=EXAMPLES[idx].synthetic?"Synthetic test fixture restored.":"Public research-note draft restored. To revise official documentation, import an authorized exact local source file.";
  renderSource();renderRevision();renderRetest();renderGuide();renderDelivery()
 }
 
 function by(id){return document.getElementById(id)}
 function node(tag,txt){const x=document.createElement(tag);x.textContent=txt;return x}
 function show(page){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===page));document.querySelectorAll("[data-page]").forEach(b=>{b.classList.toggle("active",b.dataset.page===page);b.setAttribute("aria-current",b.dataset.page===page?"page":"false")});by("crumb").textContent={architecture:"Architecture",case:"Question",evidence:"Evidence",review:"Human review",diagnosis:"Failure diagnosis",revision:"Document revision",retest:"Retest",guide:"Developer preview",strategy:"Search lab",handoff:"Delivery"}[page];if(page==="strategy")renderStrategy();if(page==="diagnosis")renderDiagnosis();if(page==="revision")renderRevision();if(page==="retest")renderRetest();if(page==="guide")renderGuide();if(page==="handoff")renderDelivery();window.scrollTo(0,0)}
-function renderCase(){const c=EXAMPLES[idx];by("question").textContent=c.question;by("facts").replaceChildren(...c.facts.map(x=>node("li",x)));by("gaps").replaceChildren(...c.gaps.map(x=>node("span",x)));by("scenario").value=String(idx)}
-function renderEvidence(){const box=by("evidence-list");box.replaceChildren();EXAMPLES[idx].evidence.forEach((x,i)=>{const label=document.createElement("label");label.className="item";const ck=document.createElement("input");ck.type="checkbox";ck.checked=chosen.has(i);ck.addEventListener("change",()=>{if(ck.checked)chosen.add(i);else chosen.delete(i);revokeApproval();renderCount();renderRevision();renderRetest();renderDelivery()});const content=document.createElement("div");content.append(node("h3",x.id+" · "+x.source),node("p",x.claim),node("small","Scope: "+x.limit));label.append(ck,content);box.append(label)});renderCount()}
-function renderCount(){by("count").textContent=chosen.size+" / "+EXAMPLES[idx].evidence.length+" fictional records selected"}
-function renderReview(){const c=EXAMPLES[idx];by("answer-a").value=answers.a;by("answer-b").value=answers.b;["a","b"].forEach(slot=>{const root=by("ratings-"+slot);root.replaceChildren();CRITERIA.forEach((label,i)=>{const row=document.createElement("div");row.className="criterion";const select=document.createElement("select");select.setAttribute("aria-label",slot+" "+label);[["","Unrated"],["0","0 / 2"],["1","1 / 2"],["2","2 / 2"]].forEach(([value,text])=>{const opt=node("option",text);opt.value=value;select.append(opt)});select.value=ratings[slot][i];select.addEventListener("change",()=>{ratings[slot][i]=select.value;renderScore(slot);revokeApproval();renderRevision();renderRetest();renderDelivery()});row.append(node("span",label),select);root.append(row)});renderScore(slot)});by("decision").value=decision}
+function renderCase(){
+ const c=EXAMPLES[idx];by("question").textContent=c.question;
+ by("facts").replaceChildren(...c.facts.map(x=>node("li",x)));
+ by("gaps").replaceChildren(...c.gaps.map(x=>node("span",x)));
+ by("scenario").value=String(idx);
+ by("case-status").textContent=c.synthetic?"SYNTHETIC QA FIXTURE":"REAL PUBLIC RECORD · NOT VERIFIED FIX";
+ by("model-status").textContent=c.synthetic?"Illustrative answers only":(c.source_status+" · Model: "+c.model_status);
+ const links=by("case-links");links.replaceChildren();
+ if(!c.synthetic){
+  for(const [name,url] of [["Public original question",c.case_url],["Public team report",c.report_url]]){
+   if(!/^https:\/\/(developer\.zebra\.com|github\.com)\//.test(url))continue;
+   const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=name+" ↗";a.style.fontSize="12px";a.style.color="#087e76";links.append(a);
+  }
+ }
+}
+function renderEvidence(){const box=by("evidence-list");box.replaceChildren();EXAMPLES[idx].evidence.forEach((x,i)=>{const label=document.createElement("label");label.className="item";const ck=document.createElement("input");ck.type="checkbox";ck.checked=chosen.has(i);ck.addEventListener("change",()=>{if(ck.checked)chosen.add(i);else chosen.delete(i);revokeApproval();renderCount();renderRevision();renderRetest();renderDelivery()});const content=document.createElement("div");content.append(node("h3",x.id+" · "+x.source),node("p",x.claim),node("small","Scope: "+x.limit));
+ if(x.url&&/^https:\/\/(developer\.zebra\.com|github\.com|techdocs\.zebra\.com)\//.test(x.url)){const a=document.createElement("a");a.href=x.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent="Open public source ↗";a.style.display="block";a.style.marginTop="8px";a.style.fontSize="12px";content.append(a)}
+ label.append(ck,content);box.append(label)});renderCount()}
+function renderCount(){by("count").textContent=chosen.size+" / "+EXAMPLES[idx].evidence.length+(EXAMPLES[idx].synthetic?" synthetic example records":" publicly traceable research records")+" selected"}
+function renderReview(){const c=EXAMPLES[idx];
+ by("answer-a-status").textContent=c.synthetic?"A · SYNTHETIC EXAMPLE":"A · NOT RUN / NO SAVED MODEL OUTPUT";
+ by("answer-b-status").textContent=c.synthetic?"B · SYNTHETIC EXAMPLE":"B · NOT RUN / NO SAVED MODEL OUTPUT";
+ by("answer-a").placeholder=c.synthetic?"Illustrative sample answer":"No model output recorded. Paste only an authorized sanitized run output.";
+ by("answer-b").placeholder=c.synthetic?"Illustrative sample answer":"No model output recorded. Paste only an authorized sanitized run output.";
+ by("answer-a").value=answers.a;by("answer-b").value=answers.b;["a","b"].forEach(slot=>{const root=by("ratings-"+slot);root.replaceChildren();CRITERIA.forEach((label,i)=>{const row=document.createElement("div");row.className="criterion";const select=document.createElement("select");select.setAttribute("aria-label",slot+" "+label);[["","Unrated"],["0","0 / 2"],["1","1 / 2"],["2","2 / 2"]].forEach(([value,text])=>{const opt=node("option",text);opt.value=value;select.append(opt)});select.value=ratings[slot][i];select.addEventListener("change",()=>{ratings[slot][i]=select.value;renderScore(slot);revokeApproval();renderRevision();renderRetest();renderDelivery()});row.append(node("span",label),select);root.append(row)});renderScore(slot)});by("decision").value=decision}
 
 function renderDiagnosis(){
  by("failure-class").value=failureMode;by("diagnosis-note").value=diagnosisNote;
@@ -391,17 +414,21 @@ function payload(){
 function renderJson(){by("json").textContent=JSON.stringify(payload(),null,2)}
 
 
-function storyboard(){return idx===0?
- ["Show the fictional dashboard during reconnect","Contrast transport status with the displayed reading","Illustrate the refresh check and the next question"]:
- ["Show accented characters in an invented CSV","Compare export and import encoding options","Show a reversible before/after comparison"]}
+function storyboard(){
+ if(idx===0)return ["Show the real web-integration question and its seven requirements","Highlight the version-limited native Soft Scan Trigger documentation","Ask for the missing browser bridge and installed versions"];
+ if(idx===1)return ["Display the public TC26 symptom report","Separate BarcodeManager initialization from demonstrated root cause","List the runtime logs and lifecycle details required"];
+ if(idx===2)return ["Compare reported manual and programmatic MultiBarcode configuration","Highlight unverified SET_CONFIG parameter applicability","Show required version, result-code and profile checks"];
+ if(idx===3)return ["Show the fictional dashboard during reconnect","Contrast transport status with displayed data","Illustrate the refresh check"];
+ return ["Show accented characters in invented CSV","Compare export and import encoding","Show a reversible before/after check"];
+}
 function renderGuide(){
  const c=EXAMPLES[idx],d=DOCS[idx];
  by("guide-question").textContent=c.question;by("guide-choice").value=guideChoice;
- by("guide-answer").textContent=answers[guideChoice];
- by("guide-label").textContent="UNVERIFIED · CANDIDATE "+guideChoice.toUpperCase();
+ by("guide-answer").textContent=answers[guideChoice]||(c.synthetic?"No sample answer entered.":"NO MODEL RUN RECORDED — show source evidence and missing context, not an invented answer.");
+ by("guide-label").textContent=c.synthetic?"SYNTHETIC · CANDIDATE "+guideChoice.toUpperCase():"NOT RUN / UNVERIFIED · CANDIDATE "+guideChoice.toUpperCase();
  by("guide-doc-title").textContent=docSource.name+" · "+revision.section;
  by("guide-doc-copy").textContent=previewCopy===null?revision.before:revision.after;
- by("guide-doc-status").textContent=previewCopy===null?"Current synthetic source; proposed revision NOT applied.":"Local edited copy only; still NOT published or independently validated.";
+ by("guide-doc-status").textContent=previewCopy===null?(c.synthetic?"Synthetic document, not modified.":"Public case-review note only, not the official product manual. No patch applied."):"Local edited copy only; no official documentation, device fix or approval implied.";
  const refs=by("guide-evidence");refs.replaceChildren();
  const data=c.evidence.filter((_,i)=>chosen.has(i));if(!data.length)refs.append(node("p","No supporting evidence selected."));
  for(const x of data)refs.append(node("p",x.id+" · "+x.source+": "+x.claim+" (limit: "+x.limit+")"));
