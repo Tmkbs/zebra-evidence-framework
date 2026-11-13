@@ -1,73 +1,66 @@
-# Evidence Framework × Documentation Revision: integration contract
+# Evidence Framework ↔ documentation module: integration boundary
 
-## Scope and current truth
+## Current working integration
 
-The student framework and the documentation-analysis workstream are **separate components**. This classroom build demonstrates a real, offline data flow between them: selected evidence and human diagnosis lead to a proposed wording change; a reviewer authorizes a copy-only patch; a held-out test record and an end-to-end delivery packet can be exported.
+The student framework exports a reviewable finding and accepts a minimal document-revision contract. In the standalone classroom app, a local TXT/Markdown source is actually read, a particular paragraph is selected, and an approved change is applied to a **full in-memory copy** of the file. The updated full text and complete evaluation record can be downloaded. This implementation is working at the file/contract level, not at the private repository or production publishing level.
 
-**This repository does not contain, execute or claim to have imported the teammate's independent editing source code.** The existing project analysis has documented bounded case findings and proposed revisions, but those are not equivalent to a callable service. The bridge here is a **working local JSON import contract plus an in-browser copy-preview**, not a customer documentation deployment.
+The public repository containing the teammate's archive and proposal does **not** provide the callable source of the separate \`zebra-techdocs-practicum\` implementation. The connected GitHub account cannot read that private repo. Therefore this release **does not claim to have imported, executed, or deployed the teammate's existing source code**.
 
-The classroom HTML and example revision use **invented data only**. Do not add real client reports, access-controlled sources, meeting notes, internal URLs, model keys, secrets, proprietary manuals or confidential test outputs to this public repository. Public visibility of some material does not by itself establish redistribution permission.
+## Input 1: original document
 
-## Local adapter contract
+Supported file types: UTF-8 \`.txt\`, \`.text\`, \`.md\` (maximum 200,000 bytes). A source snapshot is retained in browser memory and is never overwritten. The reviewer chooses a paragraph, creating a frozen \`before\` target.
 
-Import a JSON file at **Document revision → Future module adapter**.
+The replacement is only permitted when the exact \`before\` string appears **once** in the source. Missing or repeated targets block application. Replacing approved text or changing review decisions invalidates prior local approval.
 
-Required fields:
+## Input 2: document-revision/v1
 
-```json
+The independent documentation implementation can export the following JSON:
+
+\`\`\`json
 {
   "schema": "documentation-revision/v1",
+  "revision_id": "DEMO-01",
   "case_id": "SYN-01",
-  "before": "The exact baseline paragraph from the synthetic demo",
-  "after": "A proposed replacement paragraph",
-  "rationale": "Why this bounded change may help"
+  "before": "Exact selected paragraph in the frozen local source.",
+  "after": "Proposed replacement paragraph.",
+  "rationale": "Evidence-bounded reason for this edit."
 }
-```
+\`\`\`
 
-Optional: `revision_id`. Other keys are ignored. The browser rejects invalid schema/case, oversized content and empty paragraphs; it checks the `before` text against the current synthetic baseline before local-test approval. Imported drafts always start **PROPOSED**, never approved. No remote request occurs.
+Optional exported metadata includes \`document_id\`, \`source_filename\`, \`source_version\`, \`section\`, \`source_kind\`, \`status\`, and \`approved_for_publication\` (always false).
 
-Review gate: possible documentation clarity issue + at least one selected evidence record + explicit answer-review decision + a nonempty change that matches the frozen original + a human consent check.
+On import the app validates the schema, current case ID, field types and length, then places the draft into **PROPOSED**, not approved. The source exact-match check and separate human gate must still pass. No arbitrary scripts, HTML or remote sources are executed.
 
-The **Approve for local retest** button authorizes only a change to an in-memory disposable text copy. Any material revision or upstream review change invalidates the old approval. There is no customer publishing action.
+## Human gate
 
-## End-to-end record
+Local patch authorization requires all of:
 
-`research-documentation-handoff/v0.2` carries:
+- selected evidence, with applicability limitations preserved;
+- human review decision for the candidate answer;
+- classification as **possible documentation clarity gap** (only a review hypothesis);
+- a nonempty change that matches the source paragraph exactly once;
+- an explicit acknowledgment that testing applies only to a browser copy.
 
-- **Case**: stable synthetic ID, question, known and missing facts.
-- **Evidence**: selected record IDs and their applicability limitations.
-- **Candidate answers**: current visible text and manual criterion scores.
-- **Diagnosis**: root-cause hypothesis, not a confirmed root cause.
-- **Proposed revision**: source version/section, before/after, rationale, selected evidence IDs, review state.
-- **Copy verification**: whether the in-browser copy was actually updated; original remains unchanged.
-- **Held-out evaluation**: frozen questions, explicitly NOT RUN until a reviewer enters observed results.
-- **Developer guide concept**: synthetic answer, supporting reference labels, explanatory storyboard; no live AI or video claims.
-- **Release**: permanent NOT AUTHORIZED for classroom data; customer acceptance and device validation NOT RUN.
+The local operation produces a new file with a \`-candidate\` suffix. It cannot modify the original on disk or publish documentation. Held-out test outcomes stay **NOT RUN** until an actual independent test is recorded.
 
-## What is still required for real teammate-code integration
+## Output: research-documentation-handoff/v0.3
 
-1. Obtain the actual, authorized revision module repository or code artifact and its input/output format. Do not infer APIs from an old proposal document.
-2. Map its versioned source identifiers and editing granularity to the revision schema. Define preconditions, exact-match checks, idempotency, provenance and error outcomes.
-3. Replace mock documents with **approved** development fixtures held outside public student repos. Keep original-source bytes and reference answers separate from model input.
-4. Run integration tests against the real module and save execution evidence. A passing copy-preview test here does not substitute for that.
-5. Record a real controlled model attempt, manual source verification and a held-out original-vs-revised comparison. Preserve failures and regressions. Do not claim accuracy uplift from the current synthetic scores.
-6. Require documentation-owner review, version checking, publication authorization and feedback before changing any customer documentation.
-7. If a conversational guide or video feature is delivered, separately test its grounding, accessibility, performance and suitability for the relevant product/version.
+The exported record contains the current case and known/unknown facts, selected evidence, manual candidate-answer ratings, failure-diagnosis hypothesis, source document snapshot (including locally imported bytes decoded as text), proposed revision and status, copy-patch result, held-out outcomes, optional toy search results, developer-guide storyboard and an explicit **NOT AUTHORIZED** release status.
 
-## Classroom walkthrough (about 3–5 minutes)
+Because both the original imported source and revised text can be included in exports, these files must be treated according to their input data permissions. The classroom source fixture and cases are invented; locally imported user files may not be.
 
-1. **Architecture** — explain the framework/document-editor boundary.
-2. **Question** — select a fictional technical issue and list missing context.
-3. **Evidence** — select source records, point out their limits.
-4. **Review** — inspect or manually replace sample answers, record a reviewer decision.
-5. **Diagnosis** — select *possible documentation clarity gap* (a hypothesis).
-6. **Document revision** — edit the minimal proposed paragraph, acknowledge the gate, approve for a local test.
-7. **Retest** — apply to a disposable copy; show the NOT RUN held-out questions.
-8. **Developer preview** — show the candidate conversational answer, evidence and storyboard.
-9. **Delivery** — download JSON/Markdown with explicit provenance and unresolved statuses.
+## Steps to connect the actual teammate implementation later
 
-The **Optional search lab** explores a small fictional constrained-optimization problem and is not required for the project workflow. It makes no evolutionary-algorithm claims.
+1. Obtain authorized access to the actual implementation and agree on its input/output semantics; do not infer an API from a prior proposal.
+2. Preserve source version and exact section identifiers; agree on UTF-8 normalization, baseline checks, handling of duplicate paragraphs and error statuses.
+3. Connect the teammate's revision producer to \`documentation-revision/v1\`. The present app already imports this shape and exports its own proposed drafts.
+4. Run a real baseline-versus-revised evaluation on held-out cases using only sources approved for that purpose. Keep evidence and expert references separate from generation inputs.
+5. Review changes with the documentation owner before publishing. Report regressions and unresolved results; do not convert local text-patch success into model performance, device validation or customer acceptance.
 
-## Verification
+## Safety and validation
 
-The HTML was exercised with synthetic DOM interaction tests for approval, refusal, copy application, revision invalidation, mismatched import, guide dataflow and export generation. This is **not a full Chromium or mobile-browser test**. Real module integration, campus model calls, held-out result verification and live publication have not been performed.
+- No external scripts, source URLs, model endpoint or credentials exist in the standalone classroom HTML.
+- Public content availability alone does not establish permission to republish it or to include it in a model request.
+- Revision approval is **local-test authorization** only. It is intentionally impossible to mark any customer document as published from this demo.
+- To reproduce automated mocked-DOM regression checks: \`node classroom/test_end_to_end.cjs\`.
+- Complete browser QA, private source integration, endpoint validation and real device testing remain outside the verified scope.
