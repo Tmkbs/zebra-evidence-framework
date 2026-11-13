@@ -1,8 +1,10 @@
 {
   "schema": "documentation-revision/v1",
-  "revision_id": "SYN-REV-IMPORT-01",
-  "case_id": "SYN-01",
-  "before": "The reconnect callback indicates that transport is available. Applications can call refresh() to request a new snapshot.",
-  "after": "The reconnect callback reports transport restoration, not current display content. Applications should request refresh() and confirm completion before displaying the snapshot as current.",
-  "rationale": "Clarify the scope of the reconnect event without asserting an observed device fix."
+  "revision_id": "REVIEW-REV-WEB-01",
+  "case_id": "ZF-WEB-INTEGRATION",
+  "before": "The public review records partial evidence for software scan controls from a DataWedge 15.0 guide; the Chrome-to-native integration path and installed DataWedge version are unresolved.",
+  "after": "DataWedge 15.0 documents conditional native software scan controls, not a verified Chrome integration route. Confirm installed versions, active profile and browser-to-native mechanism separately. The six remaining requirements have not been assessed in the cited report.",
+  "rationale": "Narrow the claim in the research case note, without implying an official documentation update or device fix.",
+  "source_kind": "public_review_note",
+  "approved_for_publication": false
 }

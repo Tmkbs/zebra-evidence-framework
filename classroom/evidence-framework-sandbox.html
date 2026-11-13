@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer">
-<title>Evidence Framework — Synthetic Classroom Demo</title>
+<title>Evidence Framework — Public-Case Research Demo</title>
 <style>
 :root{font-family:Inter,"Segoe UI",Arial,sans-serif;color:#193044;background:#f5f7f9}
 *{box-sizing:border-box}body{margin:0}button,select{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #73c7b7;outline-offset:3px}
@@ -22,21 +22,21 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 </head>
 <body>
 <div class="app"><aside class="side">
- <div class="brand"><div class="mark">F</div><h2>Evidence Framework</h2><span>SYNTHETIC CLASSROOM SANDBOX</span></div>
+ <div class="brand"><div class="mark">F</div><h2>Evidence Framework</h2><span>PUBLIC CASE RESEARCH / OFFLINE REVIEW</span></div>
  <nav class="nav"><button class="active" data-page="architecture"><b>00</b><span class="name">Architecture</span></button><button data-page="case"><b>01</b><span class="name">Question</span></button><button data-page="evidence"><b>02</b><span class="name">Evidence</span></button><button data-page="review"><b>03</b><span class="name">Review</span></button><button data-page="diagnosis"><b>04</b><span class="name">Failure diagnosis</span></button><button data-page="revision"><b>05</b><span class="name">Document revision</span></button><button data-page="retest"><b>06</b><span class="name">Retest</span></button><button data-page="guide"><b>07</b><span class="name">Developer preview</span></button><button data-page="handoff"><b>08</b><span class="name">Delivery packet</span></button><button data-page="strategy"><b>+</b><span class="name">Optional search lab</span></button></nav>
  <div class="sidefoot">Framework evaluation and documentation revision remain separate workstreams. This sandbox connects them using a local draft contract, not private source code.</div>
- </aside><main><div class="bar"><span>Research prototype / <strong id="crumb">Architecture</strong></span><span class="flag">OFFLINE · FICTIONAL ONLY</span></div>
+ </aside><main><div class="bar"><span>Research prototype / <strong id="crumb">Architecture</strong></span><span class="flag">OFFLINE · PUBLIC SOURCE SUMMARIES</span></div>
  <div class="content">
  <section class="page active" id="architecture">
-  <div class="hero"><div class="eyebrow">REUSABLE FRAMEWORK · NOT A DOCUMENT EDITOR</div><h1>Evaluate answers before documents change.</h1><p>Walk from a developer question through evidence, answer review, diagnosis, a revision proposal, copy-only retest, a user-facing guide preview, and an auditable delivery package.</p><button class="btn" data-next="case">Start a fictional example →</button></div>
-  <div class="eyebrow" style="margin-top:32px">ARCHITECTURE</div><h2>One connected research workflow, distinct responsibilities</h2>
+  <div class="hero"><div class="eyebrow">REUSABLE FRAMEWORK · NOT A DOCUMENT EDITOR</div><h1>Evaluate answers before documents change.</h1><p>Walk from a developer question through evidence, answer review, diagnosis, a revision proposal, copy-only retest, a user-facing guide preview, and an auditable delivery package.</p><button class="btn" data-next="case">Explore a real public case →</button></div>
+  <div class="card" style="margin-top:16px"><div class="eyebrow">REAL PROJECT INPUT · PUBLIC STATUS NOVEMBER 5</div><h3>2,854 unique archived questions · 8 development case packets · 12 official source URLs</h3><p>These are source-processing figures from the team's public technical status, not answer accuracy or verified solutions. <a href="https://github.com/1235357/zebra-public-site-archive/blob/main/TECHNICAL_STATUS.md" target="_blank" rel="noopener noreferrer">Read status</a> · <a href="https://zebra-techdocs-practicum.vercel.app/" target="_blank" rel="noopener noreferrer">Team website</a></p></div><div class="eyebrow" style="margin-top:32px">ARCHITECTURE</div><h2>One connected research workflow, distinct responsibilities</h2>
   <div class="grid4"><div class="step"><b>01 · INPUT</b><h3>Define a case</h3><p>Normalize the question and list known information.</p></div><div class="step"><b>02 · EVIDENCE</b><h3>Record support & gaps</h3><p>Keep provenance and applicability visible.</p></div><div class="step"><b>03 · REVIEW</b><h3>Human evaluation</h3><p>Check claims rather than invent model scores.</p></div><div class="step future"><b>04 · REVISION / HANDOFF</b><h3>Minimal doc change</h3><p>Try a controlled revision on an offline copy. Real editor integration remains separate.</p></div></div>
   <div class="grid"><div class="card"><h3>Framework layer · in scope</h3><p>Case structure, evidence packet, explicit unknowns, manual comparison, and portable handoff format.</p></div><div class="card"><h3>Document-editing layer · separate</h3><p>Rewriting source documents, document versions, publication workflow and any product-specific behavior belong to a separate implementation.</p></div></div>
-  <div class="card" style="margin-top:14px"><h3>Optional computational exploration</h3><p>Review time is limited. Which missing details should the framework verify first? A search lab compares a simple greedy choice against exact subset search using transparent toy data. This is a genuine optimization problem, not a claim of evolutionary or neural-network implementation. <button class="btn" data-next="strategy" style="margin-top:8px">Open search lab →</button></p></div><div class="warning">Classroom boundary: all facts and references in this site are invented. It contains no actual customer report, source URL, identifier, prompt, endpoint, or live model connection.</div>
+  <div class="card" style="margin-top:14px"><h3>Optional computational exploration</h3><p>Review time is limited. Which missing details should the framework verify first? A separate QA lab compares Greedy and exact subset search on toy data only. It is disabled for real cases until review costs and outcomes are measured; no evolutionary or model-performance claim is made. <button class="btn" data-next="strategy" style="margin-top:8px">Open search lab →</button></p></div><div class="warning">Classroom boundary: the first three cases are paraphrased from publicly accessible research and forum records. Links point to those public sources only. No restricted support materials, keys, internal endpoints, live model calls or verified device fixes are included.</div>
  </section>
  <section class="page" id="case">
-  <div class="eyebrow">01 · FRAME THE QUESTION</div><h1>Describe uncertainty before making claims.</h1><p class="lead">Switch between two fictional scenarios. The framework remains the same regardless of the product or document source.</p>
-  <div class="grid"><div class="card"><label for="scenario" class="eyebrow">CHOOSE SYNTHETIC CASE</label><select class="field" id="scenario"><option value="0">Fictional dashboard · reconnect</option><option value="1">Fictional exporter · Unicode</option></select><div class="question" id="question"></div><h3>Known information</h3><ul class="facts" id="facts"></ul></div><div class="card"><div class="eyebrow">MISSING CONTEXT</div><h3>Don't fill the gaps with guesses.</h3><div class="tags" id="gaps"></div><p style="margin-top:20px">The goal is to preserve uncertainty for reviewers, not quietly replace it with a persuasive answer.</p></div></div>
+  <div class="eyebrow">01 · FRAME THE QUESTION</div><h1>Describe uncertainty before making claims.</h1><p class="lead">Start with real, public-source developer questions and versioned research findings. The final two cases are synthetic test fixtures. Restricted support data is not included.</p>
+  <div class="grid"><div class="card"><label for="scenario" class="eyebrow">SELECT A CASE · REAL PUBLIC SOURCES FIRST</label><select class="field" id="scenario"><option value="0">Real public report · Android web integration</option><option value="1">Real public forum · TC26 Xamarin scanner</option><option value="2">Real public forum · TC52 MultiBarcode</option><option value="3">Synthetic QA only · reconnect</option><option value="4">Synthetic QA only · CSV</option></select><div class="question" id="question"></div><div class="row" style="margin:10px 0"><span class="pill" id="case-status"></span><span class="step-note" id="model-status"></span></div><div class="row" id="case-links"></div><h3>Known information</h3><ul class="facts" id="facts"></ul></div><div class="card"><div class="eyebrow">MISSING CONTEXT</div><h3>Don't fill the gaps with guesses.</h3><div class="tags" id="gaps"></div><p style="margin-top:20px">The goal is to preserve uncertainty for reviewers, not quietly replace it with a persuasive answer.</p></div></div>
   <div class="next"><span>1 / 8 · Normalize case</span><button class="btn primary" data-next="evidence">Build evidence packet →</button></div>
  </section>
  <section class="page" id="evidence">
@@ -45,9 +45,9 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
   <div class="next"><span>2 / 8 · Evidence packet</span><button class="btn primary" data-next="review">Compare fixed examples →</button></div>
  </section>
  <section class="page" id="review">
-  <div class="eyebrow">03 · HUMAN EVALUATION</div><h1>Don't confuse fluency with evidence.</h1><p class="lead">These responses start as fictional examples. They can be replaced with manually recorded, sanitized test outputs. Ratings remain independent human judgments; no model is called here.</p>
-  <div class="grid"><div class="card"><span class="pill">CANDIDATE A · FICTIONAL</span><label class="eyebrow" for="answer-a">SAMPLE / MANUALLY RECORDED ANSWER</label><textarea class="field" id="answer-a" rows="5"></textarea><div id="ratings-a"></div><div class="score" id="score-a"></div></div><div class="card"><span class="pill">CANDIDATE B · FICTIONAL</span><label class="eyebrow" for="answer-b">SAMPLE / MANUALLY RECORDED ANSWER</label><textarea class="field" id="answer-b" rows="5"></textarea><div id="ratings-b"></div><div class="score" id="score-b"></div></div></div>
-  <div class="card" style="margin-top:14px"><label class="eyebrow" for="decision">HUMAN REVIEW DECISION</label><select class="field" id="decision"><option value="not_decided">Not decided</option><option value="prefer_a">A · further review</option><option value="prefer_b">B · further review</option><option value="neither">Neither ready</option></select><p>Choosing a preferred answer does not authorize a document change.</p></div>
+  <div class="eyebrow">03 · HUMAN EVALUATION</div><h1>Don't confuse fluency with evidence.</h1><p class="lead">Public cases have NO verified model outputs in this build. Review their documentation evidence without claiming AI performance; you may enter an authorized result manually. The final two synthetic QA cases retain illustrative answers. No model is called here.</p>
+  <div class="grid"><div class="card"><span class="pill" id="answer-a-status">CANDIDATE A</span><label class="eyebrow" for="answer-a">SAMPLE / MANUALLY RECORDED ANSWER</label><textarea class="field" id="answer-a" rows="5"></textarea><div id="ratings-a"></div><div class="score" id="score-a"></div></div><div class="card"><span class="pill" id="answer-b-status">CANDIDATE B</span><label class="eyebrow" for="answer-b">SAMPLE / MANUALLY RECORDED ANSWER</label><textarea class="field" id="answer-b" rows="5"></textarea><div id="ratings-b"></div><div class="score" id="score-b"></div></div></div>
+  <div class="card" style="margin-top:14px"><label class="eyebrow" for="decision">HUMAN REVIEW DECISION</label><select class="field" id="decision"><option value="not_decided">Not decided</option><option value="prefer_a">A · further review</option><option value="prefer_b">B · further review</option><option value="neither">Neither ready</option><option value="document_review_only">Documentation-only review · no model run</option></select><p>Choosing a preferred answer does not authorize a document change.</p></div>
   <div class="next"><span>3 / 8 · Human candidate review</span><button class="btn primary" data-next="diagnosis">Diagnose the failure →</button></div>
  </section>
 
@@ -64,23 +64,23 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 </section>
 <section class="page" id="revision">
 <div class="eyebrow">05 · DOCUMENTATION WORKSTREAM</div><h1>Review a precise before / after change.</h1>
-<p class="lead">This integrates the documentation-revision process, not a teammate's unretrieved source code. Draft edits start from a synthetic example. You can also load an approved local TXT/Markdown file, choose a paragraph and apply a verified replacement to a disposable copy. The original file remains unchanged.</p>
+<p class="lead">This integrates the documentation review process, not the inaccessible private editor source code. The built-in real cases use clearly labeled public editorial review notes, NOT official manufacturer document text. To patch an authorized actual document, load its local TXT/Markdown file and edit a disposable copy.</p>
 <div class="row" style="margin-bottom:17px"><span class="pill" id="revision-status">PROPOSED</span><span id="revision-target" class="step-note"></span></div>
 <div class="card" style="margin-bottom:14px">
  <div class="eyebrow">SOURCE DOCUMENT · LOCAL-ONLY</div>
  <div class="row">
   <label for="doc-import" class="step-note">Load approved TXT/Markdown file</label>
   <input id="doc-import" class="field" style="max-width:340px" type="file" accept=".txt,.text,.md,text/plain,text/markdown">
-  <button id="doc-restore" class="btn" type="button">Restore synthetic fixture</button>
+  <button id="doc-restore" class="btn" type="button">Restore built-in case note</button>
  </div>
- <p id="doc-source-info" class="muted">Synthetic document loaded.</p>
+ <p id="doc-source-info" class="muted">Public review-note or synthetic QA fixture loaded.</p>
  <div class="row">
   <label for="doc-blocks" class="step-note">Paragraph to revise</label>
   <select id="doc-blocks" class="field" style="max-width:500px" aria-label="Select source paragraph"></select>
   <button id="doc-select-block" class="btn" type="button">Use selected paragraph</button>
  </div>
  <p id="doc-import-status" class="step-note" role="status">Imported files stay on this device. They are never uploaded.</p>
- <div class="warning">Import only materials cleared for this demonstration. A locally imported document does not make the fictional case facts or model answers real. Never share an export containing restricted content without authorization.</div>
+ <div class="warning">Import only materials cleared for this demonstration. A locally imported document does not establish that a model ran, a device fix works, or the source is approved for publication. Never share an export containing restricted content without authorization.</div>
 </div>
 <div class="grid">
 <div class="card"><div class="eyebrow">VERSIONED ORIGINAL · READ ONLY</div><h3 id="document-heading"></h3><div class="docview" id="document-before"></div><p>Retained as the exact baseline for a safe diff and source check.</p></div>
@@ -111,7 +111,7 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 <div class="eyebrow">07 · DEVELOPER EXPERIENCE PREVIEW</div><h1>What would a developer actually see?</h1>
 <p class="lead">A front-end concept that consumes the review record above: recorded answer, its evidence labels, follow-up questions and a versioned document paragraph. No live assistant, technical fix or rendered video is claimed.</p>
 <div class="grid">
-<div class="card"><div class="eyebrow">CONVERSATION PANEL · SYNTHETIC</div><div class="question" id="guide-question"></div>
+<div class="card"><div class="eyebrow">CONVERSATION PANEL · UNVERIFIED DRAFT</div><div class="question" id="guide-question"></div>
 <div class="row"><label for="guide-choice" class="step-note">Recorded answer</label><select class="field" id="guide-choice" style="max-width:210px"><option value="b">Candidate B</option><option value="a">Candidate A</option></select><span class="pill amber" id="guide-label">UNVERIFIED DRAFT</span></div>
 <div class="docview" id="guide-answer" style="margin-top:15px"></div><div class="eyebrow" style="margin-top:18px">SELECTED EVIDENCE / LIMITS</div><div id="guide-evidence" class="muted"></div></div>
 <div class="card"><div class="eyebrow">DOCUMENT VIEW</div><h3 id="guide-doc-title"></h3><div class="docview revised" id="guide-doc-copy"></div><p id="guide-doc-status"></p>
@@ -160,29 +160,38 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 <div class="warning">The export cannot authorize customer publication. No real data, real model run or technical acceptance is included in this classroom build.</div>
 <div class="next"><span>8 / 8 · Delivery</span><button class="btn" data-next="architecture">Back to architecture ↺</button></div>
  </section>
- <div class="foot">Synthetic classroom sandbox · Local-only interactions · No external scripts, API requests, user tracking or permanent storage · No customer content</div>
+ <div class="foot">Public-source research summaries and synthetic QA fixtures · Local-only processing · Public links open only when clicked · No restricted support data, external scripts, model requests or tracking</div>
  </div></main></div>
 <script>
 "use strict";
 const EXAMPLES=[
-{id:"SYN-01",question:"A browser dashboard shows an old reading after reconnecting. Does enabling retry guarantee a fresh value?",facts:["A fictional refresh operation exists.","The reconnect event only reports transport status.","The report does not provide a library version."],gaps:["Client version","Timestamped reproduction","Was refresh invoked?"],evidence:[
+{"id":"ZF-WEB-INTEGRATION","synthetic":false,"title":"Android web integration","record_kind":"PUBLIC_PROJECT_REPORT","case_url":"https://developer.zebra.com/content/zebra-android-web-application-development-datawedge-and-enterprise-browser-integration-1","report_url":"https://github.com/1235357/zebra-public-site-archive/blob/main/faculty-checkin-2026-11-02/demo/report.json","source_status":"Public case report, 2026-11-02; not adjudicated","model_status":"NOT_RUN","question":"For an Android web app, which of seven device-integration requirements have documentation support, including on-screen scan control?","facts":["Original developer question compares Chrome with Enterprise Browser.","The public team report records partial documentation evidence for software scan commands in DataWedge 15.0.","The reported device identifiers, installed versions and browser-to-native integration are unverified."],"gaps":["Installed DataWedge/Android versions","Chrome-to-native integration route","Six other requirements not reviewed in this report","Independent device test"],"evidence":[{"id":"WEB-FORUM","source":"Original public developer question","claim":"A developer asks about Android web app scan control and six other device-integration needs.","limit":"No independent compatibility or runtime verification.","url":"https://developer.zebra.com/content/zebra-android-web-application-development-datawedge-and-enterprise-browser-integration-1"},{"id":"WEB-DW15","source":"Official DataWedge 15.0 Soft Scan Trigger","claim":"Documents native scan commands subject to active profile configuration.","limit":"Does not prove Chrome can invoke them or that installed software supports the cited version.","url":"https://techdocs.zebra.com/datawedge/15-0/guide/api/softscantrigger/"},{"id":"WEB-REVIEW","source":"Public case-review report (November 2)","claim":"One requirement has partial document evidence; six are not assessed.","limit":"Editorial review, not a model run, device test or client acceptance.","url":"https://github.com/1235357/zebra-public-site-archive/blob/main/faculty-checkin-2026-11-02/demo/report.json"}],"a":"","b":""},
+{"id":"PUBLIC-TC26-XAMARIN","synthetic":false,"title":"TC26 Xamarin scanner configuration","record_kind":"PUBLIC_ARCHIVED_FORUM","case_url":"https://developer.zebra.com/content/zebra-tc26-scanner-does-not-scan-when-config-changed-code-xamarin","report_url":"https://github.com/1235357/zebra-public-site-archive/blob/main/README.md","source_status":"Original public forum capture; fix not independently tested","model_status":"NOT_RUN","question":"Why does the TC26 scanner reportedly stop responding after obtaining BarcodeManager during Xamarin startup?","facts":["The reporter says scanning worked before the startup configuration change.","Their report associates a nonresponsive trigger with BarcodeManager initialization.","A later forum reply points to an outside discussion without providing a verified device test record."],"gaps":["Full startup/lifecycle code","Installed EMDK and Android versions","Scanner status logs","Device reproduction"],"evidence":[{"id":"TC26-QUESTION","source":"Public TC26 Xamarin forum question","claim":"Reports a nonresponsive scanner after a configuration change.","limit":"Original report records a symptom, not a confirmed cause.","url":"https://developer.zebra.com/content/zebra-tc26-scanner-does-not-scan-when-config-changed-code-xamarin"},{"id":"TC26-REPLIES","source":"Replies in the same thread","claim":"A responder refers readers to a separate technical discussion.","limit":"Reply is not an independently tested resolution.","url":"https://developer.zebra.com/content/zebra-tc26-scanner-does-not-scan-when-config-changed-code-xamarin"},{"id":"TC26-OVERVIEW","source":"Team public project overview (November 10)","claim":"The team reports a TC26 scanner-lifecycle case analysis on its read-only website.","limit":"The public overview does not identify this archived thread as the same analyzed case.","url":"https://github.com/1235357/zebra-public-site-archive/blob/main/README.md"}],"a":"","b":""},
+{"id":"PUBLIC-TC52-MULTIBARCODE","synthetic":false,"title":"TC52 MultiBarcode via Xamarin","record_kind":"PUBLIC_ARCHIVED_FORUM","case_url":"https://developer.zebra.com/forum/25873","report_url":"https://github.com/1235357/zebra-public-site-archive/blob/main/README.md","source_status":"Original public forum capture; parameter validity not adjudicated","model_status":"NOT_RUN","question":"Why does MultiBarcode work in manual DataWedge settings but reportedly fail through the Xamarin intent API?","facts":["The TC52 reporter says MultiBarcode and Instant Reporting work after manual profile setup.","Programmatic configuration using scanning_mode and instant_reporting_enable reportedly fails.","The thread also asks about scanner-status notifications and Xamarin examples."],"gaps":["Exact DataWedge version","SET_CONFIG result and intent logs","Before/after profile snapshot","Official parameter applicability and device reproduction"],"evidence":[{"id":"MB-QUESTION","source":"Public Xamarin and DataWedge Intent API forum question","claim":"Manual configuration reportedly works; an attempted programmatic equivalent does not.","limit":"Forum report is not proof of an API or documentation defect.","url":"https://developer.zebra.com/forum/25873"},{"id":"MB-CODE","source":"Configuration fields in the public forum question","claim":"The request mentions scanning_mode and instant_reporting_enable.","limit":"Validity for a specific installed version has not been independently established.","url":"https://developer.zebra.com/forum/25873"},{"id":"MB-OVERVIEW","source":"Team public project overview (November 10)","claim":"The team reports a DataWedge MultiBarcode case analysis on its read-only site.","limit":"The overview does not establish that this forum question is the exact analyzed case.","url":"https://github.com/1235357/zebra-public-site-archive/blob/main/README.md"}],"a":"","b":""},
+
+{id:"SYN-01",synthetic:true,question:"A browser dashboard shows an old reading after reconnecting. Does enabling retry guarantee a fresh value?",facts:["A fictional refresh operation exists.","The reconnect event only reports transport status.","The report does not provide a library version."],gaps:["Client version","Timestamped reproduction","Was refresh invoked?"],evidence:[
 {id:"S1",source:"Invented SDK note",claim:"Successful explicit refresh returns the current snapshot.",limit:"Only if refresh is actually called and succeeds."},
 {id:"S2",source:"Invented integration note",claim:"Reconnect signals transport restoration.",limit:"Does not guarantee that displayed data was refreshed."},
 {id:"S3",source:"Invented report",claim:"One user saw a stale reading after reconnecting.",limit:"No device logs or reproduction are available."}],
 a:"Enable retry: reconnect always updates the dashboard and solves this issue on all versions.",b:"Reconnect alone does not establish fresh displayed data. Check whether refresh ran and collect the client version and timestamps before recommending a fix."},
-{id:"SYN-02",question:"A CSV export drops some accented characters. Is stripping accents a safe automatic fix?",facts:["The fictional exporter offers UTF-8.","The importing application is unknown.","No approved transformation policy is supplied."],gaps:["Actual file encoding","Destination application","Data-loss policy"],evidence:[
+{id:"SYN-02",synthetic:true,question:"A CSV export drops some accented characters. Is stripping accents a safe automatic fix?",facts:["The fictional exporter offers UTF-8.","The importing application is unknown.","No approved transformation policy is supplied."],gaps:["Actual file encoding","Destination application","Data-loss policy"],evidence:[
 {id:"S1",source:"Invented export manual",claim:"UTF-8 is a supported export encoding.",limit:"Does not prove UTF-8 was selected."},
 {id:"S2",source:"Invented data-handling note",claim:"Stripping accents may alter names and identifiers.",limit:"Requires an explicit compatibility rationale."},
 {id:"S3",source:"Invented sample report",claim:"A spreadsheet appeared to lose accents.",limit:"Original bytes and import settings are missing."}],
 a:"Strip accents from every field. This always fixes CSV issues and preserves meaning.",b:"First check export encoding and importer settings on a controlled sample. Avoid irreversible normalization without an approved requirement."}
 ];
 const STRATEGY_CHECKS=[
+[],[],[],
 [{name:"Check client version",minutes:2,points:3},{name:"Reconcile reconnect and refresh timestamps",minutes:5,points:10},{name:"Inspect whether explicit refresh ran",minutes:4,points:8},{name:"Reproduce the offline transition",minutes:6,points:13},{name:"Inspect cache invalidation",minutes:3,points:2}],
 [{name:"Inspect raw CSV byte encoding",minutes:4,points:9},{name:"Confirm selected export encoding",minutes:2,points:3},{name:"Compare two importer configurations",minutes:6,points:11},{name:"Compare source Unicode values",minutes:3,points:5},{name:"Review permitted normalization policy",minutes:5,points:4}]
 ];
 let budget=9;
 
 const DOCS=[
+{"id":"REVIEW-WEB","label":"Public Android web case review note","version":"editorial report 2026-11-02","section":"Case report clarification · not an official product manual","before":"The public review records partial evidence for software scan controls from a DataWedge 15.0 guide; the Chrome-to-native integration path and installed DataWedge version are unresolved.","after":"DataWedge 15.0 documents conditional native software scan controls, not a verified Chrome integration route. Confirm installed versions, active profile and browser-to-native mechanism separately. The six remaining requirements have not been assessed in the cited report.","rationale":"Narrow the claim in the research case note, without implying an official documentation update or device fix.","heldout":[{"id":"H01","question":"Does documented native scan control imply Chrome support?"},{"id":"H02","question":"Are all seven requirements independently reviewed?"}]},
+{"id":"REVIEW-TC26","label":"Public TC26 forum case review note","version":"archived forum 2026-10-26","section":"Observed symptom versus causal diagnosis","before":"The TC26 Xamarin author reports scanner behavior changing after BarcodeManager initialization, but the cause has not been verified.","after":"The TC26 author reports that scanner input worked before a startup configuration change, then stopped responding after obtaining BarcodeManager. The observed sequence alone does not establish the root cause; collect lifecycle code, runtime versions and scanner logs before proposing a fix.","rationale":"Improve the case summary's traceability without attributing a confirmed defect to the device or documentation.","heldout":[{"id":"H01","question":"What observation is directly supported by the original thread?"},{"id":"H02","question":"Which evidence is missing before making a fix claim?"}]},
+{"id":"REVIEW-MB","label":"Public TC52 MultiBarcode review note","version":"archived forum 2026-10-26","section":"Manual versus programmatic setup","before":"The TC52 author reports manual MultiBarcode configuration working, while the programmatic Xamarin setup does not; the cause remains unconfirmed.","after":"Separate the reported working manual DataWedge profile from the unverified programmatic SET_CONFIG attempt. Check the installed version, documented parameter values, exact intent payload and result codes before recommending a configuration or documentation change.","rationale":"Make the missing evidence explicit rather than treating the observed behavior as a confirmed documentation defect.","heldout":[{"id":"H01","question":"What did the reporter observe using manual configuration?"},{"id":"H02","question":"What must be verified for programmatic configuration?"}]},
+
  {id:"SYN-DOC-01",label:"Invented SDK / Connection lifecycle",version:"synthetic v1.3",section:"4.2 · Reconnect and refresh",before:"The reconnect callback indicates that transport is available. Applications can call refresh() to request a new snapshot.",after:"The reconnect callback indicates transport availability only; it does not guarantee that the displayed reading is fresh. After reconnecting, explicitly request refresh() and verify completion before treating a reading as current.",rationale:"Clarify the boundary between restoring the connection and updating the displayed data. This is not a confirmed fix.",heldout:[{id:"H01",question:"Does reconnect guarantee an updated displayed reading?"},{id:"H02",question:"What must be checked before treating a reading as current?"}]},
  {id:"SYN-DOC-02",label:"Invented guide / CSV export settings",version:"synthetic v2.1",section:"3.1 · Text encoding",before:"CSV export supports UTF-8 encoding. Text is saved using the configured export setting.",after:"CSV export supports UTF-8 encoding. If accented text appears changed after import, check the exported file encoding and the importing application's settings using the same sample. Avoid stripping accents unless an explicit data policy permits that transformation.",rationale:"Add a non-destructive diagnostic step instead of asserting that removing diacritics is harmless.",heldout:[{id:"H01",question:"How would you distinguish export encoding from import rendering?"},{id:"H02",question:"When is accent removal allowed?"}]}
 ];
@@ -192,7 +201,8 @@ let guideChoice="b",guideFeedback="not_recorded";
 let answers={a:"",b:""},failureMode="unassessed",diagnosisNote="",revision={},riskAcknowledged=false,previewCopy=null,previewStatus="not_run",holdout={},holdoutNote="";
 let docSource=null,sourceBlocks=[],sourceBlockIndex=0;
 function resetSource(){
- const d=DOCS[idx];docSource={name:"fictional-document-"+(idx+1)+".txt",extension:".txt",kind:"synthetic",text:d.before};
+ const d=DOCS[idx],c=EXAMPLES[idx];
+ docSource={name:c.synthetic?"fictional-document-"+(idx+1)+".txt":"public-case-review-note-"+c.id.toLowerCase()+".md",extension:c.synthetic?".txt":".md",kind:c.synthetic?"synthetic":"public_review_note",text:d.before};
  sourceBlocks=[d.before];sourceBlockIndex=0;
 }
 function paragraphs(text){
@@ -209,13 +219,13 @@ function sourceHits(part){
 function freshRevision(){
  const d=DOCS[idx],imported=docSource?.kind==="local_import";
  return{
-  schema:"documentation-revision/v1",revision_id:"SYN-REV-"+(idx+1),case_id:EXAMPLES[idx].id,
+  schema:"documentation-revision/v1",revision_id:(EXAMPLES[idx].synthetic?"SYN-REV-":"REVIEW-REV-")+(idx+1),case_id:EXAMPLES[idx].id,
   document_id:imported?"LOCAL-DOC-"+(idx+1):d.id,
   source_label:imported?docSource.name:d.label,source_version:imported?"unverified local text":d.version,
   section:imported?"Selected paragraph "+(sourceBlockIndex+1):d.section,
   before:imported?sourceBlocks[sourceBlockIndex]:d.before,
   after:imported?sourceBlocks[sourceBlockIndex]:d.after,
-  rationale:imported?"":d.rationale,origin:imported?"local_text_document":"synthetic_local_draft",status:"proposed"
+  rationale:imported?"":d.rationale,origin:imported?"local_text_document":(EXAMPLES[idx].synthetic?"synthetic_local_draft":"public_research_note_proposal"),status:"proposed"
  }
 }
 function resetRetest(){previewCopy=null;previewStatus="not_run";holdout={H01:"not_run",H02:"not_run"};holdoutNote=""}
@@ -223,7 +233,8 @@ function revokeApproval(){if(revision.status==="approved_for_retest")revision.st
 function gateReasons(){const reasons=[];
  if(failureMode!=="clarity")reasons.push("select a suspected documentation clarity gap");
  if(!chosen.size)reasons.push("select supporting evidence");
- if(decision==="not_decided")reasons.push("record the human answer review decision");
+ if(decision==="not_decided")reasons.push("record the human review decision");
+ if(!EXAMPLES[idx].synthetic&&["prefer_a","prefer_b"].includes(decision)&&!answers[decision==="prefer_a"?"a":"b"].trim())reasons.push("cannot prefer an unrun model response; select documentation-only review");
  if(revision.status==="rejected")reasons.push("restore or edit the rejected draft");
  if(!revision.after?.trim()||revision.after.trim()===revision.before.trim())reasons.push("propose a substantive, nonempty change");
  if(revision.after?.length>20000||revision.before?.length>20000)reasons.push("keep replacement text below 20,000 characters");
@@ -231,7 +242,7 @@ function gateReasons(){const reasons=[];
  if(!riskAcknowledged)reasons.push("acknowledge copy-only testing");
  return reasons}
 function renderSource(){
- const d=DOCS[idx];by("doc-source-info").textContent=(docSource.kind==="synthetic"?"Built-in fictional source: ":"Local offline file: ")+docSource.name+" · "+docSource.text.length+" characters · "+sourceBlocks.length+" candidate paragraphs.";
+ const d=DOCS[idx];by("doc-source-info").textContent=(docSource.kind==="synthetic"?"Built-in fictional source: ":docSource.kind==="public_review_note"?"Public-case editorial review-note draft (NOT official product documentation): ":"Local offline file: ")+docSource.name+" · "+docSource.text.length+" characters · "+sourceBlocks.length+" candidate paragraphs.";
  const select=by("doc-blocks");select.replaceChildren();
  sourceBlocks.forEach((t,i)=>{const o=node("option",(i+1)+". "+t.replace(/\s+/g," ").slice(0,110));o.value=String(i);select.append(o)});
  select.value=String(sourceBlockIndex);
@@ -263,17 +274,38 @@ async function importDocument(file){
 }
 function restoreSource(){
  resetSource();revision=freshRevision();riskAcknowledged=false;resetRetest();
- by("doc-import-status").textContent="Synthetic source restored. No local file retained.";
+ by("doc-import-status").textContent=EXAMPLES[idx].synthetic?"Synthetic test fixture restored.":"Public research-note draft restored. To revise official documentation, import an authorized exact local source file.";
  renderSource();renderRevision();renderRetest();renderGuide();renderDelivery()
 }
 
 function by(id){return document.getElementById(id)}
 function node(tag,txt){const x=document.createElement(tag);x.textContent=txt;return x}
 function show(page){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===page));document.querySelectorAll("[data-page]").forEach(b=>{b.classList.toggle("active",b.dataset.page===page);b.setAttribute("aria-current",b.dataset.page===page?"page":"false")});by("crumb").textContent={architecture:"Architecture",case:"Question",evidence:"Evidence",review:"Human review",diagnosis:"Failure diagnosis",revision:"Document revision",retest:"Retest",guide:"Developer preview",strategy:"Search lab",handoff:"Delivery"}[page];if(page==="strategy")renderStrategy();if(page==="diagnosis")renderDiagnosis();if(page==="revision")renderRevision();if(page==="retest")renderRetest();if(page==="guide")renderGuide();if(page==="handoff")renderDelivery();window.scrollTo(0,0)}
-function renderCase(){const c=EXAMPLES[idx];by("question").textContent=c.question;by("facts").replaceChildren(...c.facts.map(x=>node("li",x)));by("gaps").replaceChildren(...c.gaps.map(x=>node("span",x)));by("scenario").value=String(idx)}
-function renderEvidence(){const box=by("evidence-list");box.replaceChildren();EXAMPLES[idx].evidence.forEach((x,i)=>{const label=document.createElement("label");label.className="item";const ck=document.createElement("input");ck.type="checkbox";ck.checked=chosen.has(i);ck.addEventListener("change",()=>{if(ck.checked)chosen.add(i);else chosen.delete(i);revokeApproval();renderCount();renderRevision();renderRetest();renderDelivery()});const content=document.createElement("div");content.append(node("h3",x.id+" · "+x.source),node("p",x.claim),node("small","Scope: "+x.limit));label.append(ck,content);box.append(label)});renderCount()}
-function renderCount(){by("count").textContent=chosen.size+" / "+EXAMPLES[idx].evidence.length+" fictional records selected"}
-function renderReview(){const c=EXAMPLES[idx];by("answer-a").value=answers.a;by("answer-b").value=answers.b;["a","b"].forEach(slot=>{const root=by("ratings-"+slot);root.replaceChildren();CRITERIA.forEach((label,i)=>{const row=document.createElement("div");row.className="criterion";const select=document.createElement("select");select.setAttribute("aria-label",slot+" "+label);[["","Unrated"],["0","0 / 2"],["1","1 / 2"],["2","2 / 2"]].forEach(([value,text])=>{const opt=node("option",text);opt.value=value;select.append(opt)});select.value=ratings[slot][i];select.addEventListener("change",()=>{ratings[slot][i]=select.value;renderScore(slot);revokeApproval();renderRevision();renderRetest();renderDelivery()});row.append(node("span",label),select);root.append(row)});renderScore(slot)});by("decision").value=decision}
+function renderCase(){
+ const c=EXAMPLES[idx];by("question").textContent=c.question;
+ by("facts").replaceChildren(...c.facts.map(x=>node("li",x)));
+ by("gaps").replaceChildren(...c.gaps.map(x=>node("span",x)));
+ by("scenario").value=String(idx);
+ by("case-status").textContent=c.synthetic?"SYNTHETIC QA FIXTURE":"REAL PUBLIC RECORD · NOT VERIFIED FIX";
+ by("model-status").textContent=c.synthetic?"Illustrative answers only":(c.source_status+" · Model: "+c.model_status);
+ const links=by("case-links");links.replaceChildren();
+ if(!c.synthetic){
+  for(const [name,url] of [["Public original question",c.case_url],["Public team report",c.report_url]]){
+   if(!/^https:\/\/(developer\.zebra\.com|github\.com)\//.test(url))continue;
+   const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=name+" ↗";a.style.fontSize="12px";a.style.color="#087e76";links.append(a);
+  }
+ }
+}
+function renderEvidence(){const box=by("evidence-list");box.replaceChildren();EXAMPLES[idx].evidence.forEach((x,i)=>{const label=document.createElement("label");label.className="item";const ck=document.createElement("input");ck.type="checkbox";ck.checked=chosen.has(i);ck.addEventListener("change",()=>{if(ck.checked)chosen.add(i);else chosen.delete(i);revokeApproval();renderCount();renderRevision();renderRetest();renderDelivery()});const content=document.createElement("div");content.append(node("h3",x.id+" · "+x.source),node("p",x.claim),node("small","Scope: "+x.limit));
+ if(x.url&&/^https:\/\/(developer\.zebra\.com|github\.com|techdocs\.zebra\.com)\//.test(x.url)){const a=document.createElement("a");a.href=x.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent="Open public source ↗";a.style.display="block";a.style.marginTop="8px";a.style.fontSize="12px";content.append(a)}
+ label.append(ck,content);box.append(label)});renderCount()}
+function renderCount(){by("count").textContent=chosen.size+" / "+EXAMPLES[idx].evidence.length+(EXAMPLES[idx].synthetic?" synthetic example records":" publicly traceable research records")+" selected"}
+function renderReview(){const c=EXAMPLES[idx];
+ by("answer-a-status").textContent=c.synthetic?"A · SYNTHETIC EXAMPLE":"A · NOT RUN / NO SAVED MODEL OUTPUT";
+ by("answer-b-status").textContent=c.synthetic?"B · SYNTHETIC EXAMPLE":"B · NOT RUN / NO SAVED MODEL OUTPUT";
+ by("answer-a").placeholder=c.synthetic?"Illustrative sample answer":"No model output recorded. Paste only an authorized sanitized run output.";
+ by("answer-b").placeholder=c.synthetic?"Illustrative sample answer":"No model output recorded. Paste only an authorized sanitized run output.";
+ by("answer-a").value=answers.a;by("answer-b").value=answers.b;["a","b"].forEach(slot=>{const root=by("ratings-"+slot);root.replaceChildren();CRITERIA.forEach((label,i)=>{const row=document.createElement("div");row.className="criterion";const select=document.createElement("select");select.setAttribute("aria-label",slot+" "+label);[["","Unrated"],["0","0 / 2"],["1","1 / 2"],["2","2 / 2"]].forEach(([value,text])=>{const opt=node("option",text);opt.value=value;select.append(opt)});select.value=ratings[slot][i];select.addEventListener("change",()=>{ratings[slot][i]=select.value;renderScore(slot);revokeApproval();renderRevision();renderRetest();renderDelivery()});row.append(node("span",label),select);root.append(row)});renderScore(slot)});by("decision").value=decision}
 
 function renderDiagnosis(){
  by("failure-class").value=failureMode;by("diagnosis-note").value=diagnosisNote;
@@ -296,7 +328,7 @@ function renderRevision(){
 function renderRetest(){
  by("run-preview").disabled=revision.status!=="approved_for_retest";
  by("preview-status").textContent=previewStatus.replace(/_/g," ").toUpperCase();
- by("preview-detail").textContent=previewStatus==="not_run"?"Apply the approved revision only to a temporary copy of the synthetic paragraph.":"Latest local copy operation: "+previewStatus.replace(/_/g," ")+".";
+ by("preview-detail").textContent=previewStatus==="not_run"?"Apply the approved revision only to a temporary copy of the selected document paragraph.":"Latest local copy operation: "+previewStatus.replace(/_/g," ")+".";
  by("preview-text").textContent=previewCopy===null?"No copy created.":previewCopy.slice(0,14000)+(previewCopy.length>14000?"\n[Preview truncated; exported file retains full text]":"");
  by("download-revised").disabled=previewStatus!=="applied_to_copy";
  const checks=[["Different, nonempty proposed paragraph",!!revision.after?.trim()&&revision.after.trim()!==revision.before.trim()],["At least one evidence link recorded",chosen.size>0],["Human answer review decision exists",decision!=="not_decided"],["Revision approved for a local test",revision.status==="approved_for_retest"],["Paragraph appears exactly once in frozen source",sourceHits(revision.before)===1],["Disposable local copy actually created",previewStatus==="applied_to_copy"]];
@@ -340,9 +372,19 @@ function searchResults(){
 }
 function labelPlan(p){return p.points+" toy priority points / "+p.minutes+" min · "+(p.labels.length?p.labels.join(" + "):"No checks")}
 function renderStrategy(){
+ if(!EXAMPLES[idx].synthetic){
+  by("strategy-case").textContent=EXAMPLES[idx].id+" · REAL PUBLIC CASE";
+  by("strategy-context").textContent="No real verification times, priority weights, or optimization outcomes have been measured for this case. Toy search is disabled; choose a Synthetic QA fixture to test algorithm mechanics.";
+  by("budget").disabled=true;by("budget-value").textContent="NOT MEASURED";
+  by("action-list").replaceChildren();by("plan-count").textContent="N/A";
+  by("optimal-plan").textContent="NOT RUN — no measured task costs";
+  by("greedy-plan").textContent="NOT RUN — no measured baseline";
+  by("search-difference").textContent="N/A";by("frontier").replaceChildren();return;
+ }
+ by("budget").disabled=false;
  const items=STRATEGY_CHECKS[idx],res=searchResults(),total=items.reduce((n,x)=>n+x.points,0);
  by("strategy-case").textContent=EXAMPLES[idx].id+" · "+EXAMPLES[idx].question;
- by("strategy-context").textContent=chosen.size+" of "+EXAMPLES[idx].evidence.length+" fictional evidence records selected earlier. The search explores follow-up checks for remaining unknowns; it does not validate those sources.";
+ by("strategy-context").textContent="SYNTHETIC QA ONLY. "+chosen.size+" of "+EXAMPLES[idx].evidence.length+" toy records selected. Priority points and minutes are illustrative, NOT measured research results.";
  by("budget").value=String(budget);by("budget-value").textContent=budget+" illustrative minutes";
  const act=by("action-list");act.replaceChildren();
  for(const item of items){const row=document.createElement("div");row.className="action-row";row.append(node("b",item.name),node("small",item.minutes+" min · "+item.points+" pts"));act.append(row)}
@@ -363,18 +405,18 @@ function renderStrategy(){
 function payload(){
  const c=EXAMPLES[idx],human=slot=>Object.fromEntries(CRITERIA.map((name,i)=>[name,ratings[slot][i]===""?null:Number(ratings[slot][i])]));const search=searchResults();
  return{
-  schema:"research-documentation-handoff/v0.3",fictional_demo:true,document_source_kind:docSource.kind,
-  case:{id:c.id,question:c.question,known_facts:c.facts,unknowns:c.gaps,document_reference:revision.document_id},
+  schema:"research-documentation-handoff/v0.4",fictional_demo:EXAMPLES[idx].synthetic,record_kind:EXAMPLES[idx].synthetic?"SYNTHETIC_QA":"PUBLIC_SOURCE_RESEARCH",document_source_kind:docSource.kind,
+  case:{id:c.id,question:c.question,known_facts:c.facts,unknowns:c.gaps,document_reference:revision.document_id,source_status:c.source_status||"SYNTHETIC",case_url:c.case_url||null,public_report_url:c.report_url||null,model_execution_status:c.model_status||"SYNTHETIC_ONLY"},
   document_snapshot:{name:docSource.name,type:docSource.kind,extension:docSource.extension,original_text:docSource.text,character_count:docSource.text.length,selected_paragraph:revision.before,exact_match_count:sourceHits(revision.before),customer_source_verified:false},
-  evidence:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>({id:x.id,source_label:x.source,claim:x.claim,scope_limit:x.limit})),
-  recorded_answers:[{id:"A",source:"manual_or_synthetic",output:answers.a,human_scores:human("a")},{id:"B",source:"manual_or_synthetic",output:answers.b,human_scores:human("b")}],
+  evidence:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>({id:x.id,source_label:x.source,claim:x.claim,scope_limit:x.limit,public_url:x.url||null})),
+  recorded_answers:[{id:"A",source:c.synthetic?"SYNTHETIC_FIXTURE":(answers.a?"MANUAL_ENTRY_NOT_VERIFIED":"NOT_RUN"),output:answers.a,human_scores:human("a")},{id:"B",source:c.synthetic?"SYNTHETIC_FIXTURE":(answers.b?"MANUAL_ENTRY_NOT_VERIFIED":"NOT_RUN"),output:answers.b,human_scores:human("b")}],
   reviewer_choice:decision,
   failure_diagnosis:{status:"HYPOTHESIS_ONLY",category:failureMode,notes:diagnosisNote,confirmed_root_cause:false},
   proposed_revision:{...revision,evidence_links:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>x.id),local_retest_approved:revision.status==="approved_for_retest",customer_publication_approved:false},
   patch_execution:{status:previewStatus,result_copy:previewCopy,original_modified:false},
   heldout_evaluation:{questions:DOCS[idx].heldout.map(q=>({...q,outcome:holdout[q.id]||"not_run"})),notes:holdoutNote,real_model_test_performed:false},
-  optional_search_experiment:{synthetic_only:true,goal:"maximize invented priority points under toy review-time constraint",budget_minutes:budget,candidate_action_sets:search.plans.length,exact_best:{minutes:search.optimal.minutes,points:search.optimal.points,checks:search.optimal.labels},greedy_baseline:{minutes:search.greedy.minutes,points:search.greedy.points,checks:search.greedy.labels},evolutionary_algorithm_used:false},
-  developer_preview:{status:"SYNTHETIC_NOT_VERIFIED",shown_candidate:guideChoice,draft_answer:answers[guideChoice],evidence_ids:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>x.id),document_paragraph:previewCopy===null?revision.before:revision.after,video_storyboard:storyboard(),video_generated:false,illustrative_feedback:guideFeedback,customer_study_performed:false},
+  optional_search_experiment:c.synthetic?{synthetic_only:true,goal:"maximize invented priority points under toy review-time constraint",budget_minutes:budget,candidate_action_sets:search.plans.length,exact_best:{minutes:search.optimal.minutes,points:search.optimal.points,checks:search.optimal.labels},greedy_baseline:{minutes:search.greedy.minutes,points:search.greedy.points,checks:search.greedy.labels},evolutionary_algorithm_used:false}:null,
+  developer_preview:{status:c.synthetic?"SYNTHETIC_NOT_VERIFIED":"PUBLIC_SOURCE_DRAFT_NO_VERIFIED_MODEL_OUTPUT",shown_candidate:guideChoice,draft_answer:answers[guideChoice],evidence_ids:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>x.id),document_paragraph:previewCopy===null?revision.before:revision.after,video_storyboard:storyboard(),video_generated:false,illustrative_feedback:guideFeedback,customer_study_performed:false},
   release:{status:"NOT_AUTHORIZED",publication:false,real_device_validation:"NOT_RUN",customer_acceptance:"NOT_RUN"},
   downstream_adapter:{schema:"documentation-revision/v1",mode:"local_json_import_and_copy_preview_only",teammate_private_code_connected:false}
  }
@@ -382,17 +424,21 @@ function payload(){
 function renderJson(){by("json").textContent=JSON.stringify(payload(),null,2)}
 
 
-function storyboard(){return idx===0?
- ["Show the fictional dashboard during reconnect","Contrast transport status with the displayed reading","Illustrate the refresh check and the next question"]:
- ["Show accented characters in an invented CSV","Compare export and import encoding options","Show a reversible before/after comparison"]}
+function storyboard(){
+ if(idx===0)return ["Show the real web-integration question and its seven requirements","Highlight the version-limited native Soft Scan Trigger documentation","Ask for the missing browser bridge and installed versions"];
+ if(idx===1)return ["Display the public TC26 symptom report","Separate BarcodeManager initialization from demonstrated root cause","List the runtime logs and lifecycle details required"];
+ if(idx===2)return ["Compare reported manual and programmatic MultiBarcode configuration","Highlight unverified SET_CONFIG parameter applicability","Show required version, result-code and profile checks"];
+ if(idx===3)return ["Show the fictional dashboard during reconnect","Contrast transport status with displayed data","Illustrate the refresh check"];
+ return ["Show accented characters in invented CSV","Compare export and import encoding","Show a reversible before/after check"];
+}
 function renderGuide(){
  const c=EXAMPLES[idx],d=DOCS[idx];
  by("guide-question").textContent=c.question;by("guide-choice").value=guideChoice;
- by("guide-answer").textContent=answers[guideChoice];
- by("guide-label").textContent="UNVERIFIED · CANDIDATE "+guideChoice.toUpperCase();
+ by("guide-answer").textContent=answers[guideChoice]||(c.synthetic?"No sample answer entered.":"NO MODEL RUN RECORDED — show source evidence and missing context, not an invented answer.");
+ by("guide-label").textContent=c.synthetic?"SYNTHETIC · CANDIDATE "+guideChoice.toUpperCase():"NOT RUN / UNVERIFIED · CANDIDATE "+guideChoice.toUpperCase();
  by("guide-doc-title").textContent=docSource.name+" · "+revision.section;
  by("guide-doc-copy").textContent=previewCopy===null?revision.before:revision.after;
- by("guide-doc-status").textContent=previewCopy===null?"Current synthetic source; proposed revision NOT applied.":"Local edited copy only; still NOT published or independently validated.";
+ by("guide-doc-status").textContent=previewCopy===null?(c.synthetic?"Synthetic document, not modified.":"Public case-review note only, not the official product manual. No patch applied."):"Local edited copy only; no official documentation, device fix or approval implied.";
  const refs=by("guide-evidence");refs.replaceChildren();
  const data=c.evidence.filter((_,i)=>chosen.has(i));if(!data.length)refs.append(node("p","No supporting evidence selected."));
  for(const x of data)refs.append(node("p",x.id+" · "+x.source+": "+x.claim+" (limit: "+x.limit+")"));
@@ -403,7 +449,7 @@ function renderGuide(){
 }
 function guideMarkdown(){
  const c=EXAMPLES[idx],d=DOCS[idx],refs=c.evidence.filter((_,i)=>chosen.has(i));
- return ["# Synthetic developer guide","","Status: DRAFT / NOT VERIFIED","","## Question",c.question,"","## Candidate answer",answers[guideChoice],"","## Fictional evidence",...refs.map(x=>"- "+x.id+": "+x.claim+" (limit: "+x.limit+")"),"","## Clarifying questions",...c.gaps.map(g=>"- "+g),"","## Documentation paragraph",previewCopy===null?d.before:previewCopy,"","## Video storyboard (not generated)",...storyboard().map((g,i)=>"- "+(i+1)+". "+g),"","Feedback is illustrative only: "+guideFeedback,""].join("\n")
+ return ["# "+(c.synthetic?"Synthetic QA":"Public-source research")+" developer guide","","Status: DRAFT / NOT VERIFIED","","## Question",c.question,"","## Candidate answer",answers[guideChoice],"","## Source-linked evidence",...refs.map(x=>"- "+x.id+": "+x.claim+" (limit: "+x.limit+")"+(x.url?" — "+x.url:"")),"","## Clarifying questions",...c.gaps.map(g=>"- "+g),"","## Research note / document paragraph",previewCopy===null?revision.before:revision.after,"","Document type: "+docSource.kind+"; a public case-review note is not official manufacturer documentation.","","## Video storyboard (not generated)",...storyboard().map((g,i)=>"- "+(i+1)+". "+g),"","Feedback is illustrative only: "+guideFeedback,""].join("\n")
 }
 function renderDelivery(){
  const remaining=DOCS[idx].heldout.filter(q=>(holdout[q.id]||"not_run")==="not_run").length;
@@ -413,14 +459,14 @@ function renderDelivery(){
 }
 function reportMarkdown(){
  const p=payload(),lines=[
- "# Synthetic case and documentation revision report","",
- "Status: CANDIDATE / NOT CUSTOMER VALIDATED","","## Developer question",p.case.question,"",
+ "# "+(EXAMPLES[idx].synthetic?"Synthetic QA":"Public-source research")+" documentation review report","",
+ "Status: CANDIDATE / NOT CUSTOMER VALIDATED","- Model: "+(EXAMPLES[idx].model_status||"SYNTHETIC_ONLY"),"- Original public question: "+(EXAMPLES[idx].case_url||"SYNTHETIC_FIXTURE"),"- Published team research source: "+(EXAMPLES[idx].report_url||"SYNTHETIC_FIXTURE"),"","## Developer question",p.case.question,"",
  "## Known facts",...p.case.known_facts.map(x=>"- "+x),"",
  "## Missing context",...p.case.unknowns.map(x=>"- "+x),"",
- "## Evidence",...(p.evidence.length?p.evidence.map(x=>"- "+x.id+" · "+x.claim+" [limit: "+x.scope_limit+"]"):["- NOT PROVIDED"]),"",
- "## Candidate answer review","- Human choice: "+decision,"- Candidate A: "+answers.a,"- Candidate B: "+answers.b,"",
+ "## Evidence",...(p.evidence.length?p.evidence.map(x=>"- "+x.id+" · "+x.claim+" [limit: "+x.scope_limit+"]"+(x.public_url?" [source: "+x.public_url+"]":"")):["- NOT PROVIDED"]),"",
+ "## Candidate answer review","- Human choice: "+decision,"- Candidate A: "+(answers.a||"NOT RUN"),"- Candidate B: "+(answers.b||"NOT RUN"),"- Real-model controlled comparison: NOT RUN","",
  "## Failure diagnosis","- Hypothesis: "+failureMode,"- Notes: "+diagnosisNote,"- Root cause confirmed: NO","",
- "## Proposed document revision","- Document / section: "+revision.source_label+" / "+revision.section,"- Source kind: "+docSource.kind,"- Exact source occurrences: "+sourceHits(revision.before),"- Revision status: "+revision.status,"",
+ "## Proposed document revision","- Document / section: "+revision.source_label+" / "+revision.section,"- Built-in public-case note is an editorial draft, NOT official product documentation.","- Source kind: "+docSource.kind,"- Exact source occurrences: "+sourceHits(revision.before),"- Revision status: "+revision.status,"",
  "### Baseline paragraph",revision.before,"","### Proposed paragraph",revision.after,"","### Rationale",revision.rationale,"",
  "## Copy-only validation","- Status: "+previewStatus,"- Original file modified: NO","",
  "## Held-out checks",...p.heldout_evaluation.questions.map(q=>"- "+q.id+" · "+q.question+": "+q.outcome),"- Notes: "+holdoutNote,"",
@@ -488,9 +534,9 @@ by("download-revised").addEventListener("click",downloadRevised);
 by("holdout-note").addEventListener("input",e=>{holdoutNote=e.target.value;renderDelivery()});
 by("guide-choice").addEventListener("change",e=>{guideChoice=e.target.value;renderGuide();renderDelivery()});
 by("guide-feedback").addEventListener("change",e=>{guideFeedback=e.target.value;renderDelivery()});
-by("download-guide").addEventListener("click",()=>downloadText("synthetic-developer-guide.md",guideMarkdown(),"text/markdown"));
-by("download").addEventListener("click",()=>downloadText("synthetic-research-handoff.json",JSON.stringify(payload(),null,2)+"\n","application/json"));
-by("download-report").addEventListener("click",()=>downloadText("synthetic-documentation-case-report.md",reportMarkdown(),"text/markdown"));
+by("download-guide").addEventListener("click",()=>downloadText(EXAMPLES[idx].synthetic?"synthetic-developer-guide.md":"public-case-developer-guide.md",guideMarkdown(),"text/markdown"));
+by("download").addEventListener("click",()=>downloadText(EXAMPLES[idx].synthetic?"synthetic-research-handoff.json":"public-case-research-handoff.json",JSON.stringify(payload(),null,2)+"\n","application/json"));
+by("download-report").addEventListener("click",()=>downloadText(EXAMPLES[idx].synthetic?"synthetic-documentation-case-report.md":"public-case-documentation-report.md",reportMarkdown(),"text/markdown"));
 by("copy").addEventListener("click",async()=>{const data=JSON.stringify(payload(),null,2);try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(data)}else{const ta=document.createElement("textarea");ta.value=data;document.body.append(ta);ta.select();if(!document.execCommand("copy"))throw Error("unsupported");ta.remove()}by("copy-status").textContent="Copied"}catch(e){by("copy-status").textContent="Please use Download JSON"}});
 reset(0);
 </script>

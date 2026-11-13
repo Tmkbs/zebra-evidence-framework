@@ -9,7 +9,7 @@ const html = fs.readFileSync(path.join(__dirname, "evidence-framework-sandbox.ht
 const script = html.split("<script>")[1]?.split("</script>")[0];
 assert.ok(script, "Expected one inline application script");
 assert.equal((html.match(/<section class="page/g) || []).length, 10);
-assert.ok(!/fetch\s*\(|XMLHttpRequest|WebSocket|https?:\/\//i.test(html), "Classroom HTML must be offline-only");
+assert.ok(!/fetch\s*\(|XMLHttpRequest|WebSocket/i.test(html), "No automatic network requests; public sources are only click-through links");
 
 class FakeElement {
   constructor(name) {
@@ -67,6 +67,58 @@ const test = (name, fn) => {
 };
 
 async function main() {
+  test("public project report loads as the default case", () => {
+    const p=app.payload();
+    assert.equal(p.case.id,"ZF-WEB-INTEGRATION");
+    assert.equal(p.fictional_demo,false);
+    assert.equal(p.record_kind,"PUBLIC_SOURCE_RESEARCH");
+    assert.equal(p.case.model_execution_status,"NOT_RUN");
+    assert.ok(p.case.case_url.includes("developer.zebra.com"));
+    assert.ok(p.evidence.every(x=>x.public_url?.startsWith("https://")));
+    assert.equal(p.optional_search_experiment,null);
+    assert.equal(p.document_source_kind,"public_review_note");
+    assert.equal(element("budget-value").textContent,"NOT MEASURED");
+  });
+  test("unrun model outputs cannot be presented as evidence", () => {
+    const p=app.payload();
+    assert.equal(p.recorded_answers[0].source,"NOT_RUN");
+    assert.equal(p.recorded_answers[1].output,"");
+    assert.equal(p.release.publication,false);
+  });
+  change("decision","prefer_b");
+  change("failure-class","clarity");
+  change("review-ack",true);
+  test("cannot approve a nonexistent model answer", () => {
+    assert.ok(app.gateReasons().some(x=>x.includes("unrun model response")));
+  });
+  change("decision","document_review_only");
+  test("real case note can use documentation-only human review", () => {
+    assert.equal(app.gateReasons().length,0);
+  });
+  click("revision-approve");
+  click("run-preview");
+  test("public research note patch is isolated and never an official documentation fix", () => {
+    const p=app.payload();
+    assert.equal(p.patch_execution.status,"applied_to_copy");
+    assert.equal(p.patch_execution.original_modified,false);
+    assert.equal(p.release.real_device_validation,"NOT_RUN");
+    assert.equal(p.proposed_revision.customer_publication_approved,false);
+  });
+  app.reset(1);
+  test("TC26 original public forum source is present", () => {
+    const p=app.payload();
+    assert.equal(p.case.id,"PUBLIC-TC26-XAMARIN");
+    assert.ok(p.case.case_url.includes("developer.zebra.com"));
+    assert.equal(p.optional_search_experiment,null);
+  });
+  app.reset(2);
+  test("TC52 MultiBarcode original public source is present", () => {
+    const p=app.payload();
+    assert.equal(p.case.id,"PUBLIC-TC52-MULTIBARCODE");
+    assert.ok(p.case.case_url.includes("25873"));
+    assert.equal(p.recorded_answers[0].source,"NOT_RUN");
+  });
+  app.reset(3);
   test("synthetic document starts unapproved", () => {
     const p = app.payload();
     assert.equal(p.document_source_kind, "synthetic");
@@ -143,7 +195,7 @@ async function main() {
   await app.importDocument({name:"duplicate.txt",size:61,text:async()=> "A repeated example paragraph.\n\nA repeated example paragraph."});
   test("repeated matching text is blocked", () => assert.equal(app.sourceHits(app.payload().proposed_revision.before),2));
   test("extra search lab remains functional", () => assert.equal(app.searchResults().plans.length,32));
-  app.reset(1);
+  app.reset(4);
   test("scenario switch clears potentially stale imported content", () => {
     const p=app.payload();
     assert.equal(p.document_source_kind,"synthetic");
