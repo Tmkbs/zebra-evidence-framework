@@ -17,6 +17,21 @@ main{flex:1;min-width:0}.bar{height:72px;background:#fff;border-bottom:1px solid
 pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:450px;overflow:auto;padding:20px;border-radius:9px;background:#142b3e;color:#dbf6ed;font-size:11px;line-height:1.6}.foot{margin-top:40px;border-top:1px solid #dce5e9;padding-top:17px;font-size:11px;color:#758a96}
 .search-range{width:100%;accent-color:#087e76;cursor:pointer;margin:12px 0 7px}.search-metric{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-top:1px solid #e5ecf0;padding:15px 0}.search-metric strong{font-size:24px;color:#1b5358;letter-spacing:-.05em}.search-metric span{color:#617687;font-size:12px}.action-row{padding:12px 0;border-top:1px solid #e8eef1;display:flex;justify-content:space-between;align-items:start;gap:10px}.action-row b{font-size:12px}.action-row small{color:#728593;font-size:11px;white-space:nowrap}.plan{padding:15px;border-radius:9px;background:#f4f9f8;border:1px solid #d9eae4;margin-top:12px}.plan h3{margin:0 0 7px}.plan p{margin:0;font-size:12px;color:#425c65;line-height:1.65}.frontier-row{display:grid;grid-template-columns:70px minmax(90px,1fr) 70px;gap:10px;align-items:center;font-size:11px;border-bottom:1px solid #e7ecee;padding:8px 0}.frontier-bar{height:9px;background:#e5f0ef;border-radius:8px;overflow:hidden}.frontier-bar span{display:block;height:100%;background:#148b7e;border-radius:8px}.frontier-row small{color:#728390;font-size:11px}.search-note{color:#5c7282;font-size:12px;line-height:1.7}
 textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:110px}.docview{white-space:pre-wrap;overflow-wrap:anywhere;padding:18px;border-radius:9px;background:#f3f7f8;border:1px solid #dce5e9;font-size:13px;line-height:1.75;min-height:120px}.docview.revised{background:#effaf5;border-color:#b8decf}.gate{background:#eaf6f2;border-left:3px solid #138c7e;border-radius:7px;padding:13px 15px;font-size:12px;line-height:1.7;color:#2b5e58;margin:15px 0}.step-note{font-size:11px;color:#63808a}.review-table{width:100%;border-collapse:collapse;font-size:12px}.review-table td,.review-table th{padding:11px 8px;border-bottom:1px solid #e0e9ed;text-align:left;vertical-align:top}.review-table th{font-size:10px;letter-spacing:.06em;color:#657d86}.review-table select{min-width:170px}.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.presenter-toggle{border:1px solid #badbd3;background:#edf8f4;color:#096e64;border-radius:8px;padding:10px 13px;font-size:12px;font-weight:800;white-space:nowrap}
+.presenter-toggle:hover{background:#dbf1e8}.bar-actions{display:flex;align-items:center;gap:12px}
+.presenter-panel{position:fixed;z-index:90;right:18px;top:86px;width:min(365px,calc(100vw - 36px));max-height:calc(100vh - 104px);overflow-y:auto;box-shadow:0 22px 60px rgba(11,42,56,.22);border:1px solid #accdc7;border-radius:15px;background:#fff;color:#1e3849;padding:20px}
+.presenter-panel[hidden]{display:none!important}.presenter-panel .panel-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.presenter-panel .panel-title{font-size:13px;font-weight:850;letter-spacing:-.02em}.presenter-panel .panel-kicker{font-size:10px;letter-spacing:.1em;color:#0b8177;font-weight:850}
+.presenter-panel .panel-close{background:transparent;border:0;border-radius:8px;color:#5a707e;padding:4px 8px;font-size:18px;cursor:pointer}
+.presenter-progress{height:5px;background:#e4efed;border-radius:20px;overflow:hidden;margin:10px 0 17px}.presenter-progress span{display:block;height:100%;width:11.1%;background:#0b8779;transition:width .18s}
+.presenter-panel h3{font-size:19px;letter-spacing:-.04em;line-height:1.25;margin:8px 0 12px}
+.presenter-say{background:#edf8f5;border-left:3px solid #0b8779;border-radius:8px;padding:14px;color:#1c5054;line-height:1.65;font-size:13px;margin:8px 0 17px}
+.presenter-do{font-size:12px;line-height:1.65;color:#526b78;padding:9px 0 14px}
+.presenter-controls{display:flex;gap:8px;margin-bottom:12px}.presenter-controls .btn{flex:1}
+.presenter-foot{font-size:10px;line-height:1.6;color:#708490;border-top:1px solid #e4ebee;padding-top:10px}
+@media(max-width:800px){.presenter-panel{right:12px;top:76px;max-height:calc(100vh - 88px)}.bar-actions{gap:7px}}
+@media(max-width:490px){.bar-actions .flag{display:none}.presenter-toggle{padding:9px 10px;font-size:11px}}
 @media(max-width:1030px){.grid4{grid-template-columns:repeat(2,1fr)}}@media(max-width:800px){.side{width:72px;flex-basis:72px;padding:18px 8px}.brand h2,.brand span,.sidefoot,.nav .name{display:none}.brand{padding:0 8px 15px}.nav button{justify-content:center}.grid{grid-template-columns:1fr}.content{padding:30px 22px}.hero{padding:28px}.bar{padding:0 20px}}@media(max-width:490px){.grid4{grid-template-columns:1fr}.flag{font-size:9px}}
 </style>
 </head>
@@ -25,8 +40,20 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
  <div class="brand"><div class="mark">F</div><h2>Evidence Framework</h2><span>PUBLIC CASE RESEARCH / OFFLINE REVIEW</span></div>
  <nav class="nav"><button class="active" data-page="architecture"><b>00</b><span class="name">Architecture</span></button><button data-page="case"><b>01</b><span class="name">Question</span></button><button data-page="evidence"><b>02</b><span class="name">Evidence</span></button><button data-page="review"><b>03</b><span class="name">Review</span></button><button data-page="diagnosis"><b>04</b><span class="name">Failure diagnosis</span></button><button data-page="revision"><b>05</b><span class="name">Document revision</span></button><button data-page="retest"><b>06</b><span class="name">Retest</span></button><button data-page="guide"><b>07</b><span class="name">Developer preview</span></button><button data-page="handoff"><b>08</b><span class="name">Delivery packet</span></button><button data-page="strategy"><b>+</b><span class="name">Optional search lab</span></button></nav>
  <div class="sidefoot">Framework evaluation and documentation revision remain separate workstreams. This sandbox connects them using a local draft contract, not private source code.</div>
- </aside><main><div class="bar"><span>Research prototype / <strong id="crumb">Architecture</strong></span><span class="flag">OFFLINE · PUBLIC SOURCE SUMMARIES</span></div>
+ </aside><main><div class="bar"><span>Research prototype / <strong id="crumb">Architecture</strong></span><div class="bar-actions"><button type="button" class="presenter-toggle" id="presenter-toggle" aria-expanded="false" aria-controls="presenter-panel">Presenter mode · 5 min</button><span class="flag">OFFLINE · PUBLIC SOURCE SUMMARIES</span></div></div>
  <div class="content">
+ <aside id="presenter-panel" class="presenter-panel" hidden aria-labelledby="presenter-heading">
+   <div class="panel-bar"><span class="panel-title" id="presenter-heading">Live demo cue cards</span><button type="button" id="presenter-close" class="panel-close" aria-label="Close presenter notes">×</button></div>
+   <div class="panel-kicker" id="presenter-count">01 / 09 · 0:25</div>
+   <div class="presenter-progress" aria-hidden="true"><span id="presenter-progress"></span></div>
+   <h3 id="presenter-title">What are we testing?</h3>
+   <div class="panel-kicker">SAY</div>
+   <p class="presenter-say" id="presenter-say"></p>
+   <div class="panel-kicker">ON SCREEN</div>
+   <p class="presenter-do" id="presenter-do"></p>
+   <div class="presenter-controls"><button type="button" class="btn" id="presenter-prev">← Previous</button><button type="button" class="btn primary" id="presenter-next">Next step →</button></div>
+   <div class="presenter-foot">Presenter steps navigate the real app; they never fabricate model results or approve edits. Use the on-screen controls when the step says to review or patch. <a href="https://github.com/Tmkbs/zebra-evidence-framework/blob/main/PRESENTER_NOTES.md" target="_blank" rel="noopener noreferrer">Full script</a>.</div>
+ </aside>
  <section class="page active" id="architecture">
   <div class="hero"><div class="eyebrow">REUSABLE FRAMEWORK · NOT A DOCUMENT EDITOR</div><h1>Evaluate answers before documents change.</h1><p>Walk from a developer question through evidence, answer review, diagnosis, a revision proposal, copy-only retest, a user-facing guide preview, and an auditable delivery package.</p><button class="btn" data-next="case">Explore a real public case →</button></div>
   <div class="card" style="margin-top:16px"><div class="eyebrow">REAL PROJECT INPUT · PUBLIC STATUS NOVEMBER 5</div><h3>2,854 unique archived questions · 8 development case packets · 12 official source URLs</h3><p>These are source-processing figures from the team's public technical status, not answer accuracy or verified solutions. <a href="https://github.com/1235357/zebra-public-site-archive/blob/main/TECHNICAL_STATUS.md" target="_blank" rel="noopener noreferrer">Read status</a> · <a href="https://zebra-techdocs-practicum.vercel.app/" target="_blank" rel="noopener noreferrer">Team website</a></p></div><div class="eyebrow" style="margin-top:32px">ARCHITECTURE</div><h2>One connected research workflow, distinct responsibilities</h2>
@@ -281,6 +308,38 @@ function restoreSource(){
 function by(id){return document.getElementById(id)}
 function node(tag,txt){const x=document.createElement(tag);x.textContent=txt;return x}
 function show(page){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===page));document.querySelectorAll("[data-page]").forEach(b=>{b.classList.toggle("active",b.dataset.page===page);b.setAttribute("aria-current",b.dataset.page===page?"page":"false")});by("crumb").textContent={architecture:"Architecture",case:"Question",evidence:"Evidence",review:"Human review",diagnosis:"Failure diagnosis",revision:"Document revision",retest:"Retest",guide:"Developer preview",strategy:"Search lab",handoff:"Delivery"}[page];if(page==="strategy")renderStrategy();if(page==="diagnosis")renderDiagnosis();if(page==="revision")renderRevision();if(page==="retest")renderRetest();if(page==="guide")renderGuide();if(page==="handoff")renderDelivery();window.scrollTo(0,0)}
+
+const PRESENTER_STEPS=[
+ {page:"architecture",time:"0:25",title:"Why a review framework?",say:"We are working with real developer questions, but a plausible technical answer is not always a supported one. I built a framework to track evidence, uncertainty, and what needs to be checked next.",action:"Start with the public-source research overview. Point to the research counts as collection progress, not accuracy results."},
+ {page:"case",time:"0:30",title:"Start from a real question",say:"This case comes from a real public developer question about controlling barcode scanning from an Android web app. We are not jumping to a fix; we first identify which part of the question is actually answerable.",action:"Keep the first public Android web-integration case selected. Show the original question and team report links."},
+ {page:"evidence",time:"0:35",title:"A relevant source is not enough",say:"The official guide describes native software scanning controls for a particular DataWedge version. But that doesn't prove a Chrome web app can trigger them, or that the device runs that version.",action:"Show the official guide reference and the limits under each evidence record. Explain what is still unknown."},
+ {page:"review",time:"0:30",title:"Do not invent model results",say:"We have real source research here, but we do not have a controlled model comparison for this case. So I'm marking this as a documentation-only review rather than pretending two AI answers have been tested.",action:"Select 'Documentation-only review · no model run'. Leave the empty model-output fields empty."},
+ {page:"diagnosis",time:"0:30",title:"Find the type of failure",say:"A bad answer could come from missing context, retrieval, a version mismatch, or unclear documentation. I want the review to separate those causes before suggesting a change.",action:"Select 'Possible documentation clarity gap'. Say explicitly that this is still a hypothesis."},
+ {page:"revision",time:"0:55",title:"Make a bounded revision",say:"Here we can propose a precise edit to our research note. This is not an edit to Zebra's official manual. The system checks the original text and requires a reviewer to approve a local test.",action:"Show before/after, keep the proposed clarification, tick the local-only acknowledgment, then approve for local retest."},
+ {page:"retest",time:"0:35",title:"Test the workflow, not the device",say:"The approved wording can be applied to a temporary copy without overwriting the source. That proves our document-review handoff works; it does not prove a scanner fix or a model improvement.",action:"Click 'Apply to temporary copy'. Point out that held-out checks and device validation are still NOT RUN."},
+ {page:"guide",time:"0:35",title:"What the developer sees",say:"The same review record could drive a developer-facing assistant: an answer area, linked evidence, follow-up questions, and a visual explanation plan. The AI answer and video are not generated in this offline demo.",action:"Show the source-linked view, missing-context questions and the three storyboard frames. Do not describe them as generated video."},
+ {page:"handoff",time:"0:25",title:"Finish with a traceable handoff",say:"We can export the whole case: question, source limits, reviewer decision, proposed text change and outstanding tests. That's the boundary between my reusable framework and the separate documentation implementation.",action:"Export the case report or JSON. For the course, the open search question is which verification steps to prioritize once we have measured review costs."}
+];
+let presenterStep=0,presenterOpen=false;
+function updatePresenter(){
+ const step=PRESENTER_STEPS[presenterStep];
+ by("presenter-panel").hidden=!presenterOpen;
+ by("presenter-toggle").setAttribute("aria-expanded",presenterOpen?"true":"false");
+ by("presenter-toggle").textContent=presenterOpen?"Hide presenter notes":"Presenter mode · 5 min";
+ by("presenter-count").textContent=String(presenterStep+1).padStart(2,"0")+" / "+String(PRESENTER_STEPS.length).padStart(2,"0")+" · "+step.time;
+ by("presenter-progress").style.width=((presenterStep+1)/PRESENTER_STEPS.length*100)+"%";
+ by("presenter-title").textContent=step.title;
+ by("presenter-say").textContent=step.say;
+ by("presenter-do").textContent=step.action;
+ by("presenter-prev").disabled=presenterStep===0;
+ by("presenter-next").textContent=presenterStep===PRESENTER_STEPS.length-1?"Back to start":"Next step →";
+}
+function jumpPresenter(n){
+ presenterStep=(n+PRESENTER_STEPS.length)%PRESENTER_STEPS.length;
+ show(PRESENTER_STEPS[presenterStep].page);
+ updatePresenter();
+}
+function presenterToggle(){presenterOpen=!presenterOpen;updatePresenter()}
 function renderCase(){
  const c=EXAMPLES[idx];by("question").textContent=c.question;
  by("facts").replaceChildren(...c.facts.map(x=>node("li",x)));
@@ -506,6 +565,10 @@ function reset(i){
  answers={a:EXAMPLES[idx].a,b:EXAMPLES[idx].b};guideChoice="b";guideFeedback="not_recorded";failureMode="unassessed";diagnosisNote="";resetSource();revision=freshRevision();riskAcknowledged=false;resetRetest();
  renderCase();renderEvidence();renderReview();renderDiagnosis();renderRevision();renderRetest();renderGuide();renderStrategy();renderDelivery()
 }
+by("presenter-toggle").addEventListener("click",presenterToggle);
+by("presenter-close").addEventListener("click",()=>{presenterOpen=false;updatePresenter()});
+by("presenter-prev").addEventListener("click",()=>jumpPresenter(presenterStep-1));
+by("presenter-next").addEventListener("click",()=>jumpPresenter(presenterStep+1));
 document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.page)));document.querySelectorAll("[data-next]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.next)));
 by("scenario").addEventListener("change",e=>reset(Number(e.target.value)));
 by("budget").addEventListener("input",e=>{budget=Number(e.target.value);renderStrategy();renderDelivery()});
@@ -539,5 +602,6 @@ by("download").addEventListener("click",()=>downloadText(EXAMPLES[idx].synthetic
 by("download-report").addEventListener("click",()=>downloadText(EXAMPLES[idx].synthetic?"synthetic-documentation-case-report.md":"public-case-documentation-report.md",reportMarkdown(),"text/markdown"));
 by("copy").addEventListener("click",async()=>{const data=JSON.stringify(payload(),null,2);try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(data)}else{const ta=document.createElement("textarea");ta.value=data;document.body.append(ta);ta.select();if(!document.execCommand("copy"))throw Error("unsupported");ta.remove()}by("copy-status").textContent="Copied"}catch(e){by("copy-status").textContent="Please use Download JSON"}});
 reset(0);
+updatePresenter();
 </script>
 </body></html>
