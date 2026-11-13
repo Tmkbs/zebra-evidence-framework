@@ -85,6 +85,34 @@ async function main() {
     assert.equal(p.recorded_answers[1].output,"");
     assert.equal(p.release.publication,false);
   });
+  test("presenter cue cards open with real-source narration", () => {
+    assert.equal(element("presenter-panel").hidden,true);
+    click("presenter-toggle");
+    assert.equal(element("presenter-panel").hidden,false);
+    assert.equal(element("presenter-toggle")["aria-expanded"],"true");
+    assert.ok(element("presenter-say").textContent.includes("real developer questions"));
+    assert.ok(element("presenter-do").textContent.includes("accuracy"));
+  });
+  test("all nine presenter steps navigate working app sections", () => {
+    const crumbs=["Architecture","Question","Evidence","Human review","Failure diagnosis","Document revision","Retest","Developer preview","Delivery"];
+    for(let i=0;i<crumbs.length;i++){
+      assert.equal(element("crumb").textContent,crumbs[i]);
+      assert.ok(element("presenter-count").textContent.startsWith(String(i+1).padStart(2,"0")+" / 09"));
+      if(i<crumbs.length-1)click("presenter-next");
+    }
+    click("presenter-next");
+    assert.equal(element("crumb").textContent,"Architecture");
+    assert.equal(element("presenter-count").textContent.slice(0,2),"01");
+  });
+  test("presenter mode never fabricates model outputs or approves an edit", () => {
+    click("presenter-close");
+    const p=app.payload();
+    assert.equal(element("presenter-panel").hidden,true);
+    assert.equal(element("presenter-toggle")["aria-expanded"],"false");
+    assert.equal(p.recorded_answers[0].source,"NOT_RUN");
+    assert.equal(p.proposed_revision.status,"proposed");
+    assert.equal(p.patch_execution.status,"not_run");
+  });
   change("decision","prefer_b");
   change("failure-class","clarity");
   change("review-ack",true);
