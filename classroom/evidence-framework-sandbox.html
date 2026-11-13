@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer">
+<title>Evidence Framework — Synthetic Classroom Demo</title>
+<style>
+:root{font-family:Inter,"Segoe UI",Arial,sans-serif;color:#193044;background:#f5f7f9}
+*{box-sizing:border-box}body{margin:0}button,select{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #73c7b7;outline-offset:3px}
+.app{display:flex;min-height:100vh}.side{position:sticky;top:0;width:230px;flex:0 0 230px;height:100vh;padding:30px 16px;background:#142c40;color:white;display:flex;flex-direction:column}.mark{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;background:#198279;font-weight:900;font-size:20px}.brand{padding:15px 9px 25px;border-bottom:1px solid #335269}.brand h2{font-size:17px;margin:0 0 6px;letter-spacing:-.035em}.brand span,.sidefoot{font-size:11px;color:#acc0cc;line-height:1.6}.nav{display:grid;gap:5px;margin-top:26px}.nav button{border:0;text-align:left;border-radius:9px;background:transparent;color:#b9cbd4;padding:13px 10px;font-size:13px;display:flex;gap:12px}.nav button.active,.nav button:hover{background:#2c5460;color:white}.nav b{font-size:11px;color:#8cdbca}.sidefoot{margin-top:auto;padding:17px 10px 0;border-top:1px solid #335269}
+main{flex:1;min-width:0}.bar{height:72px;background:#fff;border-bottom:1px solid #dce5e9;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(22px,4vw,55px);gap:10px;font-size:12px;color:#6b7d88}.bar strong{color:#234253}.flag{background:#e8f5ef;color:#06786a;font-weight:850;font-size:10px;padding:8px 11px;border-radius:99px;letter-spacing:.03em}
+.content{max-width:1260px;margin:auto;padding:38px clamp(22px,4vw,55px) 70px}.page{display:none}.page.active{display:block}.eyebrow{font-size:10px;color:#007e74;font-weight:900;letter-spacing:.15em;margin:0 0 12px}h1{font-size:clamp(30px,3.5vw,43px);letter-spacing:-.055em;line-height:1.13;margin:0 0 15px}h2{font-size:19px;letter-spacing:-.035em;margin:0 0 12px}h3{font-size:15px;margin:0 0 9px}.lead{font-size:14px;color:#647788;line-height:1.7;margin:0 0 24px;max-width:760px}.hero{background:linear-gradient(120deg,#172c40,#20525a);border-radius:15px;color:white;padding:40px;min-height:260px}.hero .eyebrow{color:#a2e8d7}.hero p{color:#d5e6e8;font-size:14px;line-height:1.7;max-width:650px}.card{background:white;border:1px solid #dce5e9;padding:22px;border-radius:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0}.step{background:white;border:1px solid #dce5e9;border-radius:11px;padding:18px;min-height:155px}.step b{color:#087c74;font-size:11px}.step h3{font-size:14px;margin:17px 0 9px}.step p,.card p{font-size:12px;line-height:1.65;color:#667987}.step.future{background:#faf9f5;border-style:dashed}.step.future b{color:#986b35}
+.btn{background:white;color:#176660;border:1px solid #cddde0;border-radius:8px;padding:11px 15px;font-size:12px;font-weight:800}.btn:hover{background:#eff8f6}.btn.primary{background:#087e76;border-color:#087e76;color:white}.btn.primary:hover{background:#006b64}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.next{margin:22px 0 0;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#738493}.pill{display:inline-block;background:#e9f6f1;color:#067b70;border-radius:90px;padding:6px 10px;font-size:10px;font-weight:800}.pill.amber{background:#fff4e4;color:#8c622b}
+.question{font-size:16px;line-height:1.65;background:#edf8f5;padding:18px;border-left:3px solid #087e76;border-radius:7px;margin:17px 0}.field{width:100%;background:white;color:#233c4d;border:1px solid #cfdbe1;border-radius:8px;padding:11px;font-size:13px}.muted{font-size:12px;color:#6b7e8b;line-height:1.65}.facts{padding-left:20px;font-size:13px;line-height:1.8}.tags{display:flex;flex-wrap:wrap;gap:7px}.tags span{font-size:11px;background:#eff3f5;color:#5d7583;border-radius:90px;padding:7px 10px}
+.item{display:flex;gap:12px;background:white;border:1px solid #dce5e9;border-radius:11px;padding:18px;margin:11px 0}.item input{accent-color:#087e76;width:18px;height:18px;margin-top:3px;cursor:pointer}.item h3{margin:0 0 7px}.item p{margin:0 0 9px;font-size:13px;line-height:1.6}.item small{color:#69808d;font-size:11px}.warning{background:#fff7e9;color:#815c25;border:1px solid #f1e1c2;border-radius:9px;padding:14px 16px;font-size:12px;line-height:1.6;margin-top:17px}
+.answer{font-size:13px;line-height:1.7;padding:16px;background:#f4f8f9;border-radius:8px;min-height:125px;margin:15px 0}.criterion{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid #e5ecf0;padding:11px 0;font-size:12px}.criterion select{min-width:105px;border:1px solid #d6e0e5;border-radius:6px;background:white;padding:7px;color:#344f60}.score{font-size:12px;color:#246769;font-weight:800;padding-top:10px}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:450px;overflow:auto;padding:20px;border-radius:9px;background:#142b3e;color:#dbf6ed;font-size:11px;line-height:1.6}.foot{margin-top:40px;border-top:1px solid #dce5e9;padding-top:17px;font-size:11px;color:#758a96}
+.search-range{width:100%;accent-color:#087e76;cursor:pointer;margin:12px 0 7px}.search-metric{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-top:1px solid #e5ecf0;padding:15px 0}.search-metric strong{font-size:24px;color:#1b5358;letter-spacing:-.05em}.search-metric span{color:#617687;font-size:12px}.action-row{padding:12px 0;border-top:1px solid #e8eef1;display:flex;justify-content:space-between;align-items:start;gap:10px}.action-row b{font-size:12px}.action-row small{color:#728593;font-size:11px;white-space:nowrap}.plan{padding:15px;border-radius:9px;background:#f4f9f8;border:1px solid #d9eae4;margin-top:12px}.plan h3{margin:0 0 7px}.plan p{margin:0;font-size:12px;color:#425c65;line-height:1.65}.frontier-row{display:grid;grid-template-columns:70px minmax(90px,1fr) 70px;gap:10px;align-items:center;font-size:11px;border-bottom:1px solid #e7ecee;padding:8px 0}.frontier-bar{height:9px;background:#e5f0ef;border-radius:8px;overflow:hidden}.frontier-bar span{display:block;height:100%;background:#148b7e;border-radius:8px}.frontier-row small{color:#728390;font-size:11px}.search-note{color:#5c7282;font-size:12px;line-height:1.7}
+textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:110px}.docview{white-space:pre-wrap;overflow-wrap:anywhere;padding:18px;border-radius:9px;background:#f3f7f8;border:1px solid #dce5e9;font-size:13px;line-height:1.75;min-height:120px}.docview.revised{background:#effaf5;border-color:#b8decf}.gate{background:#eaf6f2;border-left:3px solid #138c7e;border-radius:7px;padding:13px 15px;font-size:12px;line-height:1.7;color:#2b5e58;margin:15px 0}.step-note{font-size:11px;color:#63808a}.review-table{width:100%;border-collapse:collapse;font-size:12px}.review-table td,.review-table th{padding:11px 8px;border-bottom:1px solid #e0e9ed;text-align:left;vertical-align:top}.review-table th{font-size:10px;letter-spacing:.06em;color:#657d86}.review-table select{min-width:170px}.btn:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:1030px){.grid4{grid-template-columns:repeat(2,1fr)}}@media(max-width:800px){.side{width:72px;flex-basis:72px;padding:18px 8px}.brand h2,.brand span,.sidefoot,.nav .name{display:none}.brand{padding:0 8px 15px}.nav button{justify-content:center}.grid{grid-template-columns:1fr}.content{padding:30px 22px}.hero{padding:28px}.bar{padding:0 20px}}@media(max-width:490px){.grid4{grid-template-columns:1fr}.flag{font-size:9px}}
+</style>
+</head>
+<body>
+<div class="app"><aside class="side">
+ <div class="brand"><div class="mark">F</div><h2>Evidence Framework</h2><span>SYNTHETIC CLASSROOM SANDBOX</span></div>
+ <nav class="nav"><button class="active" data-page="architecture"><b>00</b><span class="name">Architecture</span></button><button data-page="case"><b>01</b><span class="name">Question</span></button><button data-page="evidence"><b>02</b><span class="name">Evidence</span></button><button data-page="review"><b>03</b><span class="name">Review</span></button><button data-page="diagnosis"><b>04</b><span class="name">Failure diagnosis</span></button><button data-page="revision"><b>05</b><span class="name">Document revision</span></button><button data-page="retest"><b>06</b><span class="name">Retest</span></button><button data-page="guide"><b>07</b><span class="name">Developer preview</span></button><button data-page="handoff"><b>08</b><span class="name">Delivery packet</span></button><button data-page="strategy"><b>+</b><span class="name">Optional search lab</span></button></nav>
+ <div class="sidefoot">Framework evaluation and documentation revision remain separate workstreams. This sandbox connects them using a local draft contract, not private source code.</div>
+ </aside><main><div class="bar"><span>Research prototype / <strong id="crumb">Architecture</strong></span><span class="flag">OFFLINE · FICTIONAL ONLY</span></div>
+ <div class="content">
+ <section class="page active" id="architecture">
+  <div class="hero"><div class="eyebrow">REUSABLE FRAMEWORK · NOT A DOCUMENT EDITOR</div><h1>Evaluate answers before documents change.</h1><p>Walk from a developer question through evidence, answer review, diagnosis, a revision proposal, copy-only retest, a user-facing guide preview, and an auditable delivery package.</p><button class="btn" data-next="case">Start a fictional example →</button></div>
+  <div class="eyebrow" style="margin-top:32px">ARCHITECTURE</div><h2>One connected research workflow, distinct responsibilities</h2>
+  <div class="grid4"><div class="step"><b>01 · INPUT</b><h3>Define a case</h3><p>Normalize the question and list known information.</p></div><div class="step"><b>02 · EVIDENCE</b><h3>Record support & gaps</h3><p>Keep provenance and applicability visible.</p></div><div class="step"><b>03 · REVIEW</b><h3>Human evaluation</h3><p>Check claims rather than invent model scores.</p></div><div class="step future"><b>04 · REVISION / HANDOFF</b><h3>Minimal doc change</h3><p>Try a controlled revision on an offline copy. Real editor integration remains separate.</p></div></div>
+  <div class="grid"><div class="card"><h3>Framework layer · in scope</h3><p>Case structure, evidence packet, explicit unknowns, manual comparison, and portable handoff format.</p></div><div class="card"><h3>Document-editing layer · separate</h3><p>Rewriting source documents, document versions, publication workflow and any product-specific behavior belong to a separate implementation.</p></div></div>
+  <div class="card" style="margin-top:14px"><h3>Optional computational exploration</h3><p>Review time is limited. Which missing details should the framework verify first? A search lab compares a simple greedy choice against exact subset search using transparent toy data. This is a genuine optimization problem, not a claim of evolutionary or neural-network implementation. <button class="btn" data-next="strategy" style="margin-top:8px">Open search lab →</button></p></div><div class="warning">Classroom boundary: all facts and references in this site are invented. It contains no actual customer report, source URL, identifier, prompt, endpoint, or live model connection.</div>
+ </section>
+ <section class="page" id="case">
+  <div class="eyebrow">01 · FRAME THE QUESTION</div><h1>Describe uncertainty before making claims.</h1><p class="lead">Switch between two fictional scenarios. The framework remains the same regardless of the product or document source.</p>
+  <div class="grid"><div class="card"><label for="scenario" class="eyebrow">CHOOSE SYNTHETIC CASE</label><select class="field" id="scenario"><option value="0">Fictional dashboard · reconnect</option><option value="1">Fictional exporter · Unicode</option></select><div class="question" id="question"></div><h3>Known information</h3><ul class="facts" id="facts"></ul></div><div class="card"><div class="eyebrow">MISSING CONTEXT</div><h3>Don't fill the gaps with guesses.</h3><div class="tags" id="gaps"></div><p style="margin-top:20px">The goal is to preserve uncertainty for reviewers, not quietly replace it with a persuasive answer.</p></div></div>
+  <div class="next"><span>1 / 8 · Normalize case</span><button class="btn primary" data-next="evidence">Build evidence packet →</button></div>
+ </section>
+ <section class="page" id="evidence">
+  <div class="eyebrow">02 · SELECT EVIDENCE</div><h1>Evidence must carry its limits.</h1><p class="lead">Choose what belongs in the packet. All three records are fictitious; no actual documents are retrieved or checked by this page.</p>
+  <div id="evidence-list"></div><div class="card"><span class="pill" id="count"></span><p>Provenance labels are illustrative. A real integration must independently verify the underlying source and document version.</p></div>
+  <div class="next"><span>2 / 8 · Evidence packet</span><button class="btn primary" data-next="review">Compare fixed examples →</button></div>
+ </section>
+ <section class="page" id="review">
+  <div class="eyebrow">03 · HUMAN EVALUATION</div><h1>Don't confuse fluency with evidence.</h1><p class="lead">These responses start as fictional examples. They can be replaced with manually recorded, sanitized test outputs. Ratings remain independent human judgments; no model is called here.</p>
+  <div class="grid"><div class="card"><span class="pill">CANDIDATE A · FICTIONAL</span><label class="eyebrow" for="answer-a">SAMPLE / MANUALLY RECORDED ANSWER</label><textarea class="field" id="answer-a" rows="5"></textarea><div id="ratings-a"></div><div class="score" id="score-a"></div></div><div class="card"><span class="pill">CANDIDATE B · FICTIONAL</span><label class="eyebrow" for="answer-b">SAMPLE / MANUALLY RECORDED ANSWER</label><textarea class="field" id="answer-b" rows="5"></textarea><div id="ratings-b"></div><div class="score" id="score-b"></div></div></div>
+  <div class="card" style="margin-top:14px"><label class="eyebrow" for="decision">HUMAN REVIEW DECISION</label><select class="field" id="decision"><option value="not_decided">Not decided</option><option value="prefer_a">A · further review</option><option value="prefer_b">B · further review</option><option value="neither">Neither ready</option></select><p>Choosing a preferred answer does not authorize a document change.</p></div>
+  <div class="next"><span>3 / 8 · Human candidate review</span><button class="btn primary" data-next="diagnosis">Diagnose the failure →</button></div>
+ </section>
+
+<section class="page" id="diagnosis">
+<div class="eyebrow">04 · DIAGNOSIS</div><h1>First decide what went wrong.</h1>
+<p class="lead">An AI answer may fail because of missing inputs, retrieval, version mismatch, interpretation or an actual documentation gap. Do not rewrite documentation simply because an answer sounds wrong.</p>
+<div class="grid"><div class="card"><label class="eyebrow" for="failure-class">SUSPECTED CAUSE</label>
+<select id="failure-class" class="field"><option value="unassessed">Unassessed</option><option value="access">Source inaccessible</option><option value="retrieval">Retrieval failure</option><option value="version">Version mismatch</option><option value="reasoning">Model interpretation</option><option value="clarity">Possible documentation clarity gap</option><option value="context">Missing question context</option><option value="no_failure">No supported failure</option></select>
+<label class="eyebrow" for="diagnosis-note" style="display:block;margin-top:17px">REVIEWER NOTES</label><textarea class="field" id="diagnosis-note" rows="4" placeholder="What evidence supports this classification? What remains unknown?"></textarea>
+</div><div class="card"><div class="eyebrow">GATE LOGIC</div><h3 id="diagnosis-title">Unassessed</h3><p id="diagnosis-explanation"></p><div class="gate" id="diagnosis-gate"></div>
+<p>The classification is always a hypothesis until a discriminating test supports it. A proposed documentation clarification is not a verified device fix.</p></div></div>
+<div class="row" style="margin-top:17px"><button class="btn" data-next="strategy">Optional: explore review priorities →</button></div>
+<div class="next"><span>4 / 8 · Review the cause</span><button class="btn primary" data-next="revision">Propose a minimal documentation change →</button></div>
+</section>
+<section class="page" id="revision">
+<div class="eyebrow">05 · DOCUMENTATION WORKSTREAM</div><h1>Review a precise before / after change.</h1>
+<p class="lead">This integrates the documentation-revision process, not a teammate's unretrieved source code. Draft edits start from a synthetic example. You can also load an approved local TXT/Markdown file, choose a paragraph and apply a verified replacement to a disposable copy. The original file remains unchanged.</p>
+<div class="row" style="margin-bottom:17px"><span class="pill" id="revision-status">PROPOSED</span><span id="revision-target" class="step-note"></span></div>
+<div class="card" style="margin-bottom:14px">
+ <div class="eyebrow">SOURCE DOCUMENT · LOCAL-ONLY</div>
+ <div class="row">
+  <label for="doc-import" class="step-note">Load approved TXT/Markdown file</label>
+  <input id="doc-import" class="field" style="max-width:340px" type="file" accept=".txt,.text,.md,text/plain,text/markdown">
+  <button id="doc-restore" class="btn" type="button">Restore synthetic fixture</button>
+ </div>
+ <p id="doc-source-info" class="muted">Synthetic document loaded.</p>
+ <div class="row">
+  <label for="doc-blocks" class="step-note">Paragraph to revise</label>
+  <select id="doc-blocks" class="field" style="max-width:500px" aria-label="Select source paragraph"></select>
+  <button id="doc-select-block" class="btn" type="button">Use selected paragraph</button>
+ </div>
+ <p id="doc-import-status" class="step-note" role="status">Imported files stay on this device. They are never uploaded.</p>
+ <div class="warning">Import only materials cleared for this demonstration. A locally imported document does not make the fictional case facts or model answers real. Never share an export containing restricted content without authorization.</div>
+</div>
+<div class="grid">
+<div class="card"><div class="eyebrow">VERSIONED ORIGINAL · READ ONLY</div><h3 id="document-heading"></h3><div class="docview" id="document-before"></div><p>Retained as the exact baseline for a safe diff and source check.</p></div>
+<div class="card"><label class="eyebrow" for="document-after">MINIMAL REVISION · EDITABLE</label><textarea class="field" id="document-after" rows="8"></textarea><label class="eyebrow" for="document-reason" style="display:block;margin-top:15px">WHY THIS CHANGE?</label><textarea id="document-reason" class="field" rows="3"></textarea></div>
+</div>
+<div class="card" style="margin-top:14px"><div class="eyebrow">FUTURE MODULE ADAPTER</div><p>Import a sanitized draft JSON using <code>schema: documentation-revision/v1</code>, the active <code>case_id</code>, and <code>before</code>, <code>after</code>, <code>rationale</code>. The file is reviewed locally and never automatically approved. Do not import real customer content into a classroom screen share.</p>
+<div class="row"><input id="revision-import" type="file" accept=".json,application/json" class="field" style="max-width:340px"><button id="download-revision" class="btn" type="button">Export revision adapter JSON</button><span class="step-note" id="import-status">No file imported.</span></div></div>
+<div class="card" style="margin-top:14px"><div class="eyebrow">HUMAN SIGNOFF · LOCAL TEST ONLY</div>
+<label style="font-size:12px;line-height:1.7"><input id="review-ack" type="checkbox"> I checked evidence and understand this permits only an in-browser copy test, not publication.</label>
+<div class="gate" id="revision-gate"></div>
+<div class="row"><button id="revision-approve" class="btn primary" disabled>Approve for local retest</button><button id="revision-reject" class="btn">Reject candidate</button><button id="revision-reset" class="btn">Restore sample draft</button></div>
+</div>
+<div class="next"><span>5 / 8 · Minimal revision</span><button class="btn primary" data-next="retest">Run copy-only check →</button></div>
+</section>
+<section class="page" id="retest">
+<div class="eyebrow">06 · HELD-OUT VALIDATION</div><h1>Check the changed text, without overstating results.</h1>
+<p class="lead">An approved revision can be applied to a disposable full-text copy. The original file remains untouched. You can download the revised TXT/Markdown and report, but this does not prove technical correctness or customer acceptance.</p>
+<div class="grid">
+<div class="card"><div class="eyebrow">LOCAL DOCUMENT COPY</div><div class="row"><button id="run-preview" class="btn primary" disabled>Apply to temporary copy</button><button id="download-revised" class="btn" disabled>Download revised file</button><span id="preview-status" class="pill amber">NOT RUN</span></div><p id="preview-detail"></p><h3>Resulting local document copy</h3><div id="preview-text" class="docview revised">No copy created.</div></div>
+<div class="card"><div class="eyebrow">STRUCTURAL SAFETY CHECKS</div><div id="safety-checks" class="muted"></div><p>These checks are only local and never claim actual source correctness, device validation or customer acceptance.</p></div>
+</div>
+<div class="card" style="margin-top:14px"><div class="eyebrow">FROZEN HELD-OUT QUESTIONS</div><p>Record independent observed outcomes. Default is NOT RUN; do not invent improvements.</p><table class="review-table"><thead><tr><th>Question</th><th>Outcome</th></tr></thead><tbody id="holdout-list"></tbody></table><label class="eyebrow" for="holdout-note" style="display:block;margin-top:18px">RETEST CONDITIONS / NOTES</label><textarea class="field" id="holdout-note" rows="3" placeholder="Model, prompt, inputs, observed failures, or why NOT RUN..."></textarea></div>
+<div class="warning">Release gate remains external: source owner review, technical verification, permitted-data checks and publication authorization are not simulated as completed.</div>
+<div class="next"><span>6 / 8 · Before/after and independent tests</span><button class="btn primary" data-next="guide">See the developer experience →</button></div>
+</section>
+
+<section class="page" id="guide">
+<div class="eyebrow">07 · DEVELOPER EXPERIENCE PREVIEW</div><h1>What would a developer actually see?</h1>
+<p class="lead">A front-end concept that consumes the review record above: recorded answer, its evidence labels, follow-up questions and a versioned document paragraph. No live assistant, technical fix or rendered video is claimed.</p>
+<div class="grid">
+<div class="card"><div class="eyebrow">CONVERSATION PANEL · SYNTHETIC</div><div class="question" id="guide-question"></div>
+<div class="row"><label for="guide-choice" class="step-note">Recorded answer</label><select class="field" id="guide-choice" style="max-width:210px"><option value="b">Candidate B</option><option value="a">Candidate A</option></select><span class="pill amber" id="guide-label">UNVERIFIED DRAFT</span></div>
+<div class="docview" id="guide-answer" style="margin-top:15px"></div><div class="eyebrow" style="margin-top:18px">SELECTED EVIDENCE / LIMITS</div><div id="guide-evidence" class="muted"></div></div>
+<div class="card"><div class="eyebrow">DOCUMENT VIEW</div><h3 id="guide-doc-title"></h3><div class="docview revised" id="guide-doc-copy"></div><p id="guide-doc-status"></p>
+<div class="eyebrow" style="margin-top:17px">CLARIFYING QUESTIONS</div><ul id="guide-followups" class="facts"></ul></div>
+</div>
+<div class="card" style="margin-top:14px"><div class="eyebrow">VISUAL EXPLANATION · STORYBOARD ONLY</div><p>Three planned frames outline a possible explanatory clip. No video is generated, narrated or validated.</p><div class="grid4" id="guide-storyboard"></div></div>
+<div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between"><h3>Illustrative feedback</h3><span class="pill amber">NOT CUSTOMER FEEDBACK</span></div><div class="row"><label class="step-note" for="guide-feedback">Was this draft helpful?</label><select class="field" id="guide-feedback" style="max-width:260px"><option value="not_recorded">Not recorded</option><option value="helpful">Helpful · illustrative</option><option value="needs_clarification">Needs clarification · illustrative</option><option value="unhelpful">Not helpful · illustrative</option></select><button class="btn" id="download-guide">Export guide draft (.md)</button></div></div>
+<div class="warning">A visually complete interface does not establish correctness. Model behavior, product instructions, source applicability and video content still require real tests and approval.</div>
+<div class="next"><span>7 / 8 · Developer-facing concept</span><button class="btn primary" data-next="handoff">Export research delivery packet →</button></div>
+</section>
+ <section class="page" id="strategy">
+  <div class="eyebrow">04 · OPTIONAL COMPUTATIONAL EXPLORATION</div><h1>Which unknown should we check first?</h1>
+  <p class="lead">With a limited human-review budget, the framework must decide which verification actions to prioritize. Compare a transparent greedy rule against an exact search of possible action sets. This is combinatorial optimization—not a genetic algorithm, neural-network training, or a measured project result.</p>
+  <div class="grid">
+   <div class="card">
+    <div class="eyebrow">SYNTHETIC INPUTS · CURRENT CASE</div><h3 id="strategy-case">Fictional case</h3>
+    <p id="strategy-context"></p>
+    <label class="eyebrow" for="budget">HYPOTHETICAL REVIEW BUDGET</label>
+    <input class="search-range" id="budget" type="range" min="3" max="15" step="1" value="9">
+    <div class="row" style="justify-content:space-between"><strong id="budget-value">9 minutes</strong><span class="pill">Change budget to explore</span></div>
+    <div id="action-list" style="margin-top:17px"></div>
+   </div>
+   <div class="card">
+    <div class="eyebrow">SEARCH UNDER A CONSTRAINT</div>
+    <div class="search-metric"><span>Possible action sets</span><strong id="plan-count">32</strong></div>
+    <div class="plan"><h3>Exact best set under budget</h3><p id="optimal-plan"></p></div>
+    <div class="plan" style="background:#f8f9fa"><h3>Greedy impact-per-minute baseline</h3><p id="greedy-plan"></p></div>
+    <div class="search-metric"><span>Extra priority points found by exact search</span><strong id="search-difference">0</strong></div>
+    <p class="search-note">Objective: maximize <b>illustrative uncertainty-priority points</b> without exceeding available minutes. Priority points and time estimates were assigned for this fictional demonstration; they are not empirical risk reduction or accuracy measurements.</p>
+   </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+   <div class="eyebrow">TRADEOFFS · ALL POSSIBLE SETS</div><h3>Pareto-efficient action plans</h3>
+   <p>Each row is a non-dominated plan. A different plan can gain more hypothetical priority coverage only by using more review time. The marker indicates whether it fits the current budget.</p>
+   <div id="frontier"></div>
+  </div>
+  <div class="warning"><b>Connection to the course:</b> the framework has a discrete search space, an explicit objective, a resource constraint and a baseline algorithm. Evolutionary search could be evaluated later on larger, real and permitted datasets; this small example deliberately uses exact search as its ground truth and makes no evolutionary-computation performance claims.</div>
+  <div class="next"><span>Optional optimization exploration</span><button class="btn" data-next="diagnosis">Return to the main workflow →</button></div>
+ </section>
+ <section class="page" id="handoff">
+<div class="eyebrow">08 · DELIVERY PACKAGE</div><h1>A traceable record from question to proposed revision.</h1>
+<p class="lead">Export the case, selected evidence, candidate responses, failure diagnosis, proposed document patch, local copy result, and held-out test statuses. Every claim includes its limits.</p>
+<div class="grid"><div class="card"><h3>Evidence & review framework</h3><p>Identifies question facts, source limits, answer review and next actions.</p><span class="pill">IMPLEMENTED HERE</span></div><div class="card"><h3>Documentation revision workstream</h3><p>Minimal before/after draft, explicit approval, copy-only application, repeatable JSON exchange. External team's actual code is not connected.</p><span class="pill amber">SANDBOX ADAPTER</span></div></div>
+<div class="card" style="margin-top:14px"><h3 id="delivery-status">Candidate packet</h3><p id="delivery-summary"></p><div class="row"><button class="btn primary" id="download">Download complete JSON</button><button class="btn" id="download-report">Download case report (.md)</button><button class="btn" id="copy">Copy JSON</button><span class="step-note" id="copy-status" role="status"></span></div></div>
+<div class="card" style="margin-top:14px"><div class="eyebrow">AUDITABLE DELIVERY PREVIEW</div><pre id="json"></pre></div>
+<div class="warning">The export cannot authorize customer publication. No real data, real model run or technical acceptance is included in this classroom build.</div>
+<div class="next"><span>8 / 8 · Delivery</span><button class="btn" data-next="architecture">Back to architecture ↺</button></div>
+ </section>
+ <div class="foot">Synthetic classroom sandbox · Local-only interactions · No external scripts, API requests, user tracking or permanent storage · No customer content</div>
+ </div></main></div>
+<script>
+"use strict";
+const EXAMPLES=[
+{id:"SYN-01",question:"A browser dashboard shows an old reading after reconnecting. Does enabling retry guarantee a fresh value?",facts:["A fictional refresh operation exists.","The reconnect event only reports transport status.","The report does not provide a library version."],gaps:["Client version","Timestamped reproduction","Was refresh invoked?"],evidence:[
+{id:"S1",source:"Invented SDK note",claim:"Successful explicit refresh returns the current snapshot.",limit:"Only if refresh is actually called and succeeds."},
+{id:"S2",source:"Invented integration note",claim:"Reconnect signals transport restoration.",limit:"Does not guarantee that displayed data was refreshed."},
+{id:"S3",source:"Invented report",claim:"One user saw a stale reading after reconnecting.",limit:"No device logs or reproduction are available."}],
+a:"Enable retry: reconnect always updates the dashboard and solves this issue on all versions.",b:"Reconnect alone does not establish fresh displayed data. Check whether refresh ran and collect the client version and timestamps before recommending a fix."},
+{id:"SYN-02",question:"A CSV export drops some accented characters. Is stripping accents a safe automatic fix?",facts:["The fictional exporter offers UTF-8.","The importing application is unknown.","No approved transformation policy is supplied."],gaps:["Actual file encoding","Destination application","Data-loss policy"],evidence:[
+{id:"S1",source:"Invented export manual",claim:"UTF-8 is a supported export encoding.",limit:"Does not prove UTF-8 was selected."},
+{id:"S2",source:"Invented data-handling note",claim:"Stripping accents may alter names and identifiers.",limit:"Requires an explicit compatibility rationale."},
+{id:"S3",source:"Invented sample report",claim:"A spreadsheet appeared to lose accents.",limit:"Original bytes and import settings are missing."}],
+a:"Strip accents from every field. This always fixes CSV issues and preserves meaning.",b:"First check export encoding and importer settings on a controlled sample. Avoid irreversible normalization without an approved requirement."}
+];
+const STRATEGY_CHECKS=[
+[{name:"Check client version",minutes:2,points:3},{name:"Reconcile reconnect and refresh timestamps",minutes:5,points:10},{name:"Inspect whether explicit refresh ran",minutes:4,points:8},{name:"Reproduce the offline transition",minutes:6,points:13},{name:"Inspect cache invalidation",minutes:3,points:2}],
+[{name:"Inspect raw CSV byte encoding",minutes:4,points:9},{name:"Confirm selected export encoding",minutes:2,points:3},{name:"Compare two importer configurations",minutes:6,points:11},{name:"Compare source Unicode values",minutes:3,points:5},{name:"Review permitted normalization policy",minutes:5,points:4}]
+];
+let budget=9;
+
+const DOCS=[
+ {id:"SYN-DOC-01",label:"Invented SDK / Connection lifecycle",version:"synthetic v1.3",section:"4.2 · Reconnect and refresh",before:"The reconnect callback indicates that transport is available. Applications can call refresh() to request a new snapshot.",after:"The reconnect callback indicates transport availability only; it does not guarantee that the displayed reading is fresh. After reconnecting, explicitly request refresh() and verify completion before treating a reading as current.",rationale:"Clarify the boundary between restoring the connection and updating the displayed data. This is not a confirmed fix.",heldout:[{id:"H01",question:"Does reconnect guarantee an updated displayed reading?"},{id:"H02",question:"What must be checked before treating a reading as current?"}]},
+ {id:"SYN-DOC-02",label:"Invented guide / CSV export settings",version:"synthetic v2.1",section:"3.1 · Text encoding",before:"CSV export supports UTF-8 encoding. Text is saved using the configured export setting.",after:"CSV export supports UTF-8 encoding. If accented text appears changed after import, check the exported file encoding and the importing application's settings using the same sample. Avoid stripping accents unless an explicit data policy permits that transformation.",rationale:"Add a non-destructive diagnostic step instead of asserting that removing diacritics is harmless.",heldout:[{id:"H01",question:"How would you distinguish export encoding from import rendering?"},{id:"H02",question:"When is accent removal allowed?"}]}
+];
+const CRITERIA=["Traceable evidence","Uncertainty and scope","Next verification step","Avoid unsupported claims"];
+let idx=0,chosen=new Set([0,1]),ratings={a:["","","",""],b:["","","",""]},decision="not_decided";
+let guideChoice="b",guideFeedback="not_recorded";
+let answers={a:"",b:""},failureMode="unassessed",diagnosisNote="",revision={},riskAcknowledged=false,previewCopy=null,previewStatus="not_run",holdout={},holdoutNote="";
+let docSource=null,sourceBlocks=[],sourceBlockIndex=0;
+function resetSource(){
+ const d=DOCS[idx];docSource={name:"fictional-document-"+(idx+1)+".txt",extension:".txt",kind:"synthetic",text:d.before};
+ sourceBlocks=[d.before];sourceBlockIndex=0;
+}
+function paragraphs(text){
+ const all=text.split(/\r?\n[ \t]*\r?\n/g).map(x=>x.trim()).filter(x=>x.length>=8);
+ const dedup=[...new Set(all)];
+ return dedup.length?dedup.slice(0,100):[text.trim()].filter(Boolean)
+}
+function sourceHits(part){
+ if(!docSource||!part)return 0;
+ let pos=0,n=0;
+ while((pos=docSource.text.indexOf(part,pos))!==-1){n++;if(n>1)break;pos+=part.length}
+ return n
+}
+function freshRevision(){
+ const d=DOCS[idx],imported=docSource?.kind==="local_import";
+ return{
+  schema:"documentation-revision/v1",revision_id:"SYN-REV-"+(idx+1),case_id:EXAMPLES[idx].id,
+  document_id:imported?"LOCAL-DOC-"+(idx+1):d.id,
+  source_label:imported?docSource.name:d.label,source_version:imported?"unverified local text":d.version,
+  section:imported?"Selected paragraph "+(sourceBlockIndex+1):d.section,
+  before:imported?sourceBlocks[sourceBlockIndex]:d.before,
+  after:imported?sourceBlocks[sourceBlockIndex]:d.after,
+  rationale:imported?"":d.rationale,origin:imported?"local_text_document":"synthetic_local_draft",status:"proposed"
+ }
+}
+function resetRetest(){previewCopy=null;previewStatus="not_run";holdout={H01:"not_run",H02:"not_run"};holdoutNote=""}
+function revokeApproval(){if(revision.status==="approved_for_retest")revision.status="proposed";resetRetest()}
+function gateReasons(){const reasons=[];
+ if(failureMode!=="clarity")reasons.push("select a suspected documentation clarity gap");
+ if(!chosen.size)reasons.push("select supporting evidence");
+ if(decision==="not_decided")reasons.push("record the human answer review decision");
+ if(revision.status==="rejected")reasons.push("restore or edit the rejected draft");
+ if(!revision.after?.trim()||revision.after.trim()===revision.before.trim())reasons.push("propose a substantive, nonempty change");
+ if(revision.after?.length>20000||revision.before?.length>20000)reasons.push("keep replacement text below 20,000 characters");
+ if(sourceHits(revision.before)!==1)reasons.push("match the source paragraph exactly once");
+ if(!riskAcknowledged)reasons.push("acknowledge copy-only testing");
+ return reasons}
+function renderSource(){
+ const d=DOCS[idx];by("doc-source-info").textContent=(docSource.kind==="synthetic"?"Built-in fictional source: ":"Local offline file: ")+docSource.name+" · "+docSource.text.length+" characters · "+sourceBlocks.length+" candidate paragraphs.";
+ const select=by("doc-blocks");select.replaceChildren();
+ sourceBlocks.forEach((t,i)=>{const o=node("option",(i+1)+". "+t.replace(/\s+/g," ").slice(0,110));o.value=String(i);select.append(o)});
+ select.value=String(sourceBlockIndex);
+ by("doc-select-block").disabled=sourceBlocks.length===0;
+ by("document-heading").textContent=docSource.name+" · "+revision.section;
+ by("document-before").textContent=revision.before;
+ by("revision-target").textContent=docSource.name+" · "+revision.source_version+" · exact matches: "+sourceHits(revision.before);
+}
+function chooseParagraph(index){
+ if(!Number.isInteger(index)||index<0||index>=sourceBlocks.length)return;
+ sourceBlockIndex=index;revision=freshRevision();riskAcknowledged=false;resetRetest();
+ renderSource();renderRevision();renderRetest();renderGuide();renderDelivery();
+}
+async function importDocument(file){
+ const status=by("doc-import-status");
+ if(!file)return;
+ try{
+  if(typeof file.name!=="string"||!/\.(txt|text|md)$/i.test(file.name))throw Error("Use a .txt or .md file");
+  if(!Number.isFinite(file.size)||file.size>200000||file.size<=0)throw Error("File must be 1–200,000 bytes");
+  const contents=await file.text();
+  if(!contents.trim()||contents.length>200000||/\u0000/.test(contents))throw Error("Only nonempty UTF-8 text can be imported");
+  const blocks=paragraphs(contents);if(!blocks.length)throw Error("No usable text paragraphs");
+  docSource={name:file.name.slice(0,130),extension:/\.md$/i.test(file.name)?".md":".txt",kind:"local_import",text:contents};
+  sourceBlocks=blocks;sourceBlockIndex=0;revision=freshRevision();riskAcknowledged=false;resetRetest();
+  status.textContent="Loaded locally. Choose a paragraph, write a revision, and approve the copy-only test.";
+  renderSource();renderRevision();renderRetest();renderGuide();renderDelivery()
+ }catch(err){status.textContent="Import rejected: "+err.message}
+ by("doc-import").value=""
+}
+function restoreSource(){
+ resetSource();revision=freshRevision();riskAcknowledged=false;resetRetest();
+ by("doc-import-status").textContent="Synthetic source restored. No local file retained.";
+ renderSource();renderRevision();renderRetest();renderGuide();renderDelivery()
+}
+
+function by(id){return document.getElementById(id)}
+function node(tag,txt){const x=document.createElement(tag);x.textContent=txt;return x}
+function show(page){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===page));document.querySelectorAll("[data-page]").forEach(b=>{b.classList.toggle("active",b.dataset.page===page);b.setAttribute("aria-current",b.dataset.page===page?"page":"false")});by("crumb").textContent={architecture:"Architecture",case:"Question",evidence:"Evidence",review:"Human review",diagnosis:"Failure diagnosis",revision:"Document revision",retest:"Retest",guide:"Developer preview",strategy:"Search lab",handoff:"Delivery"}[page];if(page==="strategy")renderStrategy();if(page==="diagnosis")renderDiagnosis();if(page==="revision")renderRevision();if(page==="retest")renderRetest();if(page==="guide")renderGuide();if(page==="handoff")renderDelivery();window.scrollTo(0,0)}
+function renderCase(){const c=EXAMPLES[idx];by("question").textContent=c.question;by("facts").replaceChildren(...c.facts.map(x=>node("li",x)));by("gaps").replaceChildren(...c.gaps.map(x=>node("span",x)));by("scenario").value=String(idx)}
+function renderEvidence(){const box=by("evidence-list");box.replaceChildren();EXAMPLES[idx].evidence.forEach((x,i)=>{const label=document.createElement("label");label.className="item";const ck=document.createElement("input");ck.type="checkbox";ck.checked=chosen.has(i);ck.addEventListener("change",()=>{if(ck.checked)chosen.add(i);else chosen.delete(i);revokeApproval();renderCount();renderRevision();renderRetest();renderDelivery()});const content=document.createElement("div");content.append(node("h3",x.id+" · "+x.source),node("p",x.claim),node("small","Scope: "+x.limit));label.append(ck,content);box.append(label)});renderCount()}
+function renderCount(){by("count").textContent=chosen.size+" / "+EXAMPLES[idx].evidence.length+" fictional records selected"}
+function renderReview(){const c=EXAMPLES[idx];by("answer-a").value=answers.a;by("answer-b").value=answers.b;["a","b"].forEach(slot=>{const root=by("ratings-"+slot);root.replaceChildren();CRITERIA.forEach((label,i)=>{const row=document.createElement("div");row.className="criterion";const select=document.createElement("select");select.setAttribute("aria-label",slot+" "+label);[["","Unrated"],["0","0 / 2"],["1","1 / 2"],["2","2 / 2"]].forEach(([value,text])=>{const opt=node("option",text);opt.value=value;select.append(opt)});select.value=ratings[slot][i];select.addEventListener("change",()=>{ratings[slot][i]=select.value;renderScore(slot);revokeApproval();renderRevision();renderRetest();renderDelivery()});row.append(node("span",label),select);root.append(row)});renderScore(slot)});by("decision").value=decision}
+
+function renderDiagnosis(){
+ by("failure-class").value=failureMode;by("diagnosis-note").value=diagnosisNote;
+ const titles={unassessed:"Unassessed",access:"Source access concern",retrieval:"Retrieval concern",version:"Version mismatch concern",reasoning:"Interpretation concern",clarity:"Possible documentation clarity gap",context:"Context missing",no_failure:"No failure observed"};
+ by("diagnosis-title").textContent=titles[failureMode];
+ by("diagnosis-explanation").textContent=failureMode==="clarity"?"A small documentation clarification can be proposed if supported by evidence. This does not establish root cause.":"A document rewrite is not yet justified by this classification. Preserve the alternative causes and record the next test.";
+ by("diagnosis-gate").textContent=failureMode==="clarity"?"A documentation edit can be reviewed for a LOCAL TEST, subject to independent evidence and reviewer consent.":"Local document revision approval is blocked until a reviewer selects a possible documentation clarity gap.";
+}
+function renderRevisionGate(){
+ const reasons=gateReasons();
+ by("revision-gate").textContent=reasons.length?"Before authorizing the local test: "+reasons.join("; ")+".":"Required local review checks are recorded. Approval here is for a temporary copy only.";
+ by("revision-status").textContent=revision.status.replace(/_/g," ").toUpperCase();
+ by("revision-approve").disabled=!!reasons.length||revision.status==="approved_for_retest";
+}
+function renderRevision(){
+ renderSource();
+ by("document-after").value=revision.after;by("document-reason").value=revision.rationale;
+ by("review-ack").checked=riskAcknowledged;renderRevisionGate();
+}
+function renderRetest(){
+ by("run-preview").disabled=revision.status!=="approved_for_retest";
+ by("preview-status").textContent=previewStatus.replace(/_/g," ").toUpperCase();
+ by("preview-detail").textContent=previewStatus==="not_run"?"Apply the approved revision only to a temporary copy of the synthetic paragraph.":"Latest local copy operation: "+previewStatus.replace(/_/g," ")+".";
+ by("preview-text").textContent=previewCopy===null?"No copy created.":previewCopy.slice(0,14000)+(previewCopy.length>14000?"\n[Preview truncated; exported file retains full text]":"");
+ by("download-revised").disabled=previewStatus!=="applied_to_copy";
+ const checks=[["Different, nonempty proposed paragraph",!!revision.after?.trim()&&revision.after.trim()!==revision.before.trim()],["At least one evidence link recorded",chosen.size>0],["Human answer review decision exists",decision!=="not_decided"],["Revision approved for a local test",revision.status==="approved_for_retest"],["Paragraph appears exactly once in frozen source",sourceHits(revision.before)===1],["Disposable local copy actually created",previewStatus==="applied_to_copy"]];
+ by("safety-checks").replaceChildren(...checks.map(([label,ok])=>node("p",(ok?"✓ ":"○ ")+label)));
+ const root=by("holdout-list");root.replaceChildren();
+ for(const q of DOCS[idx].heldout){
+  const tr=document.createElement("tr"),td=node("td",q.id+" · "+q.question),td2=document.createElement("td"),sel=document.createElement("select");
+  sel.className="field";sel.setAttribute("aria-label","Outcome "+q.id);
+  [["not_run","NOT RUN"],["improved","Improved · human observed"],["unchanged","Unchanged"],["regressed","Regression observed"],["inconclusive","Inconclusive"]].forEach(([value,label])=>{const o=node("option",label);o.value=value;sel.append(o)});
+  sel.value=holdout[q.id]||"not_run";sel.addEventListener("change",()=>{holdout[q.id]=sel.value;renderDelivery()});
+  td2.append(sel);tr.append(td,td2);root.append(tr);
+ }
+ by("holdout-note").value=holdoutNote
+}
+function applyCopy(){
+ if(revision.status!=="approved_for_retest"){previewStatus="blocked_not_approved";previewCopy=null}
+ else if(sourceHits(revision.before)!==1){previewStatus="blocked_source_mismatch";previewCopy=null}
+ else if(!revision.after.trim()||revision.after.trim()===revision.before.trim()){previewStatus="blocked_no_change";previewCopy=null}
+ else{previewCopy=docSource.text.replace(revision.before,revision.after);previewStatus="applied_to_copy"}
+ renderRetest();renderDelivery()
+}
+function renderScore(s){const r=ratings[s];by("score-"+s).textContent=r.every(x=>x!=="")?"Human-entered: "+r.reduce((sum,x)=>sum+Number(x),0)+" / 8 · not a benchmark":r.filter(Boolean).length+" / 4 criteria manually rated"}
+function enumeratePlans(items){
+ const plans=[];
+ for(let mask=0;mask<(1<<items.length);mask++){
+  let minutes=0,points=0,labels=[];
+  for(let i=0;i<items.length;i++){if(mask&(1<<i)){minutes+=items[i].minutes;points+=items[i].points;labels.push(items[i].name)}}
+  plans.push({mask,minutes,points,labels});
+ }
+ return plans;
+}
+function searchResults(){
+ const items=STRATEGY_CHECKS[idx],plans=enumeratePlans(items),eligible=plans.filter(p=>p.minutes<=budget);
+ eligible.sort((a,b)=>b.points-a.points||a.minutes-b.minutes||a.mask-b.mask);
+ const optimal=eligible[0],greedyItems=items.map((item,i)=>({...item,i})).sort((a,b)=>b.points/b.minutes-a.points/a.minutes||a.i-b.i);
+ let minutes=0,points=0,labels=[];
+ for(const item of greedyItems){if(minutes+item.minutes<=budget){minutes+=item.minutes;points+=item.points;labels.push(item.name)}}
+ const greedy={minutes,points,labels};
+ const frontier=plans.filter(p=>!plans.some(q=>q.minutes<=p.minutes&&q.points>=p.points&&(q.minutes<p.minutes||q.points>p.points))).sort((a,b)=>a.minutes-b.minutes||a.points-b.points);
+ return {plans,optimal,greedy,frontier};
+}
+function labelPlan(p){return p.points+" toy priority points / "+p.minutes+" min · "+(p.labels.length?p.labels.join(" + "):"No checks")}
+function renderStrategy(){
+ const items=STRATEGY_CHECKS[idx],res=searchResults(),total=items.reduce((n,x)=>n+x.points,0);
+ by("strategy-case").textContent=EXAMPLES[idx].id+" · "+EXAMPLES[idx].question;
+ by("strategy-context").textContent=chosen.size+" of "+EXAMPLES[idx].evidence.length+" fictional evidence records selected earlier. The search explores follow-up checks for remaining unknowns; it does not validate those sources.";
+ by("budget").value=String(budget);by("budget-value").textContent=budget+" illustrative minutes";
+ const act=by("action-list");act.replaceChildren();
+ for(const item of items){const row=document.createElement("div");row.className="action-row";row.append(node("b",item.name),node("small",item.minutes+" min · "+item.points+" pts"));act.append(row)}
+ by("plan-count").textContent=String(res.plans.length);
+ by("optimal-plan").textContent=labelPlan(res.optimal);
+ by("greedy-plan").textContent=labelPlan(res.greedy);
+ by("search-difference").textContent="+"+(res.optimal.points-res.greedy.points);
+ const front=by("frontier");front.replaceChildren();
+ for(const p of res.frontier){
+  const row=document.createElement("div");row.className="frontier-row";
+  const cost=node("span",p.minutes+" min");
+  const bar=document.createElement("div");bar.className="frontier-bar";const fill=document.createElement("span");fill.style.width=(p.points/total*100)+"%";bar.append(fill);
+  const suffix=node("small",p.points+" pts"+(p.minutes<=budget?" · ✓":""));row.append(cost,bar,suffix);row.title=(p.labels.join(", ")||"No checks");
+  if(p.mask===res.optimal.mask){row.style.fontWeight="800";row.title="Best under current budget: "+row.title}
+  front.append(row)
+ }
+}
+function payload(){
+ const c=EXAMPLES[idx],human=slot=>Object.fromEntries(CRITERIA.map((name,i)=>[name,ratings[slot][i]===""?null:Number(ratings[slot][i])]));const search=searchResults();
+ return{
+  schema:"research-documentation-handoff/v0.3",fictional_demo:true,document_source_kind:docSource.kind,
+  case:{id:c.id,question:c.question,known_facts:c.facts,unknowns:c.gaps,document_reference:revision.document_id},
+  document_snapshot:{name:docSource.name,type:docSource.kind,extension:docSource.extension,original_text:docSource.text,character_count:docSource.text.length,selected_paragraph:revision.before,exact_match_count:sourceHits(revision.before),customer_source_verified:false},
+  evidence:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>({id:x.id,source_label:x.source,claim:x.claim,scope_limit:x.limit})),
+  recorded_answers:[{id:"A",source:"manual_or_synthetic",output:answers.a,human_scores:human("a")},{id:"B",source:"manual_or_synthetic",output:answers.b,human_scores:human("b")}],
+  reviewer_choice:decision,
+  failure_diagnosis:{status:"HYPOTHESIS_ONLY",category:failureMode,notes:diagnosisNote,confirmed_root_cause:false},
+  proposed_revision:{...revision,evidence_links:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>x.id),local_retest_approved:revision.status==="approved_for_retest",customer_publication_approved:false},
+  patch_execution:{status:previewStatus,result_copy:previewCopy,original_modified:false},
+  heldout_evaluation:{questions:DOCS[idx].heldout.map(q=>({...q,outcome:holdout[q.id]||"not_run"})),notes:holdoutNote,real_model_test_performed:false},
+  optional_search_experiment:{synthetic_only:true,goal:"maximize invented priority points under toy review-time constraint",budget_minutes:budget,candidate_action_sets:search.plans.length,exact_best:{minutes:search.optimal.minutes,points:search.optimal.points,checks:search.optimal.labels},greedy_baseline:{minutes:search.greedy.minutes,points:search.greedy.points,checks:search.greedy.labels},evolutionary_algorithm_used:false},
+  developer_preview:{status:"SYNTHETIC_NOT_VERIFIED",shown_candidate:guideChoice,draft_answer:answers[guideChoice],evidence_ids:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>x.id),document_paragraph:previewCopy===null?revision.before:revision.after,video_storyboard:storyboard(),video_generated:false,illustrative_feedback:guideFeedback,customer_study_performed:false},
+  release:{status:"NOT_AUTHORIZED",publication:false,real_device_validation:"NOT_RUN",customer_acceptance:"NOT_RUN"},
+  downstream_adapter:{schema:"documentation-revision/v1",mode:"local_json_import_and_copy_preview_only",teammate_private_code_connected:false}
+ }
+}
+function renderJson(){by("json").textContent=JSON.stringify(payload(),null,2)}
+
+
+function storyboard(){return idx===0?
+ ["Show the fictional dashboard during reconnect","Contrast transport status with the displayed reading","Illustrate the refresh check and the next question"]:
+ ["Show accented characters in an invented CSV","Compare export and import encoding options","Show a reversible before/after comparison"]}
+function renderGuide(){
+ const c=EXAMPLES[idx],d=DOCS[idx];
+ by("guide-question").textContent=c.question;by("guide-choice").value=guideChoice;
+ by("guide-answer").textContent=answers[guideChoice];
+ by("guide-label").textContent="UNVERIFIED · CANDIDATE "+guideChoice.toUpperCase();
+ by("guide-doc-title").textContent=docSource.name+" · "+revision.section;
+ by("guide-doc-copy").textContent=previewCopy===null?revision.before:revision.after;
+ by("guide-doc-status").textContent=previewCopy===null?"Current synthetic source; proposed revision NOT applied.":"Local edited copy only; still NOT published or independently validated.";
+ const refs=by("guide-evidence");refs.replaceChildren();
+ const data=c.evidence.filter((_,i)=>chosen.has(i));if(!data.length)refs.append(node("p","No supporting evidence selected."));
+ for(const x of data)refs.append(node("p",x.id+" · "+x.source+": "+x.claim+" (limit: "+x.limit+")"));
+ by("guide-followups").replaceChildren(...c.gaps.map(g=>node("li",g+"?")));
+ const frames=by("guide-storyboard");frames.replaceChildren();
+ storyboard().forEach((line,i)=>{const box=document.createElement("div");box.className="step";box.append(node("b","FRAME "+(i+1)+" / PLANNED"),node("h3",line),node("p","No generated video. Planning note only."));frames.append(box)});
+ by("guide-feedback").value=guideFeedback
+}
+function guideMarkdown(){
+ const c=EXAMPLES[idx],d=DOCS[idx],refs=c.evidence.filter((_,i)=>chosen.has(i));
+ return ["# Synthetic developer guide","","Status: DRAFT / NOT VERIFIED","","## Question",c.question,"","## Candidate answer",answers[guideChoice],"","## Fictional evidence",...refs.map(x=>"- "+x.id+": "+x.claim+" (limit: "+x.limit+")"),"","## Clarifying questions",...c.gaps.map(g=>"- "+g),"","## Documentation paragraph",previewCopy===null?d.before:previewCopy,"","## Video storyboard (not generated)",...storyboard().map((g,i)=>"- "+(i+1)+". "+g),"","Feedback is illustrative only: "+guideFeedback,""].join("\n")
+}
+function renderDelivery(){
+ const remaining=DOCS[idx].heldout.filter(q=>(holdout[q.id]||"not_run")==="not_run").length;
+ by("delivery-status").textContent=previewStatus==="applied_to_copy"?"Temporary document copy generated · release still blocked":"Candidate research packet · no document changed";
+ by("delivery-summary").textContent="Document: "+docSource.name+" ("+docSource.kind+"); "+chosen.size+" selected evidence records; answer review: "+decision.replace(/_/g," ")+"; diagnosis: "+failureMode.replace(/_/g," ")+"; revision: "+revision.status.replace(/_/g," ")+"; "+remaining+" held-out tests NOT RUN. Publication and customer acceptance remain NOT AUTHORIZED.";
+ renderJson();
+}
+function reportMarkdown(){
+ const p=payload(),lines=[
+ "# Synthetic case and documentation revision report","",
+ "Status: CANDIDATE / NOT CUSTOMER VALIDATED","","## Developer question",p.case.question,"",
+ "## Known facts",...p.case.known_facts.map(x=>"- "+x),"",
+ "## Missing context",...p.case.unknowns.map(x=>"- "+x),"",
+ "## Evidence",...(p.evidence.length?p.evidence.map(x=>"- "+x.id+" · "+x.claim+" [limit: "+x.scope_limit+"]"):["- NOT PROVIDED"]),"",
+ "## Candidate answer review","- Human choice: "+decision,"- Candidate A: "+answers.a,"- Candidate B: "+answers.b,"",
+ "## Failure diagnosis","- Hypothesis: "+failureMode,"- Notes: "+diagnosisNote,"- Root cause confirmed: NO","",
+ "## Proposed document revision","- Document / section: "+revision.source_label+" / "+revision.section,"- Source kind: "+docSource.kind,"- Exact source occurrences: "+sourceHits(revision.before),"- Revision status: "+revision.status,"",
+ "### Baseline paragraph",revision.before,"","### Proposed paragraph",revision.after,"","### Rationale",revision.rationale,"",
+ "## Copy-only validation","- Status: "+previewStatus,"- Original file modified: NO","",
+ "## Held-out checks",...p.heldout_evaluation.questions.map(q=>"- "+q.id+" · "+q.question+": "+q.outcome),"- Notes: "+holdoutNote,"",
+ "## Release boundary","- Real model rerun: NOT RUN","- Device validation: NOT RUN","- Customer acceptance: NOT RUN","- Publication: NOT AUTHORIZED",""
+ ];return lines.join("\n")
+}
+function downloadText(name,contents,mime){
+ const blob=new Blob([contents],{type:mime}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500)
+}
+function revisionAdapter(){
+ return{schema:"documentation-revision/v1",revision_id:revision.revision_id,case_id:EXAMPLES[idx].id,document_id:revision.document_id,source_filename:docSource.name,source_kind:docSource.kind,source_version:revision.source_version,section:revision.section,before:revision.before,after:revision.after,rationale:revision.rationale,status:revision.status,exact_original_occurrences:sourceHits(revision.before),approved_for_publication:false}
+}
+function revisedFilename(){
+ const base=docSource.name.replace(/\.(md|txt|text)$/i,"").replace(/[^A-Za-z0-9._-]/g,"_").slice(0,90)||"document";
+ return base+"-candidate"+docSource.extension
+}
+function downloadRevised(){
+ if(previewStatus!=="applied_to_copy"||previewCopy===null)return;
+ downloadText(revisedFilename(),previewCopy,docSource.extension===".md"?"text/markdown;charset=utf-8":"text/plain;charset=utf-8")
+}
+async function importRevision(file){
+ if(!file)return;const out=by("import-status");
+ if(file.size>100000){out.textContent="Rejected: over 100 KB";return}
+ try{
+  const v=JSON.parse(await file.text());
+  if(v?.schema!=="documentation-revision/v1"||v.case_id!==EXAMPLES[idx].id||typeof v.before!=="string"||typeof v.after!=="string"||typeof v.rationale!=="string")throw Error("schema or case mismatch");
+  if([v.before,v.after,v.rationale].some(t=>t.length>5000)||!v.before.trim()||!v.after.trim())throw Error("missing or oversized text");
+  revision={...freshRevision(),before:v.before,after:v.after,rationale:v.rationale,origin:"local_imported_json",status:"proposed",revision_id:String(v.revision_id||"SYN-IMPORT").slice(0,80)};
+  riskAcknowledged=false;resetRetest();out.textContent="Imported as unapproved draft; baseline match required.";
+  renderRevision();renderRetest();renderDelivery()
+ }catch(e){out.textContent="Import rejected: "+e.message}
+ by("revision-import").value=""
+}
+
+function reset(i){
+ idx=i;budget=9;chosen=new Set([0,1]);ratings={a:["","","",""],b:["","","",""]};decision="not_decided";
+ answers={a:EXAMPLES[idx].a,b:EXAMPLES[idx].b};guideChoice="b";guideFeedback="not_recorded";failureMode="unassessed";diagnosisNote="";resetSource();revision=freshRevision();riskAcknowledged=false;resetRetest();
+ renderCase();renderEvidence();renderReview();renderDiagnosis();renderRevision();renderRetest();renderGuide();renderStrategy();renderDelivery()
+}
+document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.page)));document.querySelectorAll("[data-next]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.next)));
+by("scenario").addEventListener("change",e=>reset(Number(e.target.value)));
+by("budget").addEventListener("input",e=>{budget=Number(e.target.value);renderStrategy();renderDelivery()});
+by("decision").addEventListener("change",e=>{decision=e.target.value;revokeApproval();renderRevision();renderRetest();renderDelivery()});
+for(const slot of ["a","b"])by("answer-"+slot).addEventListener("input",e=>{answers[slot]=e.target.value;revokeApproval();renderRevision();renderRetest();renderDelivery()});
+by("failure-class").addEventListener("change",e=>{failureMode=e.target.value;revokeApproval();renderDiagnosis();renderRevision();renderRetest();renderDelivery()});
+by("diagnosis-note").addEventListener("input",e=>{diagnosisNote=e.target.value;revokeApproval();renderRevisionGate();renderRetest();renderDelivery()});
+for(const [id,key] of [["document-after","after"],["document-reason","rationale"]])by(id).addEventListener("input",e=>{
+ revision[key]=e.target.value;revision.status="proposed";riskAcknowledged=false;by("review-ack").checked=false;
+ resetRetest();renderRevisionGate();renderRetest();renderDelivery()
+});
+by("review-ack").addEventListener("change",e=>{riskAcknowledged=e.target.checked;renderRevisionGate()});
+by("revision-approve").addEventListener("click",()=>{
+ if(gateReasons().length)return;revision.status="approved_for_retest";resetRetest();
+ renderRevision();renderRetest();renderDelivery()
+});
+by("revision-reject").addEventListener("click",()=>{revision.status="rejected";riskAcknowledged=false;resetRetest();renderRevision();renderRetest();renderDelivery()});
+by("revision-reset").addEventListener("click",()=>{revision=freshRevision();riskAcknowledged=false;resetRetest();renderRevision();renderRetest();renderDelivery()});
+by("revision-import").addEventListener("change",e=>importRevision(e.target.files?.[0]));
+by("download-revision").addEventListener("click",()=>downloadText("documentation-revision-candidate.json",JSON.stringify(revisionAdapter(),null,2)+"\n","application/json;charset=utf-8"));
+by("doc-import").addEventListener("change",e=>importDocument(e.target.files?.[0]));
+by("doc-select-block").addEventListener("click",()=>chooseParagraph(Number(by("doc-blocks").value)));
+by("doc-restore").addEventListener("click",restoreSource);
+by("run-preview").addEventListener("click",applyCopy);
+by("download-revised").addEventListener("click",downloadRevised);
+by("holdout-note").addEventListener("input",e=>{holdoutNote=e.target.value;renderDelivery()});
+by("guide-choice").addEventListener("change",e=>{guideChoice=e.target.value;renderGuide();renderDelivery()});
+by("guide-feedback").addEventListener("change",e=>{guideFeedback=e.target.value;renderDelivery()});
+by("download-guide").addEventListener("click",()=>downloadText("synthetic-developer-guide.md",guideMarkdown(),"text/markdown"));
+by("download").addEventListener("click",()=>downloadText("synthetic-research-handoff.json",JSON.stringify(payload(),null,2)+"\n","application/json"));
+by("download-report").addEventListener("click",()=>downloadText("synthetic-documentation-case-report.md",reportMarkdown(),"text/markdown"));
+by("copy").addEventListener("click",async()=>{const data=JSON.stringify(payload(),null,2);try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(data)}else{const ta=document.createElement("textarea");ta.value=data;document.body.append(ta);ta.select();if(!document.execCommand("copy"))throw Error("unsupported");ta.remove()}by("copy-status").textContent="Copied"}catch(e){by("copy-status").textContent="Please use Download JSON"}});
+reset(0);
+</script>
+</body></html>
