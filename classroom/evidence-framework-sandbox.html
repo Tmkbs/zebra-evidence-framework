@@ -449,7 +449,7 @@ function renderGuide(){
 }
 function guideMarkdown(){
  const c=EXAMPLES[idx],d=DOCS[idx],refs=c.evidence.filter((_,i)=>chosen.has(i));
- return ["# Synthetic developer guide","","Status: DRAFT / NOT VERIFIED","","## Question",c.question,"","## Candidate answer",answers[guideChoice],"","## Fictional evidence",...refs.map(x=>"- "+x.id+": "+x.claim+" (limit: "+x.limit+")"),"","## Clarifying questions",...c.gaps.map(g=>"- "+g),"","## Documentation paragraph",previewCopy===null?d.before:previewCopy,"","## Video storyboard (not generated)",...storyboard().map((g,i)=>"- "+(i+1)+". "+g),"","Feedback is illustrative only: "+guideFeedback,""].join("\n")
+ return ["# "+(c.synthetic?"Synthetic QA":"Public-source research")+" developer guide","","Status: DRAFT / NOT VERIFIED","","## Question",c.question,"","## Candidate answer",answers[guideChoice],"","## Source-linked evidence",...refs.map(x=>"- "+x.id+": "+x.claim+" (limit: "+x.limit+")"+(x.url?" — "+x.url:"")),"","## Clarifying questions",...c.gaps.map(g=>"- "+g),"","## Research note / document paragraph",previewCopy===null?revision.before:revision.after,"","Document type: "+docSource.kind+"; a public case-review note is not official manufacturer documentation.","","## Video storyboard (not generated)",...storyboard().map((g,i)=>"- "+(i+1)+". "+g),"","Feedback is illustrative only: "+guideFeedback,""].join("\n")
 }
 function renderDelivery(){
  const remaining=DOCS[idx].heldout.filter(q=>(holdout[q.id]||"not_run")==="not_run").length;
@@ -459,14 +459,14 @@ function renderDelivery(){
 }
 function reportMarkdown(){
  const p=payload(),lines=[
- "# Synthetic case and documentation revision report","",
- "Status: CANDIDATE / NOT CUSTOMER VALIDATED","","## Developer question",p.case.question,"",
+ "# "+(EXAMPLES[idx].synthetic?"Synthetic QA":"Public-source research")+" documentation review report","",
+ "Status: CANDIDATE / NOT CUSTOMER VALIDATED","- Model: "+(EXAMPLES[idx].model_status||"SYNTHETIC_ONLY"),"- Original public question: "+(EXAMPLES[idx].case_url||"SYNTHETIC_FIXTURE"),"- Published team research source: "+(EXAMPLES[idx].report_url||"SYNTHETIC_FIXTURE"),"","## Developer question",p.case.question,"",
  "## Known facts",...p.case.known_facts.map(x=>"- "+x),"",
  "## Missing context",...p.case.unknowns.map(x=>"- "+x),"",
- "## Evidence",...(p.evidence.length?p.evidence.map(x=>"- "+x.id+" · "+x.claim+" [limit: "+x.scope_limit+"]"):["- NOT PROVIDED"]),"",
- "## Candidate answer review","- Human choice: "+decision,"- Candidate A: "+answers.a,"- Candidate B: "+answers.b,"",
+ "## Evidence",...(p.evidence.length?p.evidence.map(x=>"- "+x.id+" · "+x.claim+" [limit: "+x.scope_limit+"]"+(x.public_url?" [source: "+x.public_url+"]":"")):["- NOT PROVIDED"]),"",
+ "## Candidate answer review","- Human choice: "+decision,"- Candidate A: "+(answers.a||"NOT RUN"),"- Candidate B: "+(answers.b||"NOT RUN"),"- Real-model controlled comparison: NOT RUN","",
  "## Failure diagnosis","- Hypothesis: "+failureMode,"- Notes: "+diagnosisNote,"- Root cause confirmed: NO","",
- "## Proposed document revision","- Document / section: "+revision.source_label+" / "+revision.section,"- Source kind: "+docSource.kind,"- Exact source occurrences: "+sourceHits(revision.before),"- Revision status: "+revision.status,"",
+ "## Proposed document revision","- Document / section: "+revision.source_label+" / "+revision.section,"- Built-in public-case note is an editorial draft, NOT official product documentation.","- Source kind: "+docSource.kind,"- Exact source occurrences: "+sourceHits(revision.before),"- Revision status: "+revision.status,"",
  "### Baseline paragraph",revision.before,"","### Proposed paragraph",revision.after,"","### Rationale",revision.rationale,"",
  "## Copy-only validation","- Status: "+previewStatus,"- Original file modified: NO","",
  "## Held-out checks",...p.heldout_evaluation.questions.map(q=>"- "+q.id+" · "+q.question+": "+q.outcome),"- Notes: "+holdoutNote,"",
@@ -534,9 +534,9 @@ by("download-revised").addEventListener("click",downloadRevised);
 by("holdout-note").addEventListener("input",e=>{holdoutNote=e.target.value;renderDelivery()});
 by("guide-choice").addEventListener("change",e=>{guideChoice=e.target.value;renderGuide();renderDelivery()});
 by("guide-feedback").addEventListener("change",e=>{guideFeedback=e.target.value;renderDelivery()});
-by("download-guide").addEventListener("click",()=>downloadText("synthetic-developer-guide.md",guideMarkdown(),"text/markdown"));
-by("download").addEventListener("click",()=>downloadText("synthetic-research-handoff.json",JSON.stringify(payload(),null,2)+"\n","application/json"));
-by("download-report").addEventListener("click",()=>downloadText("synthetic-documentation-case-report.md",reportMarkdown(),"text/markdown"));
+by("download-guide").addEventListener("click",()=>downloadText(EXAMPLES[idx].synthetic?"synthetic-developer-guide.md":"public-case-developer-guide.md",guideMarkdown(),"text/markdown"));
+by("download").addEventListener("click",()=>downloadText(EXAMPLES[idx].synthetic?"synthetic-research-handoff.json":"public-case-research-handoff.json",JSON.stringify(payload(),null,2)+"\n","application/json"));
+by("download-report").addEventListener("click",()=>downloadText(EXAMPLES[idx].synthetic?"synthetic-documentation-case-report.md":"public-case-documentation-report.md",reportMarkdown(),"text/markdown"));
 by("copy").addEventListener("click",async()=>{const data=JSON.stringify(payload(),null,2);try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(data)}else{const ta=document.createElement("textarea");ta.value=data;document.body.append(ta);ta.select();if(!document.execCommand("copy"))throw Error("unsupported");ta.remove()}by("copy-status").textContent="Copied"}catch(e){by("copy-status").textContent="Please use Download JSON"}});
 reset(0);
 </script>
