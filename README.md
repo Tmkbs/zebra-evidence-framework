@@ -1,4 +1,19 @@
-# Zebra Evidence Framework — exportable review demo
+# Zebra Evidence Framework — research workbench and classroom demo
+
+## Start here: the integrated presentation
+
+**[Open the live, source-grounded classroom demo](https://tmkbs.github.io/zebra-evidence-framework/classroom/)**
+
+This is the main **no-PowerPoint** presentation. It starts with public developer questions and the team's published research references, then demonstrates case normalization, evidence scope, manual review, failure diagnosis, a proposed **research-note** revision, copy-only retest, developer preview, and exportable handoff.
+
+Click **Presenter mode · 5 min** (top-right) to open nine concise English cue cards. The cue-card buttons navigate the real app; they do not invent model results or approve edits. Read [PRESENTER_NOTES.md](PRESENTER_NOTES.md) for the 5-minute script, 90-second backup, and instructor Q&A.
+
+Useful files: [classroom guide](classroom/START_HERE.md) · [public case manifest](classroom/public_case_manifest.json) · [revision interchange contract](classroom/INTEGRATION_HANDOFF.md) · [regression tests](classroom/test_end_to_end.cjs).
+
+**What this does not claim:** access to the separate private editing program, production document updates, real model comparison results for these public cases, measured search/optimization performance, verified scanner fixes, or generated video. The original `index.html` and optional local model adapter remain available as a **separate technical workbench**.
+
+---
+
 
 This repository contains a **self-contained, static evidence-review workbench** (`index.html`) and an **optional localhost-only adapter** (`lab_proxy.py`) for an OpenAI-compatible campus model server. It does **not** modify the team's separate private application repository or its Vercel deployment.
 
@@ -40,9 +55,9 @@ py lab_proxy.py
 
 Replace `LAB_HOST:PORT` with the currently authorized, working address. Harper's November 2026 examples referenced **both 8000 and 8080**, so do not assume the port. The server can be stopped with Ctrl+C. If a credential is later required, set `ZEBRA_LAB_API_KEY` in the local process environment; **never commit credentials**.
 
-## Publish a shareable website (optional)
+## Root workbench site (separate from the classroom presentation)
 
-The GitHub repository contains working HTML source, but **the repository URL is not the live website**. For a browser-accessible demo, the repository owner can enable [GitHub Pages](https://github.com/Tmkbs/zebra-evidence-framework/settings/pages): choose **Deploy from a branch**, select **main** and **/(root)**, then save. The intended public site URL is `https://tmkbs.github.io/zebra-evidence-framework/` once GitHub confirms successful publishing; do not assume it is online before then.
+GitHub Pages is already enabled for this repository. The root workbench is at `https://tmkbs.github.io/zebra-evidence-framework/`, while the recommended, integrated classroom presentation is at `https://tmkbs.github.io/zebra-evidence-framework/classroom/`.
 
 GitHub Pages hosts only the **offline/static features and guided tour**. Live lab requests still require the separately configured local bridge on an authorized Northwestern connection. No API secrets belong in the webpage or repository.
 
