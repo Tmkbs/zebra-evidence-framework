@@ -327,8 +327,28 @@ function reset(i){
  renderCase();renderEvidence();renderReview();renderDiagnosis();renderRevision();renderRetest();renderStrategy();renderDelivery()
 }
 document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.page)));document.querySelectorAll("[data-next]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.next)));
-by("scenario").addEventListener("change",e=>reset(Number(e.target.value)));by("budget").addEventListener("input",e=>{budget=Number(e.target.value);renderStrategy();renderJson()});by("decision").addEventListener("change",e=>{decision=e.target.value;renderJson()});
-by("download").addEventListener("click",()=>{const blob=new Blob([JSON.stringify(payload(),null,2)+"\n"],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="fictional-framework-packet.json";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500)});
+by("scenario").addEventListener("change",e=>reset(Number(e.target.value)));
+by("budget").addEventListener("input",e=>{budget=Number(e.target.value);renderStrategy();renderDelivery()});
+by("decision").addEventListener("change",e=>{decision=e.target.value;revokeApproval();renderRevision();renderRetest();renderDelivery()});
+for(const slot of ["a","b"])by("answer-"+slot).addEventListener("input",e=>{answers[slot]=e.target.value;revokeApproval();renderRevision();renderRetest();renderDelivery()});
+by("failure-class").addEventListener("change",e=>{failureMode=e.target.value;revokeApproval();renderDiagnosis();renderRevision();renderRetest();renderDelivery()});
+by("diagnosis-note").addEventListener("input",e=>{diagnosisNote=e.target.value;renderDelivery()});
+for(const [id,key] of [["document-after","after"],["document-reason","rationale"]])by(id).addEventListener("input",e=>{
+ revision[key]=e.target.value;revision.status="proposed";riskAcknowledged=false;by("review-ack").checked=false;
+ resetRetest();renderRevisionGate();renderRetest();renderDelivery()
+});
+by("review-ack").addEventListener("change",e=>{riskAcknowledged=e.target.checked;renderRevisionGate()});
+by("revision-approve").addEventListener("click",()=>{
+ if(gateReasons().length)return;revision.status="approved_for_retest";resetRetest();
+ renderRevision();renderRetest();renderDelivery()
+});
+by("revision-reject").addEventListener("click",()=>{revision.status="rejected";riskAcknowledged=false;resetRetest();renderRevision();renderRetest();renderDelivery()});
+by("revision-reset").addEventListener("click",()=>{revision=freshRevision();riskAcknowledged=false;resetRetest();renderRevision();renderRetest();renderDelivery()});
+by("revision-import").addEventListener("change",e=>importRevision(e.target.files?.[0]));
+by("run-preview").addEventListener("click",applyCopy);
+by("holdout-note").addEventListener("input",e=>{holdoutNote=e.target.value;renderDelivery()});
+by("download").addEventListener("click",()=>downloadText("synthetic-research-handoff.json",JSON.stringify(payload(),null,2)+"\n","application/json"));
+by("download-report").addEventListener("click",()=>downloadText("synthetic-documentation-case-report.md",reportMarkdown(),"text/markdown"));
 by("copy").addEventListener("click",async()=>{const data=JSON.stringify(payload(),null,2);try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(data)}else{const ta=document.createElement("textarea");ta.value=data;document.body.append(ta);ta.select();if(!document.execCommand("copy"))throw Error("unsupported");ta.remove()}by("copy-status").textContent="Copied"}catch(e){by("copy-status").textContent="Please use Download JSON"}});
 reset(0);
 </script>
