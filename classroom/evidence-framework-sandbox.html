@@ -696,7 +696,7 @@ by("agent-export").addEventListener("click",()=>{
 });
 by("agent-import").addEventListener("click",importAgentContinueResult);
 by("decision").addEventListener("change",e=>{decision=e.target.value;revokeApproval();renderRevision();renderRetest();renderDelivery()});
-for(const slot of ["a","b"])by("answer-"+slot).addEventListener("input",e=>{answers[slot]=e.target.value;agentBridgeReceipts[slot]=null;revokeApproval();renderReview();renderRevision();renderRetest();renderDelivery()});
+for(const slot of ["a","b"])by("answer-"+slot).addEventListener("input",e=>{answers[slot]=e.target.value;agentBridgeReceipts[slot]=null;if(!EXAMPLES[idx].synthetic)by("answer-"+slot+"-status").textContent=slot.toUpperCase()+(answers[slot]?" · MANUALLY ENTERED · UNVERIFIED":" · NOT RUN / NO SAVED MODEL OUTPUT");revokeApproval();renderRevision();renderRetest();renderDelivery()});
 by("failure-class").addEventListener("change",e=>{failureMode=e.target.value;revokeApproval();renderDiagnosis();renderRevision();renderRetest();renderDelivery()});
 by("diagnosis-note").addEventListener("input",e=>{diagnosisNote=e.target.value;revokeApproval();renderRevisionGate();renderRetest();renderDelivery()});
 for(const [id,key] of [["document-after","after"],["document-reason","rationale"]])by(id).addEventListener("input",e=>{
