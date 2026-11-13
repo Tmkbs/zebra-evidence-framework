@@ -1,0 +1,128 @@
+{
+  "schema": "public-research-case-manifest/v1",
+  "snapshot_date": "2026-11-13",
+  "source_repositories": [
+    {
+      "repo": "1235357/zebra-public-site-archive",
+      "public_status_report": "https://github.com/1235357/zebra-public-site-archive/blob/main/TECHNICAL_STATUS.md",
+      "public_project_overview": "https://github.com/1235357/zebra-public-site-archive/blob/main/README.md"
+    }
+  ],
+  "scope": "Publicly accessible case question paraphrases and public research-note drafts only; not copied private team analyses or a complete benchmark",
+  "cases": [
+    {
+      "id": "ZF-WEB-INTEGRATION",
+      "record_kind": "PUBLIC_PROJECT_REPORT",
+      "question": "For an Android web app, which of seven device-integration requirements have documentation support, including on-screen scan control?",
+      "original_public_url": "https://developer.zebra.com/content/zebra-android-web-application-development-datawedge-and-enterprise-browser-integration-1",
+      "public_team_summary_url": "https://github.com/1235357/zebra-public-site-archive/blob/main/faculty-checkin-2026-11-02/demo/report.json",
+      "source_status": "Public case report, 2026-11-02; not adjudicated",
+      "model_status": "NOT_RUN",
+      "evidence": [
+        {
+          "id": "WEB-FORUM",
+          "source": "Original public developer question",
+          "url": "https://developer.zebra.com/content/zebra-android-web-application-development-datawedge-and-enterprise-browser-integration-1",
+          "claim_summary": "A developer asks about Android web app scan control and six other device-integration needs.",
+          "scope_limit": "No independent compatibility or runtime verification."
+        },
+        {
+          "id": "WEB-DW15",
+          "source": "Official DataWedge 15.0 Soft Scan Trigger",
+          "url": "https://techdocs.zebra.com/datawedge/15-0/guide/api/softscantrigger/",
+          "claim_summary": "Documents native scan commands subject to active profile configuration.",
+          "scope_limit": "Does not prove Chrome can invoke them or that installed software supports the cited version."
+        },
+        {
+          "id": "WEB-REVIEW",
+          "source": "Public case-review report (November 2)",
+          "url": "https://github.com/1235357/zebra-public-site-archive/blob/main/faculty-checkin-2026-11-02/demo/report.json",
+          "claim_summary": "One requirement has partial document evidence; six are not assessed.",
+          "scope_limit": "Editorial review, not a model run, device test or client acceptance."
+        }
+      ],
+      "document_note_id": "REVIEW-WEB",
+      "source_note_type": "EDITORIAL_REVIEW_NOTE_NOT_OFFICIAL_DOCUMENTATION",
+      "device_validation": "NOT_RUN",
+      "customer_approval": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "PUBLIC-TC26-XAMARIN",
+      "record_kind": "PUBLIC_ARCHIVED_FORUM",
+      "question": "Why does the TC26 scanner reportedly stop responding after obtaining BarcodeManager during Xamarin startup?",
+      "original_public_url": "https://developer.zebra.com/content/zebra-tc26-scanner-does-not-scan-when-config-changed-code-xamarin",
+      "public_team_summary_url": "https://github.com/1235357/zebra-public-site-archive/blob/main/README.md",
+      "source_status": "Original public forum capture; fix not independently tested",
+      "model_status": "NOT_RUN",
+      "evidence": [
+        {
+          "id": "TC26-QUESTION",
+          "source": "Public TC26 Xamarin forum question",
+          "url": "https://developer.zebra.com/content/zebra-tc26-scanner-does-not-scan-when-config-changed-code-xamarin",
+          "claim_summary": "Reports a nonresponsive scanner after a configuration change.",
+          "scope_limit": "Original report records a symptom, not a confirmed cause."
+        },
+        {
+          "id": "TC26-REPLIES",
+          "source": "Replies in the same thread",
+          "url": "https://developer.zebra.com/content/zebra-tc26-scanner-does-not-scan-when-config-changed-code-xamarin",
+          "claim_summary": "A responder refers readers to a separate technical discussion.",
+          "scope_limit": "Reply is not an independently tested resolution."
+        },
+        {
+          "id": "TC26-OVERVIEW",
+          "source": "Team public project overview (November 10)",
+          "url": "https://github.com/1235357/zebra-public-site-archive/blob/main/README.md",
+          "claim_summary": "The team reports a TC26 scanner-lifecycle case analysis on its read-only website.",
+          "scope_limit": "The public overview does not identify this archived thread as the same analyzed case."
+        }
+      ],
+      "document_note_id": "REVIEW-TC26",
+      "source_note_type": "EDITORIAL_REVIEW_NOTE_NOT_OFFICIAL_DOCUMENTATION",
+      "device_validation": "NOT_RUN",
+      "customer_approval": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "PUBLIC-TC52-MULTIBARCODE",
+      "record_kind": "PUBLIC_ARCHIVED_FORUM",
+      "question": "Why does MultiBarcode work in manual DataWedge settings but reportedly fail through the Xamarin intent API?",
+      "original_public_url": "https://developer.zebra.com/forum/25873",
+      "public_team_summary_url": "https://github.com/1235357/zebra-public-site-archive/blob/main/README.md",
+      "source_status": "Original public forum capture; parameter validity not adjudicated",
+      "model_status": "NOT_RUN",
+      "evidence": [
+        {
+          "id": "MB-QUESTION",
+          "source": "Public Xamarin and DataWedge Intent API forum question",
+          "url": "https://developer.zebra.com/forum/25873",
+          "claim_summary": "Manual configuration reportedly works; an attempted programmatic equivalent does not.",
+          "scope_limit": "Forum report is not proof of an API or documentation defect."
+        },
+        {
+          "id": "MB-CODE",
+          "source": "Configuration fields in the public forum question",
+          "url": "https://developer.zebra.com/forum/25873",
+          "claim_summary": "The request mentions scanning_mode and instant_reporting_enable.",
+          "scope_limit": "Validity for a specific installed version has not been independently established."
+        },
+        {
+          "id": "MB-OVERVIEW",
+          "source": "Team public project overview (November 10)",
+          "url": "https://github.com/1235357/zebra-public-site-archive/blob/main/README.md",
+          "claim_summary": "The team reports a DataWedge MultiBarcode case analysis on its read-only site.",
+          "scope_limit": "The overview does not establish that this forum question is the exact analyzed case."
+        }
+      ],
+      "document_note_id": "REVIEW-MB",
+      "source_note_type": "EDITORIAL_REVIEW_NOTE_NOT_OFFICIAL_DOCUMENTATION",
+      "device_validation": "NOT_RUN",
+      "customer_approval": "NOT_ESTABLISHED"
+    }
+  ],
+  "quantitative_counts_from_public_2026_11_05_status": {
+    "unique_admitted_forum_records": 2854,
+    "initial_development_case_packets": 8,
+    "official_source_urls_identified": 12,
+    "model_accuracy_metrics": "NOT_AVAILABLE"
+  }
+}
