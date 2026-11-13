@@ -22,6 +22,12 @@ The checks cover:
 - Local TXT/Markdown import, paragraph selection, unique-match checks, revision JSON import/export, and safe candidate file download.
 - No client data transmission, remote model call, automatic source fetching, external scripts, browser tracking or credential storage.
 
+## Agent Continue interoperability
+
+The Review page exports Agent Continue's actual version-1 settings JSON (checked against public v2.2.1 release source), with queue-once and a maximum of one send, **requiring manual task start** in the extension. Selected public source links are included, but no local imported document, credential or secret. A manually returned JSON answer is checked against the exact current case ID before entering Candidate A/B; import provenance is marked unverified and human scores remain blank. The website cannot directly control or detect the Chrome extension.
+
+The regression suite checks JSON structure, absence of automatic sends, wrong-case rejection, provenance on valid manual import, clearing receipts after later edits, and synthetic-only case exclusion. See [Agent Continue bridge](AGENT_CONTINUE_BRIDGE.md).
+
 ## Manual/static checks
 
 JavaScript and Node test syntax compiled, all UI element references resolved, no duplicate element IDs, 10 workflow sections preserved. In a prior iteration the local DOM simulation passed 18 public-case-specific assertions. This is separate from actual browser acceptance and is not an empirical model result.

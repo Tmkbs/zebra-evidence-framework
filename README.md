@@ -8,6 +8,8 @@ This is the main **no-PowerPoint** presentation. It starts with public developer
 
 Click **Presenter mode · 5 min** (top-right) to open nine concise English cue cards. The cue-card buttons navigate the real app; they do not invent model results or approve edits. Read [PRESENTER_NOTES.md](PRESENTER_NOTES.md) for the 5-minute script, 90-second backup, and instructor Q&A.
 
+**Agent Continue is now connected via its actual JSON import format:** in **03 Review**, export a one-time public-case task for [叶真同's Chrome extension](https://github.com/1235357/agent-continue); after running it in ChatGPT, manually import the JSON result into Candidate A/B. This is a **file-based workflow, not a direct extension connection**. [Exact setup and limits](classroom/AGENT_CONTINUE_BRIDGE.md).
+
 Useful files: [classroom guide](classroom/START_HERE.md) · [public case manifest](classroom/public_case_manifest.json) · [revision interchange contract](classroom/INTEGRATION_HANDOFF.md) · [regression tests](classroom/test_end_to_end.cjs).
 
 **What this does not claim:** access to the separate private editing program, production document updates, real model comparison results for these public cases, measured search/optimization performance, verified scanner fixes, or generated video. The original `index.html` and optional local model adapter remain available as a **separate technical workbench**.
