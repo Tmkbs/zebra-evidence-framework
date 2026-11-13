@@ -23,12 +23,12 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 <body>
 <div class="app"><aside class="side">
  <div class="brand"><div class="mark">F</div><h2>Evidence Framework</h2><span>SYNTHETIC CLASSROOM SANDBOX</span></div>
- <nav class="nav"><button class="active" data-page="architecture"><b>00</b><span class="name">Architecture</span></button><button data-page="case"><b>01</b><span class="name">Question</span></button><button data-page="evidence"><b>02</b><span class="name">Evidence</span></button><button data-page="review"><b>03</b><span class="name">Review</span></button><button data-page="diagnosis"><b>04</b><span class="name">Failure diagnosis</span></button><button data-page="revision"><b>05</b><span class="name">Document revision</span></button><button data-page="retest"><b>06</b><span class="name">Retest</span></button><button data-page="handoff"><b>07</b><span class="name">Delivery packet</span></button><button data-page="strategy"><b>+</b><span class="name">Optional search lab</span></button></nav>
+ <nav class="nav"><button class="active" data-page="architecture"><b>00</b><span class="name">Architecture</span></button><button data-page="case"><b>01</b><span class="name">Question</span></button><button data-page="evidence"><b>02</b><span class="name">Evidence</span></button><button data-page="review"><b>03</b><span class="name">Review</span></button><button data-page="diagnosis"><b>04</b><span class="name">Failure diagnosis</span></button><button data-page="revision"><b>05</b><span class="name">Document revision</span></button><button data-page="retest"><b>06</b><span class="name">Retest</span></button><button data-page="guide"><b>07</b><span class="name">Developer preview</span></button><button data-page="handoff"><b>08</b><span class="name">Delivery packet</span></button><button data-page="strategy"><b>+</b><span class="name">Optional search lab</span></button></nav>
  <div class="sidefoot">Framework evaluation and documentation revision remain separate workstreams. This sandbox connects them using a local draft contract, not private source code.</div>
  </aside><main><div class="bar"><span>Research prototype / <strong id="crumb">Architecture</strong></span><span class="flag">OFFLINE · FICTIONAL ONLY</span></div>
  <div class="content">
  <section class="page active" id="architecture">
-  <div class="hero"><div class="eyebrow">REUSABLE FRAMEWORK · NOT A DOCUMENT EDITOR</div><h1>Evaluate answers before documents change.</h1><p>Walk from a developer question through evidence, an answer review, failure diagnosis, a documentation change proposal, a copy-only retest and a structured handoff.</p><button class="btn" data-next="case">Start a fictional example →</button></div>
+  <div class="hero"><div class="eyebrow">REUSABLE FRAMEWORK · NOT A DOCUMENT EDITOR</div><h1>Evaluate answers before documents change.</h1><p>Walk from a developer question through evidence, answer review, diagnosis, a revision proposal, copy-only retest, a user-facing guide preview, and an auditable delivery package.</p><button class="btn" data-next="case">Start a fictional example →</button></div>
   <div class="eyebrow" style="margin-top:32px">ARCHITECTURE</div><h2>One connected research workflow, distinct responsibilities</h2>
   <div class="grid4"><div class="step"><b>01 · INPUT</b><h3>Define a case</h3><p>Normalize the question and list known information.</p></div><div class="step"><b>02 · EVIDENCE</b><h3>Record support & gaps</h3><p>Keep provenance and applicability visible.</p></div><div class="step"><b>03 · REVIEW</b><h3>Human evaluation</h3><p>Check claims rather than invent model scores.</p></div><div class="step future"><b>04 · REVISION / HANDOFF</b><h3>Minimal doc change</h3><p>Try a controlled revision on an offline copy. Real editor integration remains separate.</p></div></div>
   <div class="grid"><div class="card"><h3>Framework layer · in scope</h3><p>Case structure, evidence packet, explicit unknowns, manual comparison, and portable handoff format.</p></div><div class="card"><h3>Document-editing layer · separate</h3><p>Rewriting source documents, document versions, publication workflow and any product-specific behavior belong to a separate implementation.</p></div></div>
@@ -37,18 +37,18 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
  <section class="page" id="case">
   <div class="eyebrow">01 · FRAME THE QUESTION</div><h1>Describe uncertainty before making claims.</h1><p class="lead">Switch between two fictional scenarios. The framework remains the same regardless of the product or document source.</p>
   <div class="grid"><div class="card"><label for="scenario" class="eyebrow">CHOOSE SYNTHETIC CASE</label><select class="field" id="scenario"><option value="0">Fictional dashboard · reconnect</option><option value="1">Fictional exporter · Unicode</option></select><div class="question" id="question"></div><h3>Known information</h3><ul class="facts" id="facts"></ul></div><div class="card"><div class="eyebrow">MISSING CONTEXT</div><h3>Don't fill the gaps with guesses.</h3><div class="tags" id="gaps"></div><p style="margin-top:20px">The goal is to preserve uncertainty for reviewers, not quietly replace it with a persuasive answer.</p></div></div>
-  <div class="next"><span>1 / 7 · Normalize case</span><button class="btn primary" data-next="evidence">Build evidence packet →</button></div>
+  <div class="next"><span>1 / 8 · Normalize case</span><button class="btn primary" data-next="evidence">Build evidence packet →</button></div>
  </section>
  <section class="page" id="evidence">
   <div class="eyebrow">02 · SELECT EVIDENCE</div><h1>Evidence must carry its limits.</h1><p class="lead">Choose what belongs in the packet. All three records are fictitious; no actual documents are retrieved or checked by this page.</p>
   <div id="evidence-list"></div><div class="card"><span class="pill" id="count"></span><p>Provenance labels are illustrative. A real integration must independently verify the underlying source and document version.</p></div>
-  <div class="next"><span>2 / 7 · Evidence packet</span><button class="btn primary" data-next="review">Compare fixed examples →</button></div>
+  <div class="next"><span>2 / 8 · Evidence packet</span><button class="btn primary" data-next="review">Compare fixed examples →</button></div>
  </section>
  <section class="page" id="review">
   <div class="eyebrow">03 · HUMAN EVALUATION</div><h1>Don't confuse fluency with evidence.</h1><p class="lead">These responses start as fictional examples. They can be replaced with manually recorded, sanitized test outputs. Ratings remain independent human judgments; no model is called here.</p>
   <div class="grid"><div class="card"><span class="pill">CANDIDATE A · FICTIONAL</span><label class="eyebrow" for="answer-a">SAMPLE / MANUALLY RECORDED ANSWER</label><textarea class="field" id="answer-a" rows="5"></textarea><div id="ratings-a"></div><div class="score" id="score-a"></div></div><div class="card"><span class="pill">CANDIDATE B · FICTIONAL</span><label class="eyebrow" for="answer-b">SAMPLE / MANUALLY RECORDED ANSWER</label><textarea class="field" id="answer-b" rows="5"></textarea><div id="ratings-b"></div><div class="score" id="score-b"></div></div></div>
   <div class="card" style="margin-top:14px"><label class="eyebrow" for="decision">HUMAN REVIEW DECISION</label><select class="field" id="decision"><option value="not_decided">Not decided</option><option value="prefer_a">A · further review</option><option value="prefer_b">B · further review</option><option value="neither">Neither ready</option></select><p>Choosing a preferred answer does not authorize a document change.</p></div>
-  <div class="next"><span>3 / 7 · Human candidate review</span><button class="btn primary" data-next="diagnosis">Diagnose the failure →</button></div>
+  <div class="next"><span>3 / 8 · Human candidate review</span><button class="btn primary" data-next="diagnosis">Diagnose the failure →</button></div>
  </section>
 
 <section class="page" id="diagnosis">
@@ -60,7 +60,7 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 </div><div class="card"><div class="eyebrow">GATE LOGIC</div><h3 id="diagnosis-title">Unassessed</h3><p id="diagnosis-explanation"></p><div class="gate" id="diagnosis-gate"></div>
 <p>The classification is always a hypothesis until a discriminating test supports it. A proposed documentation clarification is not a verified device fix.</p></div></div>
 <div class="row" style="margin-top:17px"><button class="btn" data-next="strategy">Optional: explore review priorities →</button></div>
-<div class="next"><span>4 / 7 · Review the cause</span><button class="btn primary" data-next="revision">Propose a minimal documentation change →</button></div>
+<div class="next"><span>4 / 8 · Review the cause</span><button class="btn primary" data-next="revision">Propose a minimal documentation change →</button></div>
 </section>
 <section class="page" id="revision">
 <div class="eyebrow">05 · DOCUMENTATION WORKSTREAM</div><h1>Review a precise before / after change.</h1>
@@ -77,7 +77,7 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 <div class="gate" id="revision-gate"></div>
 <div class="row"><button id="revision-approve" class="btn primary" disabled>Approve for local retest</button><button id="revision-reject" class="btn">Reject candidate</button><button id="revision-reset" class="btn">Restore sample draft</button></div>
 </div>
-<div class="next"><span>5 / 7 · Minimal revision</span><button class="btn primary" data-next="retest">Run copy-only check →</button></div>
+<div class="next"><span>5 / 8 · Minimal revision</span><button class="btn primary" data-next="retest">Run copy-only check →</button></div>
 </section>
 <section class="page" id="retest">
 <div class="eyebrow">06 · HELD-OUT VALIDATION</div><h1>Check the changed text, without overstating results.</h1>
@@ -88,7 +88,23 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 </div>
 <div class="card" style="margin-top:14px"><div class="eyebrow">FROZEN HELD-OUT QUESTIONS</div><p>Record independent observed outcomes. Default is NOT RUN; do not invent improvements.</p><table class="review-table"><thead><tr><th>Question</th><th>Outcome</th></tr></thead><tbody id="holdout-list"></tbody></table><label class="eyebrow" for="holdout-note" style="display:block;margin-top:18px">RETEST CONDITIONS / NOTES</label><textarea class="field" id="holdout-note" rows="3" placeholder="Model, prompt, inputs, observed failures, or why NOT RUN..."></textarea></div>
 <div class="warning">Release gate remains external: source owner review, technical verification, permitted-data checks and publication authorization are not simulated as completed.</div>
-<div class="next"><span>6 / 7 · Before/after and independent tests</span><button class="btn primary" data-next="handoff">Export delivery record →</button></div>
+<div class="next"><span>6 / 8 · Before/after and independent tests</span><button class="btn primary" data-next="guide">See the developer experience →</button></div>
+</section>
+
+<section class="page" id="guide">
+<div class="eyebrow">07 · DEVELOPER EXPERIENCE PREVIEW</div><h1>What would a developer actually see?</h1>
+<p class="lead">A front-end concept that consumes the review record above: recorded answer, its evidence labels, follow-up questions and a versioned document paragraph. No live assistant, technical fix or rendered video is claimed.</p>
+<div class="grid">
+<div class="card"><div class="eyebrow">CONVERSATION PANEL · SYNTHETIC</div><div class="question" id="guide-question"></div>
+<div class="row"><label for="guide-choice" class="step-note">Recorded answer</label><select class="field" id="guide-choice" style="max-width:210px"><option value="b">Candidate B</option><option value="a">Candidate A</option></select><span class="pill amber" id="guide-label">UNVERIFIED DRAFT</span></div>
+<div class="docview" id="guide-answer" style="margin-top:15px"></div><div class="eyebrow" style="margin-top:18px">SELECTED EVIDENCE / LIMITS</div><div id="guide-evidence" class="muted"></div></div>
+<div class="card"><div class="eyebrow">DOCUMENT VIEW</div><h3 id="guide-doc-title"></h3><div class="docview revised" id="guide-doc-copy"></div><p id="guide-doc-status"></p>
+<div class="eyebrow" style="margin-top:17px">CLARIFYING QUESTIONS</div><ul id="guide-followups" class="facts"></ul></div>
+</div>
+<div class="card" style="margin-top:14px"><div class="eyebrow">VISUAL EXPLANATION · STORYBOARD ONLY</div><p>Three planned frames outline a possible explanatory clip. No video is generated, narrated or validated.</p><div class="grid4" id="guide-storyboard"></div></div>
+<div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between"><h3>Illustrative feedback</h3><span class="pill amber">NOT CUSTOMER FEEDBACK</span></div><div class="row"><label class="step-note" for="guide-feedback">Was this draft helpful?</label><select class="field" id="guide-feedback" style="max-width:260px"><option value="not_recorded">Not recorded</option><option value="helpful">Helpful · illustrative</option><option value="needs_clarification">Needs clarification · illustrative</option><option value="unhelpful">Not helpful · illustrative</option></select><button class="btn" id="download-guide">Export guide draft (.md)</button></div></div>
+<div class="warning">A visually complete interface does not establish correctness. Model behavior, product instructions, source applicability and video content still require real tests and approval.</div>
+<div class="next"><span>7 / 8 · Developer-facing concept</span><button class="btn primary" data-next="handoff">Export research delivery packet →</button></div>
 </section>
  <section class="page" id="strategy">
   <div class="eyebrow">04 · OPTIONAL COMPUTATIONAL EXPLORATION</div><h1>Which unknown should we check first?</h1>
@@ -120,13 +136,13 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
   <div class="next"><span>Optional optimization exploration</span><button class="btn" data-next="diagnosis">Return to the main workflow →</button></div>
  </section>
  <section class="page" id="handoff">
-<div class="eyebrow">07 · DELIVERY PACKAGE</div><h1>A traceable record from question to proposed revision.</h1>
+<div class="eyebrow">08 · DELIVERY PACKAGE</div><h1>A traceable record from question to proposed revision.</h1>
 <p class="lead">Export the case, selected evidence, candidate responses, failure diagnosis, proposed document patch, local copy result, and held-out test statuses. Every claim includes its limits.</p>
 <div class="grid"><div class="card"><h3>Evidence & review framework</h3><p>Identifies question facts, source limits, answer review and next actions.</p><span class="pill">IMPLEMENTED HERE</span></div><div class="card"><h3>Documentation revision workstream</h3><p>Minimal before/after draft, explicit approval, copy-only application, repeatable JSON exchange. External team's actual code is not connected.</p><span class="pill amber">SANDBOX ADAPTER</span></div></div>
 <div class="card" style="margin-top:14px"><h3 id="delivery-status">Candidate packet</h3><p id="delivery-summary"></p><div class="row"><button class="btn primary" id="download">Download complete JSON</button><button class="btn" id="download-report">Download case report (.md)</button><button class="btn" id="copy">Copy JSON</button><span class="step-note" id="copy-status" role="status"></span></div></div>
 <div class="card" style="margin-top:14px"><div class="eyebrow">AUDITABLE DELIVERY PREVIEW</div><pre id="json"></pre></div>
 <div class="warning">The export cannot authorize customer publication. No real data, real model run or technical acceptance is included in this classroom build.</div>
-<div class="next"><span>7 / 7 · Delivery</span><button class="btn" data-next="architecture">Back to architecture ↺</button></div>
+<div class="next"><span>8 / 8 · Delivery</span><button class="btn" data-next="architecture">Back to architecture ↺</button></div>
  </section>
  <div class="foot">Synthetic classroom sandbox · Local-only interactions · No external scripts, API requests, user tracking or permanent storage · No customer content</div>
  </div></main></div>
@@ -156,6 +172,7 @@ const DOCS=[
 ];
 const CRITERIA=["Traceable evidence","Uncertainty and scope","Next verification step","Avoid unsupported claims"];
 let idx=0,chosen=new Set([0,1]),ratings={a:["","","",""],b:["","","",""]},decision="not_decided";
+let guideChoice="b",guideFeedback="not_recorded";
 let answers={a:"",b:""},failureMode="unassessed",diagnosisNote="",revision={},riskAcknowledged=false,previewCopy=null,previewStatus="not_run",holdout={},holdoutNote="";
 function freshRevision(){const d=DOCS[idx];return{schema:"documentation-revision/v1",revision_id:"SYN-REV-"+(idx+1),case_id:EXAMPLES[idx].id,document_id:d.id,source_label:d.label,source_version:d.version,section:d.section,before:d.before,after:d.after,rationale:d.rationale,origin:"synthetic_local_draft",status:"proposed"}}
 function resetRetest(){previewCopy=null;previewStatus="not_run";holdout={H01:"not_run",H02:"not_run"};holdoutNote=""}
@@ -172,7 +189,7 @@ function gateReasons(){const reasons=[];
 
 function by(id){return document.getElementById(id)}
 function node(tag,txt){const x=document.createElement(tag);x.textContent=txt;return x}
-function show(page){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===page));document.querySelectorAll("[data-page]").forEach(b=>{b.classList.toggle("active",b.dataset.page===page);b.setAttribute("aria-current",b.dataset.page===page?"page":"false")});by("crumb").textContent={architecture:"Architecture",case:"Question",evidence:"Evidence",review:"Human review",diagnosis:"Failure diagnosis",revision:"Document revision",retest:"Retest",strategy:"Search lab",handoff:"Delivery"}[page];if(page==="strategy")renderStrategy();if(page==="diagnosis")renderDiagnosis();if(page==="revision")renderRevision();if(page==="retest")renderRetest();if(page==="handoff")renderDelivery();window.scrollTo(0,0)}
+function show(page){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===page));document.querySelectorAll("[data-page]").forEach(b=>{b.classList.toggle("active",b.dataset.page===page);b.setAttribute("aria-current",b.dataset.page===page?"page":"false")});by("crumb").textContent={architecture:"Architecture",case:"Question",evidence:"Evidence",review:"Human review",diagnosis:"Failure diagnosis",revision:"Document revision",retest:"Retest",guide:"Developer preview",strategy:"Search lab",handoff:"Delivery"}[page];if(page==="strategy")renderStrategy();if(page==="diagnosis")renderDiagnosis();if(page==="revision")renderRevision();if(page==="retest")renderRetest();if(page==="guide")renderGuide();if(page==="handoff")renderDelivery();window.scrollTo(0,0)}
 function renderCase(){const c=EXAMPLES[idx];by("question").textContent=c.question;by("facts").replaceChildren(...c.facts.map(x=>node("li",x)));by("gaps").replaceChildren(...c.gaps.map(x=>node("span",x)));by("scenario").value=String(idx)}
 function renderEvidence(){const box=by("evidence-list");box.replaceChildren();EXAMPLES[idx].evidence.forEach((x,i)=>{const label=document.createElement("label");label.className="item";const ck=document.createElement("input");ck.type="checkbox";ck.checked=chosen.has(i);ck.addEventListener("change",()=>{if(ck.checked)chosen.add(i);else chosen.delete(i);revokeApproval();renderCount();renderRevision();renderRetest();renderDelivery()});const content=document.createElement("div");content.append(node("h3",x.id+" · "+x.source),node("p",x.claim),node("small","Scope: "+x.limit));label.append(ck,content);box.append(label)});renderCount()}
 function renderCount(){by("count").textContent=chosen.size+" / "+EXAMPLES[idx].evidence.length+" fictional records selected"}
@@ -276,12 +293,37 @@ function payload(){
   patch_execution:{status:previewStatus,result_copy:previewCopy,original_modified:false},
   heldout_evaluation:{questions:DOCS[idx].heldout.map(q=>({...q,outcome:holdout[q.id]||"not_run"})),notes:holdoutNote,real_model_test_performed:false},
   optional_search_experiment:{synthetic_only:true,goal:"maximize invented priority points under toy review-time constraint",budget_minutes:budget,candidate_action_sets:search.plans.length,exact_best:{minutes:search.optimal.minutes,points:search.optimal.points,checks:search.optimal.labels},greedy_baseline:{minutes:search.greedy.minutes,points:search.greedy.points,checks:search.greedy.labels},evolutionary_algorithm_used:false},
+  developer_preview:{status:"SYNTHETIC_NOT_VERIFIED",shown_candidate:guideChoice,draft_answer:answers[guideChoice],evidence_ids:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>x.id),document_paragraph:previewCopy===null?DOCS[idx].before:previewCopy,video_storyboard:storyboard(),video_generated:false,illustrative_feedback:guideFeedback,customer_study_performed:false},
   release:{status:"NOT_AUTHORIZED",publication:false,real_device_validation:"NOT_RUN",customer_acceptance:"NOT_RUN"},
   downstream_adapter:{schema:"documentation-revision/v1",mode:"local_json_import_and_copy_preview_only",teammate_private_code_connected:false}
  }
 }
 function renderJson(){by("json").textContent=JSON.stringify(payload(),null,2)}
 
+
+function storyboard(){return idx===0?
+ ["Show the fictional dashboard during reconnect","Contrast transport status with the displayed reading","Illustrate the refresh check and the next question"]:
+ ["Show accented characters in an invented CSV","Compare export and import encoding options","Show a reversible before/after comparison"]}
+function renderGuide(){
+ const c=EXAMPLES[idx],d=DOCS[idx];
+ by("guide-question").textContent=c.question;by("guide-choice").value=guideChoice;
+ by("guide-answer").textContent=answers[guideChoice];
+ by("guide-label").textContent="UNVERIFIED · CANDIDATE "+guideChoice.toUpperCase();
+ by("guide-doc-title").textContent=d.label+" · "+d.section;
+ by("guide-doc-copy").textContent=previewCopy===null?d.before:previewCopy;
+ by("guide-doc-status").textContent=previewCopy===null?"Current synthetic source; proposed revision NOT applied.":"Local edited copy only; still NOT published or independently validated.";
+ const refs=by("guide-evidence");refs.replaceChildren();
+ const data=c.evidence.filter((_,i)=>chosen.has(i));if(!data.length)refs.append(node("p","No supporting evidence selected."));
+ for(const x of data)refs.append(node("p",x.id+" · "+x.source+": "+x.claim+" (limit: "+x.limit+")"));
+ by("guide-followups").replaceChildren(...c.gaps.map(g=>node("li",g+"?")));
+ const frames=by("guide-storyboard");frames.replaceChildren();
+ storyboard().forEach((line,i)=>{const box=document.createElement("div");box.className="step";box.append(node("b","FRAME "+(i+1)+" / PLANNED"),node("h3",line),node("p","No generated video. Planning note only."));frames.append(box)});
+ by("guide-feedback").value=guideFeedback
+}
+function guideMarkdown(){
+ const c=EXAMPLES[idx],d=DOCS[idx],refs=c.evidence.filter((_,i)=>chosen.has(i));
+ return ["# Synthetic developer guide","","Status: DRAFT / NOT VERIFIED","","## Question",c.question,"","## Candidate answer",answers[guideChoice],"","## Fictional evidence",...refs.map(x=>"- "+x.id+": "+x.claim+" (limit: "+x.limit+")"),"","## Clarifying questions",...c.gaps.map(g=>"- "+g),"","## Documentation paragraph",previewCopy===null?d.before:previewCopy,"","## Video storyboard (not generated)",...storyboard().map((g,i)=>"- "+(i+1)+". "+g),"","Feedback is illustrative only: "+guideFeedback,""].join("\n")
+}
 function renderDelivery(){
  const remaining=DOCS[idx].heldout.filter(q=>(holdout[q.id]||"not_run")==="not_run").length;
  by("delivery-status").textContent=previewStatus==="applied_to_copy"?"Temporary document copy generated · release still blocked":"Candidate research packet · no document changed";
@@ -323,8 +365,8 @@ async function importRevision(file){
 
 function reset(i){
  idx=i;budget=9;chosen=new Set([0,1]);ratings={a:["","","",""],b:["","","",""]};decision="not_decided";
- answers={a:EXAMPLES[idx].a,b:EXAMPLES[idx].b};failureMode="unassessed";diagnosisNote="";revision=freshRevision();riskAcknowledged=false;resetRetest();
- renderCase();renderEvidence();renderReview();renderDiagnosis();renderRevision();renderRetest();renderStrategy();renderDelivery()
+ answers={a:EXAMPLES[idx].a,b:EXAMPLES[idx].b};guideChoice="b";guideFeedback="not_recorded";failureMode="unassessed";diagnosisNote="";revision=freshRevision();riskAcknowledged=false;resetRetest();
+ renderCase();renderEvidence();renderReview();renderDiagnosis();renderRevision();renderRetest();renderGuide();renderStrategy();renderDelivery()
 }
 document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.page)));document.querySelectorAll("[data-next]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.next)));
 by("scenario").addEventListener("change",e=>reset(Number(e.target.value)));
@@ -347,6 +389,9 @@ by("revision-reset").addEventListener("click",()=>{revision=freshRevision();risk
 by("revision-import").addEventListener("change",e=>importRevision(e.target.files?.[0]));
 by("run-preview").addEventListener("click",applyCopy);
 by("holdout-note").addEventListener("input",e=>{holdoutNote=e.target.value;renderDelivery()});
+by("guide-choice").addEventListener("change",e=>{guideChoice=e.target.value;renderGuide();renderDelivery()});
+by("guide-feedback").addEventListener("change",e=>{guideFeedback=e.target.value;renderDelivery()});
+by("download-guide").addEventListener("click",()=>downloadText("synthetic-developer-guide.md",guideMarkdown(),"text/markdown"));
 by("download").addEventListener("click",()=>downloadText("synthetic-research-handoff.json",JSON.stringify(payload(),null,2)+"\n","application/json"));
 by("download-report").addEventListener("click",()=>downloadText("synthetic-documentation-case-report.md",reportMarkdown(),"text/markdown"));
 by("copy").addEventListener("click",async()=>{const data=JSON.stringify(payload(),null,2);try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(data)}else{const ta=document.createElement("textarea");ta.value=data;document.body.append(ta);ta.select();if(!document.execCommand("copy"))throw Error("unsupported");ta.remove()}by("copy-status").textContent="Copied"}catch(e){by("copy-status").textContent="Please use Download JSON"}});
