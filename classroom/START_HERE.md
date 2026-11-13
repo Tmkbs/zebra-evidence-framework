@@ -14,6 +14,12 @@ The cue cards **do not perform approvals or make up data**. On the real public c
 
 [Full speaker script (5 minutes + 90-second backup)](../PRESENTER_NOTES.md). The optional Search Lab is for toy algorithm QA, **not real-case performance evidence**.
 
+## Agent Continue plugin integration (optional)
+
+In **03 Review**, click **Export plugin task (.json)** to generate a real [Agent Continue](https://github.com/1235357/agent-continue) settings file for the selected public case. In the browser extension, **Settings → Import JSON**, choose a ChatGPT conversation, check the prompt and **manually Start**. Then paste the resulting JSON into Candidate A or B in the same Review screen. The app prevents wrong-case imports and never claims a verified model run.
+
+[Full three-step plugin handoff and supported v2.2.1 schema](AGENT_CONTINUE_BRIDGE.md). The plugin is not embedded into this site; it only operates on ChatGPT.
+
 ## What actually comes from the team's research
 
 The default case is **ZF-WEB-INTEGRATION**, based on the team's [published November 2 case report](https://github.com/1235357/zebra-public-site-archive/blob/main/faculty-checkin-2026-11-02/demo/report.json) and its cited DataWedge 15.0 official documentation. It provides actual public-source references and a carefully scoped editorial finding. It is not a saved AI result, device test or approved Zebra documentation change.
