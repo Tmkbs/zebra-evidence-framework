@@ -339,7 +339,7 @@ function jumpPresenter(n){
  show(PRESENTER_STEPS[presenterStep].page);
  updatePresenter();
 }
-function presenterToggle(){presenterOpen=!presenterOpen;updatePresenter()}
+function presenterToggle(){presenterOpen=!presenterOpen;if(presenterOpen)show(PRESENTER_STEPS[presenterStep].page);updatePresenter()}
 function renderCase(){
  const c=EXAMPLES[idx];by("question").textContent=c.question;
  by("facts").replaceChildren(...c.facts.map(x=>node("li",x)));
