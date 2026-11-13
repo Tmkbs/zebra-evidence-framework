@@ -47,7 +47,7 @@ const fakeWindow = { scrollTo() {}, isSecureContext: false };
 const fakeBlob = class { constructor(parts, opts) { this.parts = parts; this.opts = opts; } };
 const fakeURL = { createObjectURL: () => "blob:fake", revokeObjectURL() {} };
 const sandbox = { document, window: fakeWindow, Blob: fakeBlob, URL: fakeURL, setTimeout: () => 1 };
-vm.runInNewContext(script + "\nthis.app={payload,gateReasons,sourceHits,importDocument,importRevision,reset,revisedFilename,revisionAdapter,searchResults,show};", sandbox, { timeout: 5000 });
+vm.runInNewContext(script + "\nthis.app={payload,gateReasons,sourceHits,importDocument,importRevision,reset,revisedFilename,revisionAdapter,searchResults,show,buildAgentContinueConfig,parseAgentContinueResponse};", sandbox, { timeout: 5000 });
 const app = sandbox.app;
 const element = id => {
   assert.ok(elements.has(id), "Missing element " + id);
@@ -85,6 +85,57 @@ async function main() {
     assert.equal(p.recorded_answers[1].output,"");
     assert.equal(p.release.publication,false);
   });
+  test("Agent Continue JSON import contract creates a one-send task for public sources", () => {
+    const task=app.buildAgentContinueConfig();
+    assert.equal(task.format,"agent-continue-settings");
+    assert.equal(task.version,1);
+    assert.equal(task.includesPrompt,true);
+    assert.equal(task.config.mode,"queue-once");
+    assert.equal(task.config.maxSends,1);
+    assert.equal(task.config.startImmediately,true);
+    assert.equal(task.config.queue.length,1);
+    assert.equal(task.config.queue[0].name.includes("ZF-WEB-INTEGRATION"),true);
+    assert.ok(task.config.queue[0].text.includes("techdocs.zebra.com"));
+    assert.ok(task.config.queue[0].text.includes("zebra-agent-continue-response/v1"));
+    assert.equal(task.config.keepAwake,false);
+    assert.equal(app.payload().agent_continue_interoperability.extension_runtime_connected,false);
+  });
+  test("extension task export is user-triggered and cannot start a model run", () => {
+    click("agent-export");
+    const p=app.payload();
+    assert.ok(element("agent-bridge-status").textContent.includes("Task JSON exported"));
+    assert.equal(p.recorded_answers[0].source,"NOT_RUN");
+    assert.equal(p.proposed_revision.status,"proposed");
+    assert.equal(p.release.status,"NOT_AUTHORIZED");
+  });
+  test("Agent Continue response is blocked when the case ID is wrong", () => {
+    element("agent-response").value=JSON.stringify({schema:"zebra-agent-continue-response/v1",case_id:"WRONG",answer:"Do not import"});
+    click("agent-import");
+    assert.ok(element("agent-bridge-status").textContent.includes("Case ID mismatch"));
+    assert.equal(app.payload().recorded_answers[0].source,"NOT_RUN");
+  });
+  test("valid response is manually transferred into Candidate A without fabricated verification", () => {
+    element("agent-response").value=JSON.stringify({schema:"zebra-agent-continue-response/v1",case_id:"ZF-WEB-INTEGRATION",answer:"The documented command is native; browser integration remains unverified."});
+    element("agent-dest").value="a";
+    click("agent-import");
+    const p=app.payload();
+    assert.equal(p.recorded_answers[0].source,"MANUAL_ENTRY_NOT_VERIFIED");
+    assert.ok(p.recorded_answers[0].output.includes("remains unverified"));
+    assert.equal(p.recorded_answers[0].transfer_receipt.source,"AGENT_CONTINUE_MANUAL_JSON_TRANSFER");
+    assert.equal(p.recorded_answers[0].transfer_receipt.extension_runtime_connected,false);
+    assert.equal(p.agent_continue_interoperability.manually_transferred_result,true);
+    assert.equal(p.reviewer_choice,"not_decided");
+    assert.equal(p.case.model_execution_status,"NOT_RUN");
+    assert.equal(p.proposed_revision.status,"proposed");
+    assert.equal(p.release.publication,false);
+    assert.equal(element("answer-a-status").textContent.includes("MANUALLY ENTERED"),true);
+  });
+  test("manual edits clear the plugin transfer receipt", () => {
+    change("answer-a","I revised the imported text","input");
+    assert.equal(app.payload().recorded_answers[0].transfer_receipt,null);
+    assert.equal(app.payload().agent_continue_interoperability.manually_transferred_result,false);
+  });
+  app.reset(0);
   test("presenter cue cards open with real-source narration", () => {
     assert.equal(element("presenter-panel").hidden,true);
     click("presenter-toggle");
@@ -147,6 +198,11 @@ async function main() {
     assert.equal(p.recorded_answers[0].source,"NOT_RUN");
   });
   app.reset(3);
+  test("Agent Continue export is disabled on fictional QA cases", () => {
+    assert.equal(element("agent-export").disabled,true);
+    assert.equal(element("agent-import").disabled,true);
+    assert.throws(()=>app.buildAgentContinueConfig(),/public-source case/);
+  });
   test("synthetic document starts unapproved", () => {
     const p = app.payload();
     assert.equal(p.document_source_kind, "synthetic");
