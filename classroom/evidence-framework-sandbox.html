@@ -472,8 +472,9 @@ function importAgentContinueResult(){
  }catch(err){agentBridgeStatus="Import blocked: "+err.message;renderAgentContinueBridge();}
 }
 function renderReview(){const c=EXAMPLES[idx];
- by("answer-a-status").textContent=c.synthetic?"A · SYNTHETIC EXAMPLE":"A · NOT RUN / NO SAVED MODEL OUTPUT";
- by("answer-b-status").textContent=c.synthetic?"B · SYNTHETIC EXAMPLE":"B · NOT RUN / NO SAVED MODEL OUTPUT";
+ by("answer-a-status").textContent=c.synthetic?"A · SYNTHETIC EXAMPLE":(answers.a?"A · MANUALLY ENTERED · UNVERIFIED":"A · NOT RUN / NO SAVED MODEL OUTPUT");
+ by("answer-b-status").textContent=c.synthetic?"B · SYNTHETIC EXAMPLE":(answers.b?"B · MANUALLY ENTERED · UNVERIFIED":"B · NOT RUN / NO SAVED MODEL OUTPUT");
+ renderAgentContinueBridge();
  by("answer-a").placeholder=c.synthetic?"Illustrative sample answer":"No model output recorded. Paste only an authorized sanitized run output.";
  by("answer-b").placeholder=c.synthetic?"Illustrative sample answer":"No model output recorded. Paste only an authorized sanitized run output.";
  by("answer-a").value=answers.a;by("answer-b").value=answers.b;["a","b"].forEach(slot=>{const root=by("ratings-"+slot);root.replaceChildren();CRITERIA.forEach((label,i)=>{const row=document.createElement("div");row.className="criterion";const select=document.createElement("select");select.setAttribute("aria-label",slot+" "+label);[["","Unrated"],["0","0 / 2"],["1","1 / 2"],["2","2 / 2"]].forEach(([value,text])=>{const opt=node("option",text);opt.value=value;select.append(opt)});select.value=ratings[slot][i];select.addEventListener("change",()=>{ratings[slot][i]=select.value;renderScore(slot);revokeApproval();renderRevision();renderRetest();renderDelivery()});row.append(node("span",label),select);root.append(row)});renderScore(slot)});by("decision").value=decision}
@@ -580,7 +581,7 @@ function payload(){
   case:{id:c.id,question:c.question,known_facts:c.facts,unknowns:c.gaps,document_reference:revision.document_id,source_status:c.source_status||"SYNTHETIC",case_url:c.case_url||null,public_report_url:c.report_url||null,model_execution_status:c.model_status||"SYNTHETIC_ONLY"},
   document_snapshot:{name:docSource.name,type:docSource.kind,extension:docSource.extension,original_text:docSource.text,character_count:docSource.text.length,selected_paragraph:revision.before,exact_match_count:sourceHits(revision.before),customer_source_verified:false},
   evidence:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>({id:x.id,source_label:x.source,claim:x.claim,scope_limit:x.limit,public_url:x.url||null})),
-  recorded_answers:[{id:"A",source:c.synthetic?"SYNTHETIC_FIXTURE":(answers.a?"MANUAL_ENTRY_NOT_VERIFIED":"NOT_RUN"),output:answers.a,human_scores:human("a")},{id:"B",source:c.synthetic?"SYNTHETIC_FIXTURE":(answers.b?"MANUAL_ENTRY_NOT_VERIFIED":"NOT_RUN"),output:answers.b,human_scores:human("b")}],
+  recorded_answers:[{id:"A",source:c.synthetic?"SYNTHETIC_FIXTURE":(answers.a?"MANUAL_ENTRY_NOT_VERIFIED":"NOT_RUN"),output:answers.a,human_scores:human("a"),transfer_receipt:agentBridgeReceipts.a},{id:"B",source:c.synthetic?"SYNTHETIC_FIXTURE":(answers.b?"MANUAL_ENTRY_NOT_VERIFIED":"NOT_RUN"),output:answers.b,human_scores:human("b"),transfer_receipt:agentBridgeReceipts.b}],
   reviewer_choice:decision,
   failure_diagnosis:{status:"HYPOTHESIS_ONLY",category:failureMode,notes:diagnosisNote,confirmed_root_cause:false},
   proposed_revision:{...revision,evidence_links:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>x.id),local_retest_approved:revision.status==="approved_for_retest",customer_publication_approved:false},
@@ -589,6 +590,7 @@ function payload(){
   optional_search_experiment:c.synthetic?{synthetic_only:true,goal:"maximize invented priority points under toy review-time constraint",budget_minutes:budget,candidate_action_sets:search.plans.length,exact_best:{minutes:search.optimal.minutes,points:search.optimal.points,checks:search.optimal.labels},greedy_baseline:{minutes:search.greedy.minutes,points:search.greedy.points,checks:search.greedy.labels},evolutionary_algorithm_used:false}:null,
   developer_preview:{status:c.synthetic?"SYNTHETIC_NOT_VERIFIED":"PUBLIC_SOURCE_DRAFT_NO_VERIFIED_MODEL_OUTPUT",shown_candidate:guideChoice,draft_answer:answers[guideChoice],evidence_ids:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>x.id),document_paragraph:previewCopy===null?revision.before:revision.after,video_storyboard:storyboard(),video_generated:false,illustrative_feedback:guideFeedback,customer_study_performed:false},
   release:{status:"NOT_AUTHORIZED",publication:false,real_device_validation:"NOT_RUN",customer_acceptance:"NOT_RUN"},
+  agent_continue_interoperability:{format:"agent-continue-settings/v1",source_repo:"https://github.com/1235357/agent-continue",extension_runtime_connected:false,task_import_requires_user_action:true,task_execution_requires_user_action:true,manually_transferred_result:!!(agentBridgeReceipts.a||agentBridgeReceipts.b)},
   downstream_adapter:{schema:"documentation-revision/v1",mode:"local_json_import_and_copy_preview_only",teammate_private_code_connected:false}
  }
 }
@@ -674,7 +676,8 @@ async function importRevision(file){
 
 function reset(i){
  idx=i;budget=9;chosen=new Set([0,1]);ratings={a:["","","",""],b:["","","",""]};decision="not_decided";
- answers={a:EXAMPLES[idx].a,b:EXAMPLES[idx].b};guideChoice="b";guideFeedback="not_recorded";failureMode="unassessed";diagnosisNote="";resetSource();revision=freshRevision();riskAcknowledged=false;resetRetest();
+ answers={a:EXAMPLES[idx].a,b:EXAMPLES[idx].b};agentBridgeReceipts={a:null,b:null};agentBridgeStatus="";by("agent-response").value="";
+ guideChoice="b";guideFeedback="not_recorded";failureMode="unassessed";diagnosisNote="";resetSource();revision=freshRevision();riskAcknowledged=false;resetRetest();
  renderCase();renderEvidence();renderReview();renderDiagnosis();renderRevision();renderRetest();renderGuide();renderStrategy();renderDelivery()
 }
 by("presenter-toggle").addEventListener("click",presenterToggle);
@@ -684,8 +687,16 @@ by("presenter-next").addEventListener("click",()=>jumpPresenter(presenterStep+1)
 document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.page)));document.querySelectorAll("[data-next]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.next)));
 by("scenario").addEventListener("change",e=>reset(Number(e.target.value)));
 by("budget").addEventListener("input",e=>{budget=Number(e.target.value);renderStrategy();renderDelivery()});
+by("agent-export").addEventListener("click",()=>{
+ try{const c=buildAgentContinueConfig();
+ downloadText("zebra-agent-continue-"+EXAMPLES[idx].id.toLowerCase()+".json",JSON.stringify(c,null,2)+"\n","application/json;charset=utf-8");
+ agentBridgeStatus="Task JSON exported. Import via Agent Continue Settings → Import JSON, choose a ChatGPT conversation, and manually press Start. One send maximum.";
+ }catch(err){agentBridgeStatus="Export blocked: "+err.message}
+ renderAgentContinueBridge();
+});
+by("agent-import").addEventListener("click",importAgentContinueResult);
 by("decision").addEventListener("change",e=>{decision=e.target.value;revokeApproval();renderRevision();renderRetest();renderDelivery()});
-for(const slot of ["a","b"])by("answer-"+slot).addEventListener("input",e=>{answers[slot]=e.target.value;revokeApproval();renderRevision();renderRetest();renderDelivery()});
+for(const slot of ["a","b"])by("answer-"+slot).addEventListener("input",e=>{answers[slot]=e.target.value;agentBridgeReceipts[slot]=null;revokeApproval();renderReview();renderRevision();renderRetest();renderDelivery()});
 by("failure-class").addEventListener("change",e=>{failureMode=e.target.value;revokeApproval();renderDiagnosis();renderRevision();renderRetest();renderDelivery()});
 by("diagnosis-note").addEventListener("input",e=>{diagnosisNote=e.target.value;revokeApproval();renderRevisionGate();renderRetest();renderDelivery()});
 for(const [id,key] of [["document-after","after"],["document-reason","rationale"]])by(id).addEventListener("input",e=>{
