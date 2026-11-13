@@ -2,11 +2,11 @@
 
 ## Open it
 
-1. Go to [evidence-framework-sandbox.html](evidence-framework-sandbox.html).
-2. Choose **Raw** in GitHub and save the page as \`evidence-framework-sandbox.html\`. Alternatively download the entire branch as a ZIP.
-3. Double-click the saved HTML in Chrome or Edge. No server, dependencies, credentials or internet access are required.
+**Direct browser version:** https://tmkbs.github.io/zebra-evidence-framework/classroom/
 
-**The GitHub code-view screen is not the running app.** The application is the actual HTML file opened in a browser.
+**Offline backup:** open [evidence-framework-sandbox.html](evidence-framework-sandbox.html) on GitHub, click **Raw**, save it as `evidence-framework-sandbox.html`, and double-click the saved file in Chrome or Edge. It does not require a server, internet connection or credentials.
+
+The GitHub code-view screen is source code, not the running interface.
 
 ## Full presentation (8 stages)
 
@@ -36,15 +36,15 @@ A public-safe fixture is provided at [sample_document.md](sample_document.md).
 5. In **Retest**, apply the edit to a full-document copy and click **Download revised file**.
 6. To exchange a revision with another module, use **Export revision adapter JSON**, or import the [adapter example](revision_adapter_example.json) after selecting the matching paragraph.
 
-The app supports approved local UTF-8 \`.txt\`, \`.text\`, and \`.md\` files up to 200 KB. It makes no network requests, sends no files to a server and does not overwrite the original. Because exports contain source text, **do not use restricted customer data or share an unapproved export**.
+The app supports approved local UTF-8 `.txt`, `.text`, and `.md` files up to 200 KB. It makes no network requests, sends no files to a server and does not overwrite the original. Because exports contain source text, **do not use restricted customer data or share an unapproved export**.
 
 ## Tests
 
 From the repository root:
 
-\`\`\`bash
+```bash
 node classroom/test_end_to_end.cjs
-\`\`\`
+```
 
 This zero-dependency regression script exercises the complete offline UI data flow using a simulated DOM. It is not a substitute for testing in Chrome/Edge against the actual source documents or a model endpoint.
 
