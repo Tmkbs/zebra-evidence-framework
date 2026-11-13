@@ -1,57 +1,43 @@
-# End-to-end Evidence Framework — classroom release
+# Evidence Framework — Public-source research release
 
-## Open it
+## Open the site
 
-**Direct browser version:** https://tmkbs.github.io/zebra-evidence-framework/classroom/
+**Interactive webpage:** https://tmkbs.github.io/zebra-evidence-framework/classroom/
 
-**Offline backup:** open [evidence-framework-sandbox.html](evidence-framework-sandbox.html) on GitHub, click **Raw**, save it as `evidence-framework-sandbox.html`, and double-click the saved file in Chrome or Edge. It does not require a server, internet connection or credentials.
+**Offline option:** Save [evidence-framework-sandbox.html](evidence-framework-sandbox.html) via GitHub Raw and open it locally in Chrome or Edge. The file uses no external scripts, model endpoints, API calls, tracking or storage. Clicking a public citation deliberately opens a separate public website.
 
-The GitHub code-view screen is source code, not the running interface.
+## What actually comes from the team's research
 
-## Full presentation (8 stages)
+The default case is **ZF-WEB-INTEGRATION**, based on the team's [published November 2 case report](https://github.com/1235357/zebra-public-site-archive/blob/main/faculty-checkin-2026-11-02/demo/report.json) and its cited DataWedge 15.0 official documentation. It provides actual public-source references and a carefully scoped editorial finding. It is not a saved AI result, device test or approved Zebra documentation change.
 
-**Architecture → Question → Evidence → Review → Diagnosis → Revision → Retest → Developer preview → Delivery**
+Two additional public archive examples are **TC26 Xamarin scanner configuration** and **TC52 DataWedge MultiBarcode**. The [team public project overview](https://github.com/1235357/zebra-public-site-archive/blob/main/README.md), dated November 10, also identifies TC26 scanner-lifecycle and MultiBarcode case reports on its [read-only project website](https://zebra-techdocs-practicum.vercel.app/). The original publicly archived forum threads included here are traceable real questions, but the overview **does not establish they are identical to the individual private-site reports**; we do not claim a match.
 
-The numbered UI includes the full pipeline; **Search lab** is an optional side experiment, not a claim that an evolutionary algorithm is deployed.
+[Public case manifest](public_case_manifest.json) preserves the source URLs, version/scope caveats and NOT RUN status in a reusable format. According to the team's [November 5 technical status](https://github.com/1235357/zebra-public-site-archive/blob/main/TECHNICAL_STATUS.md), the larger archive contains 2,854 unique admitted forum records and an initial development set of eight cases linked to 12 official source URLs. **These counts are not model scores or independently validated solutions.**
 
-Suggested walkthrough:
+The final two selector options are explicitly marked **Synthetic QA only**. Their Search Lab uses invented cost and priority values solely to exercise an optimization prototype; it is disabled for real cases until real measurements exist.
 
-1. Pick one of the two clearly fictional developer questions.
-2. Keep or change the selected evidence, and show how each source has an applicability limit.
-3. Review candidates A/B and choose *Prefer B for further review*.
-4. Under **Failure diagnosis**, choose *Possible documentation clarity gap*. Explain that this is still a hypothesis, not proof the docs caused the problem.
-5. In **Document revision**, review the before/after text, check the acknowledgment and approve **for local retest only**.
-6. Under **Retest**, apply the patch to a disposable browser copy. The original paragraph stays unchanged.
-7. In **Developer preview**, show the draft answer, selected references, follow-up questions and proposed three-frame video storyboard. No real model inference or video generation takes place.
-8. In **Delivery**, export both the full JSON review package and a Markdown case report. Held-out model/device testing correctly remains **NOT RUN**.
+## Walk through the real research workflow
 
-## Demonstrate an actual editable document, not just a fixed paragraph
+1. **Architecture:** show that this is a research/evaluation framework linked to the team's actual public-source case work.
+2. **Question:** pick the default public Android web integration case and open its original forum link and public report, if the audience wants to verify the provenance.
+3. **Evidence:** select relevant published source reviews, emphasizing applicability and missing conditions. For the first case, a versioned native soft-scan command is not proof of browser integration.
+4. **Review:** actual model runs are **NOT RUN**. Choose **Documentation-only review · no model run** instead of pretending candidates A/B were generated.
+5. **Diagnosis:** select *Possible documentation clarity gap* as a **hypothesis**, not a confirmed device or documentation defect.
+6. **Document revision:** the built-in paragraph is an **editorial case-review note**, not Zebra's official source text. The proposed change can make that note more precise. Confirm human acknowledgment.
+7. **Retest:** approve the candidate and apply it to a temporary **review-note** copy. This validates the file-editing mechanics only. Held-out checks remain NOT RUN.
+8. **Developer preview:** inspect source-linked context, the explicit lack of a verified model answer and a *storyboard only* visual plan.
+9. **Delivery:** export the case report and structured JSON containing original URLs, evidence limits, non-verification and review state.
 
-A public-safe fixture is provided at [sample_document.md](sample_document.md).
+### Real document patching (separate from the public built-in review notes)
 
-1. Download that file and open **Document revision → Load approved TXT/Markdown file**.
-2. Select the paragraph containing **"The reconnect callback"**, then click **Use selected paragraph**.
-3. Edit the proposed replacement. The original imported source stays frozen.
-4. Confirm the review decisions and approve the new draft for local testing. The system blocks changes that lack approval, have missing/multiple source matches or differ from the frozen source.
-5. In **Retest**, apply the edit to a full-document copy and click **Download revised file**.
-6. To exchange a revision with another module, use **Export revision adapter JSON**, or import the [adapter example](revision_adapter_example.json) after selecting the matching paragraph.
+If an approved, properly licensed TXT or Markdown document is available, use **Document revision → Load approved TXT/Markdown file**, select a paragraph, propose a change and use the same review gate to generate a new candidate document. The original local file remains unchanged. This does **not** automatically change the manufacturer's documentation.
 
-The app supports approved local UTF-8 `.txt`, `.text`, and `.md` files up to 200 KB. It makes no network requests, sends no files to a server and does not overwrite the original. Because exports contain source text, **do not use restricted customer data or share an unapproved export**.
+The [revision JSON example](revision_adapter_example.json) matches the default public case-review note. [A separate synthetic file](sample_document.md) remains useful for testing file imports without publishing restricted content.
 
-## Tests
+## What's finished, what's still missing
 
-From the repository root:
+**Completed here:** traceable public-source case summaries, source links and limits, documentation-only review mode, safe local document revision workflow, a repeatable import/export contract, developer-facing preview, no-run labeling, report export and automated simulated-DOM checks.
 
-```bash
-node classroom/test_end_to_end.cjs
-```
+**Not completed/claimed:** the teammate's inaccessible private editor source code, exact private website report data, restricted customer/support cases, live model comparisons, actual optimization outcomes, official documentation approval, device-level verification, or generated video.
 
-This zero-dependency regression script exercises the complete offline UI data flow using a simulated DOM. It is not a substitute for testing in Chrome/Edge against the actual source documents or a model endpoint.
-
-## What is finished versus still external
-
-**Implemented:** offline evidence/review workflow, failure classification, revision JSON import/export, permitted local text file import, unique-match paragraph replacement, review-state invalidation, full-copy download, staged retest tracking, user-facing concept preview and portable case reports.
-
-**Not claimed:** the private teammate repository or actual external editor has been imported; model calls, grounded customer answers, generated video, source-owner approval, device validation, measured accuracy or customer publication.
-
-See [Integration handoff](INTEGRATION_HANDOFF.md) for the external module contract and [Verification notes](QA.md) for the evidence boundary.
+[Engineering handoff](INTEGRATION_HANDOFF.md) · [Automated tests](test_end_to_end.cjs) · [QA boundaries](QA.md)
