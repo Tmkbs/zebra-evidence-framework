@@ -103,7 +103,7 @@ a:"Enable retry: reconnect always updates the dashboard and solves this issue on
 a:"Strip accents from every field. This always fixes CSV issues and preserves meaning.",b:"First check export encoding and importer settings on a controlled sample. Avoid irreversible normalization without an approved requirement."}
 ];
 const STRATEGY_CHECKS=[
-[{name:"Check client version",minutes:2,points:3},{name:"Reconcile reconnect and refresh timestamps",minutes:5,points:9},{name:"Inspect whether explicit refresh ran",minutes:4,points:7},{name:"Reproduce the offline transition",minutes:6,points:12},{name:"Inspect cache invalidation",minutes:3,points:5}],
+[{name:"Check client version",minutes:2,points:3},{name:"Reconcile reconnect and refresh timestamps",minutes:5,points:10},{name:"Inspect whether explicit refresh ran",minutes:4,points:8},{name:"Reproduce the offline transition",minutes:6,points:13},{name:"Inspect cache invalidation",minutes:3,points:2}],
 [{name:"Inspect raw CSV byte encoding",minutes:4,points:9},{name:"Confirm selected export encoding",minutes:2,points:3},{name:"Compare two importer configurations",minutes:6,points:11},{name:"Compare source Unicode values",minutes:3,points:5},{name:"Review permitted normalization policy",minutes:5,points:4}]
 ];
 let budget=9;
