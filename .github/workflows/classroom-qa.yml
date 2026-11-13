@@ -1,0 +1,26 @@
+name: Classroom end-to-end QA
+
+on:
+  push:
+    branches:
+      - classroom-safe-framework-20261113
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  offline-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run offline demo tests (no dependencies)
+        run: node classroom/test_end_to_end.cjs
