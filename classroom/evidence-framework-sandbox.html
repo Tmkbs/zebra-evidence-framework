@@ -430,6 +430,17 @@ function reportMarkdown(){
 function downloadText(name,contents,mime){
  const blob=new Blob([contents],{type:mime}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500)
 }
+function revisionAdapter(){
+ return{schema:"documentation-revision/v1",revision_id:revision.revision_id,case_id:EXAMPLES[idx].id,document_id:revision.document_id,source_filename:docSource.name,source_kind:docSource.kind,source_version:revision.source_version,section:revision.section,before:revision.before,after:revision.after,rationale:revision.rationale,status:revision.status,exact_original_occurrences:sourceHits(revision.before),approved_for_publication:false}
+}
+function revisedFilename(){
+ const base=docSource.name.replace(/\.(md|txt|text)$/i,"").replace(/[^A-Za-z0-9._-]/g,"_").slice(0,90)||"document";
+ return base+"-candidate"+docSource.extension
+}
+function downloadRevised(){
+ if(previewStatus!=="applied_to_copy"||previewCopy===null)return;
+ downloadText(revisedFilename(),previewCopy,docSource.extension===".md"?"text/markdown;charset=utf-8":"text/plain;charset=utf-8")
+}
 async function importRevision(file){
  if(!file)return;const out=by("import-status");
  if(file.size>100000){out.textContent="Rejected: over 100 KB";return}
@@ -455,7 +466,7 @@ by("budget").addEventListener("input",e=>{budget=Number(e.target.value);renderSt
 by("decision").addEventListener("change",e=>{decision=e.target.value;revokeApproval();renderRevision();renderRetest();renderDelivery()});
 for(const slot of ["a","b"])by("answer-"+slot).addEventListener("input",e=>{answers[slot]=e.target.value;revokeApproval();renderRevision();renderRetest();renderDelivery()});
 by("failure-class").addEventListener("change",e=>{failureMode=e.target.value;revokeApproval();renderDiagnosis();renderRevision();renderRetest();renderDelivery()});
-by("diagnosis-note").addEventListener("input",e=>{diagnosisNote=e.target.value;renderDelivery()});
+by("diagnosis-note").addEventListener("input",e=>{diagnosisNote=e.target.value;revokeApproval();renderRevisionGate();renderRetest();renderDelivery()});
 for(const [id,key] of [["document-after","after"],["document-reason","rationale"]])by(id).addEventListener("input",e=>{
  revision[key]=e.target.value;revision.status="proposed";riskAcknowledged=false;by("review-ack").checked=false;
  resetRetest();renderRevisionGate();renderRetest();renderDelivery()
@@ -468,7 +479,12 @@ by("revision-approve").addEventListener("click",()=>{
 by("revision-reject").addEventListener("click",()=>{revision.status="rejected";riskAcknowledged=false;resetRetest();renderRevision();renderRetest();renderDelivery()});
 by("revision-reset").addEventListener("click",()=>{revision=freshRevision();riskAcknowledged=false;resetRetest();renderRevision();renderRetest();renderDelivery()});
 by("revision-import").addEventListener("change",e=>importRevision(e.target.files?.[0]));
+by("download-revision").addEventListener("click",()=>downloadText("documentation-revision-candidate.json",JSON.stringify(revisionAdapter(),null,2)+"\n","application/json;charset=utf-8"));
+by("doc-import").addEventListener("change",e=>importDocument(e.target.files?.[0]));
+by("doc-select-block").addEventListener("click",()=>chooseParagraph(Number(by("doc-blocks").value)));
+by("doc-restore").addEventListener("click",restoreSource);
 by("run-preview").addEventListener("click",applyCopy);
+by("download-revised").addEventListener("click",downloadRevised);
 by("holdout-note").addEventListener("input",e=>{holdoutNote=e.target.value;renderDelivery()});
 by("guide-choice").addEventListener("change",e=>{guideChoice=e.target.value;renderGuide();renderDelivery()});
 by("guide-feedback").addEventListener("change",e=>{guideFeedback=e.target.value;renderDelivery()});
