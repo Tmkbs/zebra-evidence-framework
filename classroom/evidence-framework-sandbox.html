@@ -64,14 +64,30 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 </section>
 <section class="page" id="revision">
 <div class="eyebrow">05 · DOCUMENTATION WORKSTREAM</div><h1>Review a precise before / after change.</h1>
-<p class="lead">This integrates the documentation-revision process, not a teammate's unretrieved source code. Draft edits are made only to synthetic text. The original version is kept unchanged.</p>
+<p class="lead">This integrates the documentation-revision process, not a teammate's unretrieved source code. Draft edits start from a synthetic example. You can also load an approved local TXT/Markdown file, choose a paragraph and apply a verified replacement to a disposable copy. The original file remains unchanged.</p>
 <div class="row" style="margin-bottom:17px"><span class="pill" id="revision-status">PROPOSED</span><span id="revision-target" class="step-note"></span></div>
+<div class="card" style="margin-bottom:14px">
+ <div class="eyebrow">SOURCE DOCUMENT · LOCAL-ONLY</div>
+ <div class="row">
+  <label for="doc-import" class="step-note">Load approved TXT/Markdown file</label>
+  <input id="doc-import" class="field" style="max-width:340px" type="file" accept=".txt,.text,.md,text/plain,text/markdown">
+  <button id="doc-restore" class="btn" type="button">Restore synthetic fixture</button>
+ </div>
+ <p id="doc-source-info" class="muted">Synthetic document loaded.</p>
+ <div class="row">
+  <label for="doc-blocks" class="step-note">Paragraph to revise</label>
+  <select id="doc-blocks" class="field" style="max-width:500px" aria-label="Select source paragraph"></select>
+  <button id="doc-select-block" class="btn" type="button">Use selected paragraph</button>
+ </div>
+ <p id="doc-import-status" class="step-note" role="status">Imported files stay on this device. They are never uploaded.</p>
+ <div class="warning">Import only materials cleared for this demonstration. A locally imported document does not make the fictional case facts or model answers real. Never share an export containing restricted content without authorization.</div>
+</div>
 <div class="grid">
 <div class="card"><div class="eyebrow">VERSIONED ORIGINAL · READ ONLY</div><h3 id="document-heading"></h3><div class="docview" id="document-before"></div><p>Retained as the exact baseline for a safe diff and source check.</p></div>
 <div class="card"><label class="eyebrow" for="document-after">MINIMAL REVISION · EDITABLE</label><textarea class="field" id="document-after" rows="8"></textarea><label class="eyebrow" for="document-reason" style="display:block;margin-top:15px">WHY THIS CHANGE?</label><textarea id="document-reason" class="field" rows="3"></textarea></div>
 </div>
 <div class="card" style="margin-top:14px"><div class="eyebrow">FUTURE MODULE ADAPTER</div><p>Import a sanitized draft JSON using <code>schema: documentation-revision/v1</code>, the active <code>case_id</code>, and <code>before</code>, <code>after</code>, <code>rationale</code>. The file is reviewed locally and never automatically approved. Do not import real customer content into a classroom screen share.</p>
-<div class="row"><input id="revision-import" type="file" accept=".json,application/json" class="field" style="max-width:340px"><span class="step-note" id="import-status">No file imported.</span></div></div>
+<div class="row"><input id="revision-import" type="file" accept=".json,application/json" class="field" style="max-width:340px"><button id="download-revision" class="btn" type="button">Export revision adapter JSON</button><span class="step-note" id="import-status">No file imported.</span></div></div>
 <div class="card" style="margin-top:14px"><div class="eyebrow">HUMAN SIGNOFF · LOCAL TEST ONLY</div>
 <label style="font-size:12px;line-height:1.7"><input id="review-ack" type="checkbox"> I checked evidence and understand this permits only an in-browser copy test, not publication.</label>
 <div class="gate" id="revision-gate"></div>
@@ -81,9 +97,9 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 </section>
 <section class="page" id="retest">
 <div class="eyebrow">06 · HELD-OUT VALIDATION</div><h1>Check the changed text, without overstating results.</h1>
-<p class="lead">An approved draft can be applied to a disposable browser copy. This proves the handoff works mechanically, not that a model improved or the technical issue was solved.</p>
+<p class="lead">An approved revision can be applied to a disposable full-text copy. The original file remains untouched. You can download the revised TXT/Markdown and report, but this does not prove technical correctness or customer acceptance.</p>
 <div class="grid">
-<div class="card"><div class="eyebrow">LOCAL DOCUMENT COPY</div><div class="row"><button id="run-preview" class="btn primary" disabled>Apply to temporary copy</button><span id="preview-status" class="pill amber">NOT RUN</span></div><p id="preview-detail"></p><h3>Resulting paragraph</h3><div id="preview-text" class="docview revised">No copy created.</div></div>
+<div class="card"><div class="eyebrow">LOCAL DOCUMENT COPY</div><div class="row"><button id="run-preview" class="btn primary" disabled>Apply to temporary copy</button><button id="download-revised" class="btn" disabled>Download revised file</button><span id="preview-status" class="pill amber">NOT RUN</span></div><p id="preview-detail"></p><h3>Resulting local document copy</h3><div id="preview-text" class="docview revised">No copy created.</div></div>
 <div class="card"><div class="eyebrow">STRUCTURAL SAFETY CHECKS</div><div id="safety-checks" class="muted"></div><p>These checks are only local and never claim actual source correctness, device validation or customer acceptance.</p></div>
 </div>
 <div class="card" style="margin-top:14px"><div class="eyebrow">FROZEN HELD-OUT QUESTIONS</div><p>Record independent observed outcomes. Default is NOT RUN; do not invent improvements.</p><table class="review-table"><thead><tr><th>Question</th><th>Outcome</th></tr></thead><tbody id="holdout-list"></tbody></table><label class="eyebrow" for="holdout-note" style="display:block;margin-top:18px">RETEST CONDITIONS / NOTES</label><textarea class="field" id="holdout-note" rows="3" placeholder="Model, prompt, inputs, observed failures, or why NOT RUN..."></textarea></div>
