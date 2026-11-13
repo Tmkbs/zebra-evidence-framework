@@ -48,6 +48,14 @@
 *Click:* Delivery packet → **Download complete JSON** or **Download case report**.  
 *Say:* “The case, source limitations, review decision, proposed document change and outstanding checks all travel in one structured record. This is the boundary where my framework can connect to a separate documentation implementation.”
 
+## Optional: demonstrate the actual Agent Continue handoff (30 seconds)
+
+In **Review**, point to the **Agent Continue · real extension bridge** panel. Click **Export plugin task (.json)**, showing how the selected real public case and its evidence can become a **one-send queue task** in 叶真同's Chrome extension. The extension's Settings import can load this real file; it requires a separate, explicit user Start in an existing ChatGPT conversation. The webpage can then accept a case-matching JSON response as **MANUAL_ENTRY_NOT_VERIFIED**.
+
+*Say:* “This is the plugin handoff from our research case into Zhentong's actual Agent Continue scheduler. It uses the extension's JSON import contract, so we're not pretending that a Chrome extension can run inside our website. We still review the answer here.”
+
+Do not claim a live run occurred unless you actually perform one on a permitted public case. [Exact bridge instructions](classroom/AGENT_CONTINUE_BRIDGE.md). This is optional to the five-minute walkthrough.
+
 ## How it connects to Evolutionary Computation
 
 If Sam asks about optimization, **do not automatically open Search Lab on a real case**; it rightly says **NOT MEASURED**.
