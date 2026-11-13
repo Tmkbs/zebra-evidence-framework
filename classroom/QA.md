@@ -1,42 +1,33 @@
-# Classroom release verification — 13 November 2026
+# QA and provenance checks — public-case revision (13 November 2026)
 
-## What was executed
+## Data sources
 
-A JavaScript DOM-interaction harness loaded the committed standalone HTML and simulated real user callbacks. **26 checks passed** for the current code version. The same core paths can be rerun through the repository's zero-dependency Node script:
+Default mode contains **three traced public-source research examples**, documented in [public_case_manifest.json](public_case_manifest.json). The first is a November 2 published team case report; the other two are publicly archived forum questions. Published summary evidence is labeled by record origin and scope. A November 10 public team website update describes TC26 and MultiBarcode analyses, but does not prove these particular forum posts are the same exact reviewed cases.
 
-```bash
-node classroom/test_end_to_end.cjs
-```
+No restricted customer/support content was imported. Official manual paragraphs are **not** reproduced as editable baseline text. The built-in text to revise is a newly paraphrased editorial research-note draft.
 
-The fixture is `classroom/sample_document.md`.
+## Functional verification
 
-### Verified in the DOM harness
+The regression script [test_end_to_end.cjs](test_end_to_end.cjs) checks the actual committed HTML in a simulated DOM using `node classroom/test_end_to_end.cjs`. A pull-request-triggered GitHub Actions run executes the same script; its pass/fail status is the authoritative CI result.
 
-- Ten interface sections initialize and can share state.
-- Built-in fictional source starts unapproved and has exactly one matching paragraph.
-- A patch cannot be applied before a specific review gate is completed.
-- Reviewer choice, clarity-gap hypothesis and explicit acknowledgment permit a **local-only** test.
-- The original document snapshot remains unchanged; only the resulting in-memory copy gets the replacement.
-- Held-out model and device validations remain **NOT RUN**, even after the copy succeeds.
-- Approved local Markdown can be imported without a network call and retains its entire original text.
-- Selecting a specific paragraph updates the revision target without modifying other sections.
-- Local review gate must be reapproved after changing the proposed paragraph.
-- Complete imported Markdown content is preserved apart from the selected replacement, and an appropriately suffixed candidate filename is prepared.
-- `documentation-revision/v1` is exported with matching-case and source-count metadata.
-- Developer guide preview displays the revision target rather than an entire imported file.
-- Changing an already approved proposal invalidates prior approval and the prior patch.
-- Importing revision JSON with a mismatched baseline blocks application.
-- Unsupported file extensions and oversized files are rejected without replacing the source currently loaded.
-- Duplicate matching paragraphs are blocked to prevent ambiguous replacement.
-- Optional search experiment still enumerates 32 toy subsets.
-- Case report generation and `NOT AUTHORIZED` release semantics remain intact.
+The checks cover:
 
-## Safety and data handling
+- Public research case is first, not a fictional example; links and source provenance are explicit.
+- Saved model answers and actual optimization metrics are **NOT RUN / NOT MEASURED** for real cases.
+- Preferring a missing model output cannot pass the local review gate.
+- A documentation-only review can propose an **editorial note** change with human acknowledgment.
+- The copy-only patch never modifies the frozen original and cannot authorize publication.
+- TC26 and TC52 public forum cases retain their original links and limits.
+- Synthetic QA fixtures remain separate and can still exercise the toy search algorithm.
+- Local TXT/Markdown import, paragraph selection, unique-match checks, revision JSON import/export, and safe candidate file download.
+- No client data transmission, remote model call, automatic source fetching, external scripts, browser tracking or credential storage.
 
-Static inspection found no third-party script, browser network call, real API endpoint or proprietary source text in the **classroom HTML**. It processes local TXT/Markdown files in browser memory. Imported documents may be sensitive; an explicit warning is shown. JSON exports may include the full original and modified text.
+## Manual/static checks
 
-## Limitations
+JavaScript and Node test syntax compiled, all UI element references resolved, no duplicate element IDs, 10 workflow sections preserved. In a prior iteration the local DOM simulation passed 18 public-case-specific assertions. This is separate from actual browser acceptance and is not an empirical model result.
 
-These are **simulated-DOM integration tests**, not a complete Chromium/Edge or mobile browser acceptance pass. The persisted Node script has not been executed in the user's own environment here. No private teammate editor was accessible, and no actual data from it is represented as executed. No official-source proof, live model benchmark, deployed video, device verification or customer acceptance is established.
+## Remaining limitations
 
-The result is a functioning self-contained demo and a defined input/output boundary for later connection to a separately authorized document-editing service—not a claim of a production or client-approved deployment.
+**Not completed:** private teammate editor source integration, exact data from the private website's underlying implementation, approved model runs, real review-time measurements, optimization benchmarks, device testing, official documentation publication or customer signoff. The current public cases are credible source-grounded **research inputs**, not verified resolutions or an already completed controlled model experiment.
+
+GitHub Pages deployment should be checked after the merged commit reaches the main branch.
