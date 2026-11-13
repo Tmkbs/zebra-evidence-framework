@@ -149,15 +149,78 @@ const STRATEGY_CHECKS=[
 [{name:"Inspect raw CSV byte encoding",minutes:4,points:9},{name:"Confirm selected export encoding",minutes:2,points:3},{name:"Compare two importer configurations",minutes:6,points:11},{name:"Compare source Unicode values",minutes:3,points:5},{name:"Review permitted normalization policy",minutes:5,points:4}]
 ];
 let budget=9;
+
+const DOCS=[
+ {id:"SYN-DOC-01",label:"Invented SDK / Connection lifecycle",version:"synthetic v1.3",section:"4.2 · Reconnect and refresh",before:"The reconnect callback indicates that transport is available. Applications can call refresh() to request a new snapshot.",after:"The reconnect callback indicates transport availability only; it does not guarantee that the displayed reading is fresh. After reconnecting, explicitly request refresh() and verify completion before treating a reading as current.",rationale:"Clarify the boundary between restoring the connection and updating the displayed data. This is not a confirmed fix.",heldout:[{id:"H01",question:"Does reconnect guarantee an updated displayed reading?"},{id:"H02",question:"What must be checked before treating a reading as current?"}]},
+ {id:"SYN-DOC-02",label:"Invented guide / CSV export settings",version:"synthetic v2.1",section:"3.1 · Text encoding",before:"CSV export supports UTF-8 encoding. Text is saved using the configured export setting.",after:"CSV export supports UTF-8 encoding. If accented text appears changed after import, check the exported file encoding and the importing application's settings using the same sample. Avoid stripping accents unless an explicit data policy permits that transformation.",rationale:"Add a non-destructive diagnostic step instead of asserting that removing diacritics is harmless.",heldout:[{id:"H01",question:"How would you distinguish export encoding from import rendering?"},{id:"H02",question:"When is accent removal allowed?"}]}
+];
 const CRITERIA=["Traceable evidence","Uncertainty and scope","Next verification step","Avoid unsupported claims"];
 let idx=0,chosen=new Set([0,1]),ratings={a:["","","",""],b:["","","",""]},decision="not_decided";
+let answers={a:"",b:""},failureMode="unassessed",diagnosisNote="",revision={},riskAcknowledged=false,previewCopy=null,previewStatus="not_run",holdout={},holdoutNote="";
+function freshRevision(){const d=DOCS[idx];return{schema:"documentation-revision/v1",revision_id:"SYN-REV-"+(idx+1),case_id:EXAMPLES[idx].id,document_id:d.id,source_label:d.label,source_version:d.version,section:d.section,before:d.before,after:d.after,rationale:d.rationale,origin:"synthetic_local_draft",status:"proposed"}}
+function resetRetest(){previewCopy=null;previewStatus="not_run";holdout={H01:"not_run",H02:"not_run"};holdoutNote=""}
+function revokeApproval(){if(revision.status==="approved_for_retest")revision.status="proposed";resetRetest()}
+function gateReasons(){const reasons=[];
+ if(failureMode!=="clarity")reasons.push("select a suspected documentation clarity gap");
+ if(!chosen.size)reasons.push("select supporting evidence");
+ if(decision==="not_decided")reasons.push("record the human answer review decision");
+ if(revision.status==="rejected")reasons.push("restore or edit the rejected draft");
+ if(!revision.after?.trim()||revision.after.trim()===revision.before.trim())reasons.push("propose a substantive, nonempty change");
+ if(revision.before!==DOCS[idx].before)reasons.push("match the synthetic baseline exactly");
+ if(!riskAcknowledged)reasons.push("acknowledge copy-only testing");
+ return reasons}
+
 function by(id){return document.getElementById(id)}
 function node(tag,txt){const x=document.createElement(tag);x.textContent=txt;return x}
-function show(page){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===page));document.querySelectorAll("[data-page]").forEach(b=>{b.classList.toggle("active",b.dataset.page===page);b.setAttribute("aria-current",b.dataset.page===page?"page":"false")});by("crumb").textContent={architecture:"Architecture",case:"Question",evidence:"Evidence",review:"Human review",strategy:"Search lab",handoff:"Handoff"}[page];if(page==="strategy")renderStrategy();if(page==="handoff")renderJson();window.scrollTo(0,0)}
+function show(page){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===page));document.querySelectorAll("[data-page]").forEach(b=>{b.classList.toggle("active",b.dataset.page===page);b.setAttribute("aria-current",b.dataset.page===page?"page":"false")});by("crumb").textContent={architecture:"Architecture",case:"Question",evidence:"Evidence",review:"Human review",diagnosis:"Failure diagnosis",revision:"Document revision",retest:"Retest",strategy:"Search lab",handoff:"Delivery"}[page];if(page==="strategy")renderStrategy();if(page==="diagnosis")renderDiagnosis();if(page==="revision")renderRevision();if(page==="retest")renderRetest();if(page==="handoff")renderDelivery();window.scrollTo(0,0)}
 function renderCase(){const c=EXAMPLES[idx];by("question").textContent=c.question;by("facts").replaceChildren(...c.facts.map(x=>node("li",x)));by("gaps").replaceChildren(...c.gaps.map(x=>node("span",x)));by("scenario").value=String(idx)}
-function renderEvidence(){const box=by("evidence-list");box.replaceChildren();EXAMPLES[idx].evidence.forEach((x,i)=>{const label=document.createElement("label");label.className="item";const ck=document.createElement("input");ck.type="checkbox";ck.checked=chosen.has(i);ck.addEventListener("change",()=>{if(ck.checked)chosen.add(i);else chosen.delete(i);renderCount();renderJson()});const content=document.createElement("div");content.append(node("h3",x.id+" · "+x.source),node("p",x.claim),node("small","Scope: "+x.limit));label.append(ck,content);box.append(label)});renderCount()}
+function renderEvidence(){const box=by("evidence-list");box.replaceChildren();EXAMPLES[idx].evidence.forEach((x,i)=>{const label=document.createElement("label");label.className="item";const ck=document.createElement("input");ck.type="checkbox";ck.checked=chosen.has(i);ck.addEventListener("change",()=>{if(ck.checked)chosen.add(i);else chosen.delete(i);revokeApproval();renderCount();renderRevision();renderRetest();renderDelivery()});const content=document.createElement("div");content.append(node("h3",x.id+" · "+x.source),node("p",x.claim),node("small","Scope: "+x.limit));label.append(ck,content);box.append(label)});renderCount()}
 function renderCount(){by("count").textContent=chosen.size+" / "+EXAMPLES[idx].evidence.length+" fictional records selected"}
-function renderReview(){const c=EXAMPLES[idx];by("answer-a").textContent=c.a;by("answer-b").textContent=c.b;["a","b"].forEach(slot=>{const root=by("ratings-"+slot);root.replaceChildren();CRITERIA.forEach((label,i)=>{const row=document.createElement("div");row.className="criterion";const select=document.createElement("select");select.setAttribute("aria-label",slot+" "+label);[["","Unrated"],["0","0 / 2"],["1","1 / 2"],["2","2 / 2"]].forEach(([value,text])=>{const opt=node("option",text);opt.value=value;select.append(opt)});select.value=ratings[slot][i];select.addEventListener("change",()=>{ratings[slot][i]=select.value;renderScore(slot);renderJson()});row.append(node("span",label),select);root.append(row)});renderScore(slot)});by("decision").value=decision}
+function renderReview(){const c=EXAMPLES[idx];by("answer-a").value=answers.a;by("answer-b").value=answers.b;["a","b"].forEach(slot=>{const root=by("ratings-"+slot);root.replaceChildren();CRITERIA.forEach((label,i)=>{const row=document.createElement("div");row.className="criterion";const select=document.createElement("select");select.setAttribute("aria-label",slot+" "+label);[["","Unrated"],["0","0 / 2"],["1","1 / 2"],["2","2 / 2"]].forEach(([value,text])=>{const opt=node("option",text);opt.value=value;select.append(opt)});select.value=ratings[slot][i];select.addEventListener("change",()=>{ratings[slot][i]=select.value;renderScore(slot);revokeApproval();renderRevision();renderRetest();renderDelivery()});row.append(node("span",label),select);root.append(row)});renderScore(slot)});by("decision").value=decision}
+
+function renderDiagnosis(){
+ by("failure-class").value=failureMode;by("diagnosis-note").value=diagnosisNote;
+ const titles={unassessed:"Unassessed",access:"Source access concern",retrieval:"Retrieval concern",version:"Version mismatch concern",reasoning:"Interpretation concern",clarity:"Possible documentation clarity gap",context:"Context missing",no_failure:"No failure observed"};
+ by("diagnosis-title").textContent=titles[failureMode];
+ by("diagnosis-explanation").textContent=failureMode==="clarity"?"A small documentation clarification can be proposed if supported by evidence. This does not establish root cause.":"A document rewrite is not yet justified by this classification. Preserve the alternative causes and record the next test.";
+ by("diagnosis-gate").textContent=failureMode==="clarity"?"A documentation edit can be reviewed for a LOCAL TEST, subject to independent evidence and reviewer consent.":"Local document revision approval is blocked until a reviewer selects a possible documentation clarity gap.";
+}
+function renderRevisionGate(){
+ const reasons=gateReasons();
+ by("revision-gate").textContent=reasons.length?"Before authorizing the local test: "+reasons.join("; ")+".":"Required local review checks are recorded. Approval here is for a temporary copy only.";
+ by("revision-status").textContent=revision.status.replace(/_/g," ").toUpperCase();
+ by("revision-approve").disabled=!!reasons.length||revision.status==="approved_for_retest";
+}
+function renderRevision(){
+ const d=DOCS[idx];by("document-heading").textContent=d.label+" · "+d.section;
+ by("document-before").textContent=d.before;by("revision-target").textContent=d.id+" · "+d.version;
+ by("document-after").value=revision.after;by("document-reason").value=revision.rationale;
+ by("review-ack").checked=riskAcknowledged;renderRevisionGate();
+}
+function renderRetest(){
+ by("run-preview").disabled=revision.status!=="approved_for_retest";
+ by("preview-status").textContent=previewStatus.replace(/_/g," ").toUpperCase();
+ by("preview-detail").textContent=previewStatus==="not_run"?"Apply the approved revision only to a temporary copy of the synthetic paragraph.":"Latest local copy operation: "+previewStatus.replace(/_/g," ")+".";
+ by("preview-text").textContent=previewCopy===null?"No copy created.":previewCopy;
+ const checks=[["Different, nonempty proposed paragraph",!!revision.after?.trim()&&revision.after.trim()!==revision.before.trim()],["At least one evidence link recorded",chosen.size>0],["Human answer review decision exists",decision!=="not_decided"],["Revision approved for a local test",revision.status==="approved_for_retest"],["Original paragraph matches source snapshot",revision.before===DOCS[idx].before],["Disposable local copy actually created",previewStatus==="applied_to_copy"]];
+ by("safety-checks").replaceChildren(...checks.map(([label,ok])=>node("p",(ok?"✓ ":"○ ")+label)));
+ const root=by("holdout-list");root.replaceChildren();
+ for(const q of DOCS[idx].heldout){
+  const tr=document.createElement("tr"),td=node("td",q.id+" · "+q.question),td2=document.createElement("td"),sel=document.createElement("select");
+  sel.className="field";sel.setAttribute("aria-label","Outcome "+q.id);
+  [["not_run","NOT RUN"],["improved","Improved · human observed"],["unchanged","Unchanged"],["regressed","Regression observed"],["inconclusive","Inconclusive"]].forEach(([value,label])=>{const o=node("option",label);o.value=value;sel.append(o)});
+  sel.value=holdout[q.id]||"not_run";sel.addEventListener("change",()=>{holdout[q.id]=sel.value;renderDelivery()});
+  td2.append(sel);tr.append(td,td2);root.append(tr);
+ }
+ by("holdout-note").value=holdoutNote
+}
+function applyCopy(){
+ if(revision.status!=="approved_for_retest"){previewStatus="blocked_not_approved";previewCopy=null}
+ else if(revision.before!==DOCS[idx].before){previewStatus="blocked_source_mismatch";previewCopy=null}
+ else if(!revision.after.trim()||revision.after.trim()===revision.before.trim()){previewStatus="blocked_no_change";previewCopy=null}
+ else{previewCopy=revision.after;previewStatus="applied_to_copy"}
+ renderRetest();renderDelivery()
+}
 function renderScore(s){const r=ratings[s];by("score-"+s).textContent=r.every(x=>x!=="")?"Human-entered: "+r.reduce((sum,x)=>sum+Number(x),0)+" / 8 · not a benchmark":r.filter(Boolean).length+" / 4 criteria manually rated"}
 function enumeratePlans(items){
  const plans=[];
@@ -200,9 +263,69 @@ function renderStrategy(){
   front.append(row)
  }
 }
-function payload(){const c=EXAMPLES[idx];const human=s=>Object.fromEntries(CRITERIA.map((n,i)=>[n,ratings[s][i]===""?null:Number(ratings[s][i])]));return{schema:"evidence-review-packet/v0.1",fictional_demo:true,case:{id:c.id,question:c.question,known_facts:c.facts,unknowns:c.gaps},evidence:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>({id:x.id,source_label:x.source,claim:x.claim,scope_limit:x.limit})),review:[{candidate:"A",answer:c.a,human_scores:human("a")},{candidate:"B",answer:c.b,human_scores:human("b")}],human_decision:decision,document_change_authorized:false,optional_search_experiment:(()=>{const r=searchResults();return{synthetic_only:true,goal:"maximize manually assigned priority points under hypothetical review-minute budget",budget_minutes:budget,candidate_action_sets:r.plans.length,options:STRATEGY_CHECKS[idx],exact_best:{minutes:r.optimal.minutes,points:r.optimal.points,checks:r.optimal.labels},greedy_baseline:{minutes:r.greedy.minutes,points:r.greedy.points,checks:r.greedy.labels},no_evolutionary_algorithm_claimed:true}})(),downstream_adapter:{responsibility:"separate document-editing team module",status:"not_connected",document_changed:false}}}
+function payload(){
+ const c=EXAMPLES[idx],human=slot=>Object.fromEntries(CRITERIA.map((name,i)=>[name,ratings[slot][i]===""?null:Number(ratings[slot][i])]));const search=searchResults();
+ return{
+  schema:"research-documentation-handoff/v0.2",fictional_demo:true,
+  case:{id:c.id,question:c.question,known_facts:c.facts,unknowns:c.gaps,document_reference:DOCS[idx].id},
+  evidence:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>({id:x.id,source_label:x.source,claim:x.claim,scope_limit:x.limit})),
+  recorded_answers:[{id:"A",source:"manual_or_synthetic",output:answers.a,human_scores:human("a")},{id:"B",source:"manual_or_synthetic",output:answers.b,human_scores:human("b")}],
+  reviewer_choice:decision,
+  failure_diagnosis:{status:"HYPOTHESIS_ONLY",category:failureMode,notes:diagnosisNote,confirmed_root_cause:false},
+  proposed_revision:{...revision,evidence_links:c.evidence.filter((_,i)=>chosen.has(i)).map(x=>x.id),local_retest_approved:revision.status==="approved_for_retest",customer_publication_approved:false},
+  patch_execution:{status:previewStatus,result_copy:previewCopy,original_modified:false},
+  heldout_evaluation:{questions:DOCS[idx].heldout.map(q=>({...q,outcome:holdout[q.id]||"not_run"})),notes:holdoutNote,real_model_test_performed:false},
+  optional_search_experiment:{synthetic_only:true,goal:"maximize invented priority points under toy review-time constraint",budget_minutes:budget,candidate_action_sets:search.plans.length,exact_best:{minutes:search.optimal.minutes,points:search.optimal.points,checks:search.optimal.labels},greedy_baseline:{minutes:search.greedy.minutes,points:search.greedy.points,checks:search.greedy.labels},evolutionary_algorithm_used:false},
+  release:{status:"NOT_AUTHORIZED",publication:false,real_device_validation:"NOT_RUN",customer_acceptance:"NOT_RUN"},
+  downstream_adapter:{schema:"documentation-revision/v1",mode:"local_json_import_and_copy_preview_only",teammate_private_code_connected:false}
+ }
+}
 function renderJson(){by("json").textContent=JSON.stringify(payload(),null,2)}
-function reset(i){idx=i;budget=9;chosen=new Set([0,1]);ratings={a:["","","",""],b:["","","",""]};decision="not_decided";renderCase();renderEvidence();renderReview();renderStrategy();renderJson()}
+
+function renderDelivery(){
+ const remaining=DOCS[idx].heldout.filter(q=>(holdout[q.id]||"not_run")==="not_run").length;
+ by("delivery-status").textContent=previewStatus==="applied_to_copy"?"Temporary document copy generated · release still blocked":"Candidate research packet · no document changed";
+ by("delivery-summary").textContent=chosen.size+" selected evidence records; answer review: "+decision.replace(/_/g," ")+"; diagnosis: "+failureMode.replace(/_/g," ")+"; revision: "+revision.status.replace(/_/g," ")+"; "+remaining+" held-out tests NOT RUN. Publication and customer acceptance remain NOT AUTHORIZED.";
+ renderJson();
+}
+function reportMarkdown(){
+ const p=payload(),lines=[
+ "# Synthetic case and documentation revision report","",
+ "Status: CANDIDATE / NOT CUSTOMER VALIDATED","","## Developer question",p.case.question,"",
+ "## Known facts",...p.case.known_facts.map(x=>"- "+x),"",
+ "## Missing context",...p.case.unknowns.map(x=>"- "+x),"",
+ "## Evidence",...(p.evidence.length?p.evidence.map(x=>"- "+x.id+" · "+x.claim+" [limit: "+x.scope_limit+"]"):["- NOT PROVIDED"]),"",
+ "## Candidate answer review","- Human choice: "+decision,"- Candidate A: "+answers.a,"- Candidate B: "+answers.b,"",
+ "## Failure diagnosis","- Hypothesis: "+failureMode,"- Notes: "+diagnosisNote,"- Root cause confirmed: NO","",
+ "## Proposed document revision","- Document / section: "+revision.source_label+" / "+revision.section,"- Revision status: "+revision.status,"",
+ "### Baseline paragraph",revision.before,"","### Proposed paragraph",revision.after,"","### Rationale",revision.rationale,"",
+ "## Copy-only validation","- Status: "+previewStatus,"- Original file modified: NO","",
+ "## Held-out checks",...p.heldout_evaluation.questions.map(q=>"- "+q.id+" · "+q.question+": "+q.outcome),"- Notes: "+holdoutNote,"",
+ "## Release boundary","- Real model rerun: NOT RUN","- Device validation: NOT RUN","- Customer acceptance: NOT RUN","- Publication: NOT AUTHORIZED",""
+ ];return lines.join("\n")
+}
+function downloadText(name,contents,mime){
+ const blob=new Blob([contents],{type:mime}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500)
+}
+async function importRevision(file){
+ if(!file)return;const out=by("import-status");
+ if(file.size>100000){out.textContent="Rejected: over 100 KB";return}
+ try{
+  const v=JSON.parse(await file.text());
+  if(v?.schema!=="documentation-revision/v1"||v.case_id!==EXAMPLES[idx].id||typeof v.before!=="string"||typeof v.after!=="string"||typeof v.rationale!=="string")throw Error("schema or case mismatch");
+  if([v.before,v.after,v.rationale].some(t=>t.length>5000)||!v.before.trim()||!v.after.trim())throw Error("missing or oversized text");
+  revision={...freshRevision(),before:v.before,after:v.after,rationale:v.rationale,origin:"local_imported_json",status:"proposed",revision_id:String(v.revision_id||"SYN-IMPORT").slice(0,80)};
+  riskAcknowledged=false;resetRetest();out.textContent="Imported as unapproved draft; baseline match required.";
+  renderRevision();renderRetest();renderDelivery()
+ }catch(e){out.textContent="Import rejected: "+e.message}
+ by("revision-import").value=""
+}
+
+function reset(i){
+ idx=i;budget=9;chosen=new Set([0,1]);ratings={a:["","","",""],b:["","","",""]};decision="not_decided";
+ answers={a:EXAMPLES[idx].a,b:EXAMPLES[idx].b};failureMode="unassessed";diagnosisNote="";revision=freshRevision();riskAcknowledged=false;resetRetest();
+ renderCase();renderEvidence();renderReview();renderDiagnosis();renderRevision();renderRetest();renderStrategy();renderDelivery()
+}
 document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.page)));document.querySelectorAll("[data-next]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.next)));
 by("scenario").addEventListener("change",e=>reset(Number(e.target.value)));by("budget").addEventListener("input",e=>{budget=Number(e.target.value);renderStrategy();renderJson()});by("decision").addEventListener("change",e=>{decision=e.target.value;renderJson()});
 by("download").addEventListener("click",()=>{const blob=new Blob([JSON.stringify(payload(),null,2)+"\n"],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="fictional-framework-packet.json";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500)});
