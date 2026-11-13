@@ -6,6 +6,14 @@
 
 **Offline option:** Save [evidence-framework-sandbox.html](evidence-framework-sandbox.html) via GitHub Raw and open it locally in Chrome or Edge. The file uses no external scripts, model endpoints, API calls, tracking or storage. Clicking a public citation deliberately opens a separate public website.
 
+## Five-minute in-browser presentation
+
+Open the [interactive demo](https://tmkbs.github.io/zebra-evidence-framework/classroom/) and click **Presenter mode · 5 min** in the top-right header. Nine English cue cards provide **Say** and **On screen** prompts and let you move between the real workflow pages.
+
+The cue cards **do not perform approvals or make up data**. On the real public case, choose **Documentation-only review · no model run**, then **Possible documentation clarity gap**, approve the proposed editorial review-note text for a **local retest**, and apply it to a temporary copy. End at Delivery, which exports the full record.
+
+[Full speaker script (5 minutes + 90-second backup)](../PRESENTER_NOTES.md). The optional Search Lab is for toy algorithm QA, **not real-case performance evidence**.
+
 ## What actually comes from the team's research
 
 The default case is **ZF-WEB-INTEGRATION**, based on the team's [published November 2 case report](https://github.com/1235357/zebra-public-site-archive/blob/main/faculty-checkin-2026-11-02/demo/report.json) and its cited DataWedge 15.0 official documentation. It provides actual public-source references and a carefully scoped editorial finding. It is not a saved AI result, device test or approved Zebra documentation change.
