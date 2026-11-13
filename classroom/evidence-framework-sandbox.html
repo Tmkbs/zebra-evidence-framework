@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer">
-<title>Evidence Framework — Synthetic Classroom Demo</title>
+<title>Evidence Framework — Public-Case Research Demo</title>
 <style>
 :root{font-family:Inter,"Segoe UI",Arial,sans-serif;color:#193044;background:#f5f7f9}
 *{box-sizing:border-box}body{margin:0}button,select{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #73c7b7;outline-offset:3px}
@@ -22,7 +22,7 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 </head>
 <body>
 <div class="app"><aside class="side">
- <div class="brand"><div class="mark">F</div><h2>Evidence Framework</h2><span>SYNTHETIC CLASSROOM SANDBOX</span></div>
+ <div class="brand"><div class="mark">F</div><h2>Evidence Framework</h2><span>PUBLIC CASE RESEARCH / OFFLINE REVIEW</span></div>
  <nav class="nav"><button class="active" data-page="architecture"><b>00</b><span class="name">Architecture</span></button><button data-page="case"><b>01</b><span class="name">Question</span></button><button data-page="evidence"><b>02</b><span class="name">Evidence</span></button><button data-page="review"><b>03</b><span class="name">Review</span></button><button data-page="diagnosis"><b>04</b><span class="name">Failure diagnosis</span></button><button data-page="revision"><b>05</b><span class="name">Document revision</span></button><button data-page="retest"><b>06</b><span class="name">Retest</span></button><button data-page="guide"><b>07</b><span class="name">Developer preview</span></button><button data-page="handoff"><b>08</b><span class="name">Delivery packet</span></button><button data-page="strategy"><b>+</b><span class="name">Optional search lab</span></button></nav>
  <div class="sidefoot">Framework evaluation and documentation revision remain separate workstreams. This sandbox connects them using a local draft contract, not private source code.</div>
  </aside><main><div class="bar"><span>Research prototype / <strong id="crumb">Architecture</strong></span><span class="flag">OFFLINE · PUBLIC SOURCE SUMMARIES</span></div>
@@ -32,7 +32,7 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
   <div class="card" style="margin-top:16px"><div class="eyebrow">REAL PROJECT INPUT · PUBLIC STATUS NOVEMBER 5</div><h3>2,854 unique archived questions · 8 development case packets · 12 official source URLs</h3><p>These are source-processing figures from the team's public technical status, not answer accuracy or verified solutions. <a href="https://github.com/1235357/zebra-public-site-archive/blob/main/TECHNICAL_STATUS.md" target="_blank" rel="noopener noreferrer">Read status</a> · <a href="https://zebra-techdocs-practicum.vercel.app/" target="_blank" rel="noopener noreferrer">Team website</a></p></div><div class="eyebrow" style="margin-top:32px">ARCHITECTURE</div><h2>One connected research workflow, distinct responsibilities</h2>
   <div class="grid4"><div class="step"><b>01 · INPUT</b><h3>Define a case</h3><p>Normalize the question and list known information.</p></div><div class="step"><b>02 · EVIDENCE</b><h3>Record support & gaps</h3><p>Keep provenance and applicability visible.</p></div><div class="step"><b>03 · REVIEW</b><h3>Human evaluation</h3><p>Check claims rather than invent model scores.</p></div><div class="step future"><b>04 · REVISION / HANDOFF</b><h3>Minimal doc change</h3><p>Try a controlled revision on an offline copy. Real editor integration remains separate.</p></div></div>
   <div class="grid"><div class="card"><h3>Framework layer · in scope</h3><p>Case structure, evidence packet, explicit unknowns, manual comparison, and portable handoff format.</p></div><div class="card"><h3>Document-editing layer · separate</h3><p>Rewriting source documents, document versions, publication workflow and any product-specific behavior belong to a separate implementation.</p></div></div>
-  <div class="card" style="margin-top:14px"><h3>Optional computational exploration</h3><p>Review time is limited. Which missing details should the framework verify first? A search lab compares a simple greedy choice against exact subset search using transparent toy data. This is a genuine optimization problem, not a claim of evolutionary or neural-network implementation. <button class="btn" data-next="strategy" style="margin-top:8px">Open search lab →</button></p></div><div class="warning">Classroom boundary: the first three cases are paraphrased from publicly accessible research and forum records. Links point to those public sources only. No restricted support materials, keys, internal endpoints, live model calls or verified device fixes are included.</div>
+  <div class="card" style="margin-top:14px"><h3>Optional computational exploration</h3><p>Review time is limited. Which missing details should the framework verify first? A separate QA lab compares Greedy and exact subset search on toy data only. It is disabled for real cases until review costs and outcomes are measured; no evolutionary or model-performance claim is made. <button class="btn" data-next="strategy" style="margin-top:8px">Open search lab →</button></p></div><div class="warning">Classroom boundary: the first three cases are paraphrased from publicly accessible research and forum records. Links point to those public sources only. No restricted support materials, keys, internal endpoints, live model calls or verified device fixes are included.</div>
  </section>
  <section class="page" id="case">
   <div class="eyebrow">01 · FRAME THE QUESTION</div><h1>Describe uncertainty before making claims.</h1><p class="lead">Start with real, public-source developer questions and versioned research findings. The final two cases are synthetic test fixtures. Restricted support data is not included.</p>
@@ -64,23 +64,23 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 </section>
 <section class="page" id="revision">
 <div class="eyebrow">05 · DOCUMENTATION WORKSTREAM</div><h1>Review a precise before / after change.</h1>
-<p class="lead">This integrates the documentation-revision process, not a teammate's unretrieved source code. Draft edits start from a synthetic example. You can also load an approved local TXT/Markdown file, choose a paragraph and apply a verified replacement to a disposable copy. The original file remains unchanged.</p>
+<p class="lead">This integrates the documentation review process, not the inaccessible private editor source code. The built-in real cases use clearly labeled public editorial review notes, NOT official manufacturer document text. To patch an authorized actual document, load its local TXT/Markdown file and edit a disposable copy.</p>
 <div class="row" style="margin-bottom:17px"><span class="pill" id="revision-status">PROPOSED</span><span id="revision-target" class="step-note"></span></div>
 <div class="card" style="margin-bottom:14px">
  <div class="eyebrow">SOURCE DOCUMENT · LOCAL-ONLY</div>
  <div class="row">
   <label for="doc-import" class="step-note">Load approved TXT/Markdown file</label>
   <input id="doc-import" class="field" style="max-width:340px" type="file" accept=".txt,.text,.md,text/plain,text/markdown">
-  <button id="doc-restore" class="btn" type="button">Restore synthetic fixture</button>
+  <button id="doc-restore" class="btn" type="button">Restore built-in case note</button>
  </div>
- <p id="doc-source-info" class="muted">Synthetic document loaded.</p>
+ <p id="doc-source-info" class="muted">Public review-note or synthetic QA fixture loaded.</p>
  <div class="row">
   <label for="doc-blocks" class="step-note">Paragraph to revise</label>
   <select id="doc-blocks" class="field" style="max-width:500px" aria-label="Select source paragraph"></select>
   <button id="doc-select-block" class="btn" type="button">Use selected paragraph</button>
  </div>
  <p id="doc-import-status" class="step-note" role="status">Imported files stay on this device. They are never uploaded.</p>
- <div class="warning">Import only materials cleared for this demonstration. A locally imported document does not make the fictional case facts or model answers real. Never share an export containing restricted content without authorization.</div>
+ <div class="warning">Import only materials cleared for this demonstration. A locally imported document does not establish that a model ran, a device fix works, or the source is approved for publication. Never share an export containing restricted content without authorization.</div>
 </div>
 <div class="grid">
 <div class="card"><div class="eyebrow">VERSIONED ORIGINAL · READ ONLY</div><h3 id="document-heading"></h3><div class="docview" id="document-before"></div><p>Retained as the exact baseline for a safe diff and source check.</p></div>
@@ -111,7 +111,7 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 <div class="eyebrow">07 · DEVELOPER EXPERIENCE PREVIEW</div><h1>What would a developer actually see?</h1>
 <p class="lead">A front-end concept that consumes the review record above: recorded answer, its evidence labels, follow-up questions and a versioned document paragraph. No live assistant, technical fix or rendered video is claimed.</p>
 <div class="grid">
-<div class="card"><div class="eyebrow">CONVERSATION PANEL · SYNTHETIC</div><div class="question" id="guide-question"></div>
+<div class="card"><div class="eyebrow">CONVERSATION PANEL · UNVERIFIED DRAFT</div><div class="question" id="guide-question"></div>
 <div class="row"><label for="guide-choice" class="step-note">Recorded answer</label><select class="field" id="guide-choice" style="max-width:210px"><option value="b">Candidate B</option><option value="a">Candidate A</option></select><span class="pill amber" id="guide-label">UNVERIFIED DRAFT</span></div>
 <div class="docview" id="guide-answer" style="margin-top:15px"></div><div class="eyebrow" style="margin-top:18px">SELECTED EVIDENCE / LIMITS</div><div id="guide-evidence" class="muted"></div></div>
 <div class="card"><div class="eyebrow">DOCUMENT VIEW</div><h3 id="guide-doc-title"></h3><div class="docview revised" id="guide-doc-copy"></div><p id="guide-doc-status"></p>
@@ -160,7 +160,7 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 <div class="warning">The export cannot authorize customer publication. No real data, real model run or technical acceptance is included in this classroom build.</div>
 <div class="next"><span>8 / 8 · Delivery</span><button class="btn" data-next="architecture">Back to architecture ↺</button></div>
  </section>
- <div class="foot">Synthetic classroom sandbox · Local-only interactions · No external scripts, API requests, user tracking or permanent storage · No customer content</div>
+ <div class="foot">Public-source research summaries and synthetic QA fixtures · Local-only processing · Public links open only when clicked · No restricted support data, external scripts, model requests or tracking</div>
  </div></main></div>
 <script>
 "use strict";
@@ -328,7 +328,7 @@ function renderRevision(){
 function renderRetest(){
  by("run-preview").disabled=revision.status!=="approved_for_retest";
  by("preview-status").textContent=previewStatus.replace(/_/g," ").toUpperCase();
- by("preview-detail").textContent=previewStatus==="not_run"?"Apply the approved revision only to a temporary copy of the synthetic paragraph.":"Latest local copy operation: "+previewStatus.replace(/_/g," ")+".";
+ by("preview-detail").textContent=previewStatus==="not_run"?"Apply the approved revision only to a temporary copy of the selected document paragraph.":"Latest local copy operation: "+previewStatus.replace(/_/g," ")+".";
  by("preview-text").textContent=previewCopy===null?"No copy created.":previewCopy.slice(0,14000)+(previewCopy.length>14000?"\n[Preview truncated; exported file retains full text]":"");
  by("download-revised").disabled=previewStatus!=="applied_to_copy";
  const checks=[["Different, nonempty proposed paragraph",!!revision.after?.trim()&&revision.after.trim()!==revision.before.trim()],["At least one evidence link recorded",chosen.size>0],["Human answer review decision exists",decision!=="not_decided"],["Revision approved for a local test",revision.status==="approved_for_retest"],["Paragraph appears exactly once in frozen source",sourceHits(revision.before)===1],["Disposable local copy actually created",previewStatus==="applied_to_copy"]];
