@@ -73,6 +73,27 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
  </section>
  <section class="page" id="review">
   <div class="eyebrow">03 · HUMAN EVALUATION</div><h1>Don't confuse fluency with evidence.</h1><p class="lead">Public cases have NO verified model outputs in this build. Review their documentation evidence without claiming AI performance; you may enter an authorized result manually. The final two synthetic QA cases retain illustrative answers. No model is called here.</p>
+  <div class="card" style="margin-bottom:14px" id="agent-continue-bridge">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">Agent Continue · real extension bridge</h3><span class="pill">IMPORTABLE JSON · NO AUTO SEND</span></div>
+    <p>Use Zhentong Ye's actual Chrome extension import format: <b>export one public-case review task → import it into Agent Continue → manually run it in a ChatGPT conversation → paste the JSON result back into Candidate A/B.</b> This webpage cannot control or detect the extension.</p>
+    <div class="row" style="margin:12px 0">
+      <button class="btn primary" id="agent-export" type="button">1 · Export plugin task (.json)</button>
+      <a href="https://chromewebstore.google.com/detail/jpioilmpbolfokedaefmbfbjeaahfdkl" target="_blank" rel="noopener noreferrer">Get Agent Continue ↗</a>
+      <a href="https://github.com/1235357/agent-continue" target="_blank" rel="noopener noreferrer">Source ↗</a>
+    </div>
+    <details id="agent-return">
+      <summary style="cursor:pointer;font-size:12px;font-weight:750">2 · Paste ChatGPT result into this review</summary>
+      <p style="margin-top:12px">In the extension, use <b>Settings → Import JSON</b> while paused, select an existing ChatGPT conversation, inspect the task, and press Start yourself. The exported task sends at most once. When ChatGPT replies, copy its structured JSON here.</p>
+      <label class="eyebrow" for="agent-response">JSON RESPONSE · SAME CASE ID REQUIRED</label>
+      <textarea class="field" id="agent-response" rows="4" placeholder='{"schema":"zebra-agent-continue-response/v1","case_id":"ZF-WEB-INTEGRATION","answer":"..."}'></textarea>
+      <div class="row" style="margin-top:10px">
+        <label for="agent-dest" style="font-size:12px">Insert into</label>
+        <select class="field" id="agent-dest" style="width:auto"><option value="a">Candidate A</option><option value="b">Candidate B</option></select>
+        <button class="btn" id="agent-import" type="button">3 · Import JSON result</button>
+      </div>
+    </details>
+    <p class="muted" id="agent-bridge-status" role="status" style="margin:12px 0 0">Public data only. No extension connection or live model run has been established.</p>
+  </div>
   <div class="grid"><div class="card"><span class="pill" id="answer-a-status">CANDIDATE A</span><label class="eyebrow" for="answer-a">SAMPLE / MANUALLY RECORDED ANSWER</label><textarea class="field" id="answer-a" rows="5"></textarea><div id="ratings-a"></div><div class="score" id="score-a"></div></div><div class="card"><span class="pill" id="answer-b-status">CANDIDATE B</span><label class="eyebrow" for="answer-b">SAMPLE / MANUALLY RECORDED ANSWER</label><textarea class="field" id="answer-b" rows="5"></textarea><div id="ratings-b"></div><div class="score" id="score-b"></div></div></div>
   <div class="card" style="margin-top:14px"><label class="eyebrow" for="decision">HUMAN REVIEW DECISION</label><select class="field" id="decision"><option value="not_decided">Not decided</option><option value="prefer_a">A · further review</option><option value="prefer_b">B · further review</option><option value="neither">Neither ready</option><option value="document_review_only">Documentation-only review · no model run</option></select><p>Choosing a preferred answer does not authorize a document change.</p></div>
   <div class="next"><span>3 / 8 · Human candidate review</span><button class="btn primary" data-next="diagnosis">Diagnose the failure →</button></div>
