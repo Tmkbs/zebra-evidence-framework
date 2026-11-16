@@ -1,12 +1,364 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="refresh" content="0; url=./evidence-framework-sandbox.html">
-  <title>Evidence Framework — Classroom Demo</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Zebra · Evidence Review</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:#183445;background:#f6f8f9;font-synthesis:none}
+*{box-sizing:border-box}
+body{margin:0}
+button,select,textarea{font:inherit}
+button{cursor:pointer}
+a{color:#086d68}
+button:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #56bda9;outline-offset:3px}
+.top{background:#fff;border-bottom:1px solid #e1e8e9;height:67px;display:flex;align-items:center}
+.top .inside{max-width:1080px;margin:auto;padding:0 25px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:850;letter-spacing:-.025em}
+.brand-mark{height:33px;width:33px;display:grid;place-items:center;background:#115d59;color:#fff;border-radius:10px;font-weight:900}
+.top-note{font-size:11px;color:#69848a}
+main{max-width:1080px;margin:0 auto;padding:39px 25px 60px}
+.kicker{font-size:10px;letter-spacing:.13em;font-weight:850;color:#087c70;text-transform:uppercase}
+.hero{display:flex;align-items:center;justify-content:space-between;gap:35px;padding:6px 0 30px}
+.hero h1{font-size:clamp(31px,4.4vw,49px);line-height:1.07;letter-spacing:-.055em;margin:13px 0 13px;max-width:630px}
+.hero p{font-size:14px;line-height:1.7;max-width:610px;color:#677d88;margin:0}
+.flow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;background:#eaf6f1;border:1px solid #d2e6df;border-radius:14px;padding:17px 16px;min-width:300px}
+.flow b{font-size:11px;color:#17584f;white-space:nowrap}
+.flow small{font-size:11px;color:#548277}
+.card{background:#fff;border:1px solid #dfe8e9;border-radius:16px;padding:25px;box-shadow:0 5px 22px rgba(26,65,76,.025)}
+.stage-head{display:flex;align-items:center;gap:11px;margin-bottom:20px}
+.stage-num{display:grid;place-items:center;background:#e5f5ee;color:#0c7667;width:33px;height:33px;border-radius:10px;font-size:12px;font-weight:850}
+.stage-head h2{font-size:19px;letter-spacing:-.04em;margin:0}
+.stage-head .sub{margin-left:auto;font-size:11px;color:#7a9196;font-weight:700}
+.select-row{display:grid;grid-template-columns:1fr auto;gap:13px;align-items:end}
+label.field-label{display:block;font-size:12px;font-weight:800;color:#42616a;margin-bottom:9px}
+select{border:1px solid #cadbdd;border-radius:9px;background:white;color:#1d4654;width:100%;padding:14px;font-weight:720;font-size:14px}
+.btn{border:1px solid #bbd5d1;background:#fff;color:#116e65;font-size:12px;font-weight:800;border-radius:9px;padding:13px 17px;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .13s}
+.btn:hover{background:#eaf6f1}
+.btn.primary{background:#0a786e;border-color:#0a786e;color:white;font-size:13px;padding:14px 23px}
+.btn.primary:hover{background:#075e57}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.case-preview{margin-top:18px;background:#eff8f5;padding:19px;border-left:3px solid #158e7f;border-radius:9px}
+.case-preview .label{font-size:10px;color:#138071;font-weight:850;letter-spacing:.07em}
+.case-preview h3{font-size:16px;line-height:1.5;color:#244a52;margin:8px 0}
+.case-preview p{font-size:12px;color:#5d7980;margin:0;line-height:1.7}
+.case-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}
+.case-links a{font-size:11px;font-weight:800;text-decoration:none;border-bottom:1px solid #8bc9bc}
+.case-links a:hover{text-decoration:underline}
+.hint{font-size:11px;color:#71868c;line-height:1.7;margin:12px 0 0}
+.waiting{text-align:center;border:1px dashed #d7e4e3;border-radius:15px;padding:30px;color:#769098;font-size:13px;margin-top:16px}
+.waiting strong{color:#335c62}
+#report[hidden],#waiting[hidden]{display:none}
+.report{margin-top:23px}
+.report-head{padding:25px;background:#163747;color:white;border-radius:15px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.report-head .kicker{color:#91e2d0}
+.report-head h2{font-size:22px;letter-spacing:-.04em;margin:9px 0}
+.report-head p{color:#c5dfdd;font-size:12px;line-height:1.7;margin:0;max-width:680px}
+.report-count{display:grid;grid-template-columns:1fr 1fr;gap:10px;min-width:206px}
+.report-count>div{border:1px solid #37606a;border-radius:11px;padding:12px;text-align:center}
+.report-count strong{display:block;color:#d6f8e8;font-size:27px}
+.report-count span{display:block;color:#bed9d8;font-size:10px}
+.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.report-grid .card{padding:22px}
+.panel-title{font-size:15px;font-weight:850;margin:0 0 14px;display:flex;align-items:center;gap:9px}
+.panel-title i{display:grid;place-items:center;width:21px;height:21px;border-radius:50%;background:#ebf5f2;color:#0b8174;font-size:11px;font-style:normal}
+.row-item{border-top:1px solid #e8eeee;padding:12px 0}
+.row-item:first-of-type{border-top:0}
+.row-item strong{display:block;font-size:12px;line-height:1.5;color:#274a57}
+.row-item p{font-size:11px;line-height:1.7;color:#667d85;margin:5px 0}
+.row-item a{font-size:11px;font-weight:700}
+.risk{border-left:3px solid #d3a758;padding-left:12px;margin:10px 0}
+.risk strong{font-size:12px;color:#624f2e;line-height:1.45}
+.risk p{font-size:11px;color:#7a7463;line-height:1.65;margin:5px 0 0}
+.fix{border-left:3px solid #108675;padding-left:12px;margin:10px 0}
+.fix strong{font-size:12px;color:#285a55}
+.fix p{font-size:11px;line-height:1.6;color:#607880;margin:5px 0}
+.note-card{margin-top:16px}
+.generated{white-space:pre-wrap;line-height:1.75;font-size:13px;color:#365b64;background:#f0f7f5;border:1px solid #d8e8e2;border-radius:10px;padding:18px;margin:12px 0 14px}
+.action-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.action-row .caption{font-size:11px;color:#788e96;max-width:580px;line-height:1.6}
+.optional{margin:23px 0 0;border:1px solid #dfe7e9;border-radius:12px;background:white;padding:14px 17px}
+.optional summary{font-size:12px;color:#446570;font-weight:800;cursor:pointer}
+.optional p{font-size:11px;color:#748993;line-height:1.7}
+.optional textarea{width:100%;min-height:90px;resize:vertical;border:1px solid #cadbdd;border-radius:9px;padding:13px;font-size:12px;line-height:1.65;color:#274858;background:#fff}
+.optional label{font-size:12px;color:#49636d;font-weight:700;display:block;margin:10px 0 8px}
+.optional .file{display:block;margin:12px 0;font-size:12px;max-width:100%}
+.footer{border-top:1px solid #dfe8e9;margin-top:32px;padding-top:18px;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;font-size:11px;color:#85969e}
+.footer a{color:#687f8a}
+@media(max-width:850px){.hero{display:block}.flow{justify-content:start;margin-top:20px;min-width:0}.select-row{grid-template-columns:1fr}.report-head{display:block}.report-count{max-width:270px;margin-top:18px}.report-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.top-note{display:none}.top .inside{padding:0 16px}main{padding:26px 16px 48px}.card{padding:18px}.hero h1{font-size:31px}.report-head{padding:20px}.report-grid .card{padding:18px}.flow{gap:6px}.flow b{font-size:10px}}
+</style>
 </head>
 <body>
-  <p><a href="./evidence-framework-sandbox.html">Open the interactive Evidence Framework demo</a>.</p>
+<header class="top"><div class="inside"><div class="brand"><div class="brand-mark">Z</div><span>Zebra Evidence Review</span></div><span class="top-note">Independent research prototype · No live model or device test</span></div></header>
+<main>
+<section class="hero">
+<div><div class="kicker">One-click research review</div><h1>One case. One check. A clear result.</h1><p>Start with a public Zebra developer case or a teammate's published documentation proposal. The framework automatically organizes source limits, missing information and a safer research-note draft.</p></div>
+<div class="flow" aria-label="Three step workflow"><b>1 Select</b><small>→</small><b>2 Run checks</b><small>→</small><b>3 Read results</b></div>
+</section>
+<section class="card" aria-labelledby="case-title">
+<div class="stage-head"><span class="stage-num">01</span><h2 id="case-title">Choose a case</h2><span class="sub">No setup needed</span></div>
+<div class="select-row">
+<div><label class="field-label" for="case-select">Public case or documentation proposal</label><select id="case-select" aria-label="Choose a case"></select></div>
+<button class="btn primary" id="run" type="button">Run evidence check <span aria-hidden="true">→</span></button>
+</div>
+<div class="case-preview"><span class="label" id="case-type">PUBLIC PROPOSAL</span><h3 id="case-question"></h3><p id="case-context"></p><div class="case-links" id="case-links"></div></div>
+<p class="hint">The check runs locally on cited, preloaded research summaries. It does not retrieve live pages, call an AI model, or certify technical correctness.</p>
+</section>
+<div id="waiting" class="waiting"><strong>Ready to analyze.</strong> Choose a case and click <b>Run evidence check</b>. No manual review gates.</div>
+<section id="report" class="report" hidden aria-live="polite">
+<div class="report-head"><div><div class="kicker">02 / Automated review complete</div><h2>Needs technical verification</h2><p id="result-intro"></p></div><div class="report-count"><div><strong id="source-count">0</strong><span>Linked sources</span></div><div><strong id="gap-count">0</strong><span>Checks still open</span></div></div></div>
+<div class="report-grid">
+<div class="card"><h3 class="panel-title"><i>✓</i> What the sources record</h3><div id="evidence-list"></div></div>
+<div class="card"><h3 class="panel-title"><i>!</i> What needs checking</h3><div id="gap-list"></div></div>
+</div>
+<div class="card note-card"><div class="stage-head" style="margin:0"><span class="stage-num">03</span><h2>Suggested research note</h2><span class="sub">Generated automatically</span></div><div id="draft-output" class="generated"></div><div class="action-row"><span class="caption">This text revises a research summary only, not Zebra's official documents. No customer approval or device testing is implied.</span><div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn" id="copy" type="button">Copy note</button><button class="btn primary" id="download" type="button">Download report</button></div></div><p class="hint" id="result-action" role="status"></p></div>
+</section>
+<details class="optional" id="more">
+<summary>Optional: check your own wording or import a team CSV</summary>
+<p>This does not add approval steps. You can test whether a proposed sentence makes unsupported certainty claims, or import public case metadata from a local CSV.</p>
+<label for="draft-input">Draft sentence to check</label><textarea id="draft-input" maxlength="3000" placeholder="Optional draft claim. Leave as-is to use the case's illustrative sentence."></textarea>
+<p>Edit this sentence, then click the main Run evidence check button again. The wording check detects absolutes and version mismatch patterns; it does not understand the underlying technical truth.</p>
+<label for="csv-file">Optional local case-table CSV (public data only)</label><input class="file" id="csv-file" type="file" accept=".csv,text/csv">
+<p id="csv-status" role="status">Files stay in your browser. Unrecognized columns are marked as missing instead of being guessed.</p>
+</details>
+<footer class="footer"><span>Evidence-first, human-controlled publication · Public educational prototype</span><span><a href="./evidence-framework-sandbox.html">Advanced research tools</a> · <a href="./course.html">Evolution lab</a> · <a href="https://github.com/Tmkbs/zebra-evidence-framework" target="_blank" rel="noopener noreferrer">Source code</a></span></footer>
+</main>
+<script>
+"use strict";
+const CASES=[
+{
+id:"SC13",title:"DataWedge 13.0 · SET_CONFIG",kind:"Team revision proposal",question:"Does the proposed clarification correctly describe the combined effect of SET_CONFIG parameters?",context:"November 13 public team update · S1 adds nearby explanation; original examples are unchanged.",docVersion:"13.0",runtimeVersion:"",sourceFrozen:false,deviceTested:false,
+sourceRecords:[
+{id:"SC-TEAM",label:"Published team update",text:"The team reports a complete 13.0 article and one added clarification (S1). Individual settings were already defined.",limit:"An editorial progress statement, not a verified runtime result.",url:"https://github.com/1235357/zebra-public-site-archive/blob/main/README.md"},
+{id:"SC-PROPOSAL",label:"SET_CONFIG revised article",text:"The proposal adds a combined-behavior explanation near the configuration bundle section.",limit:"Proposal content has not been independently compared line by line inside this app.",url:"https://zebra-techdocs-practicum.vercel.app/document-reader/sc13-revised.html#plugin_configbundle"}
+],pending:["Compare S1 against the full original 13.0 article and preserve the behavior of each setting.","Confirm the reported device runs the software version covered by this explanation."],safeCore:"The public team report describes S1 as a limited clarification of two already documented SET_CONFIG settings.",
+draft:"The added SET_CONFIG explanation definitively fixes the device configuration problem."
+},
+{
+id:"EHS28",title:"EHS 2.8 · Link removal",kind:"Team revision proposal",question:"Is the link-removal clarification useful and applicable to the reported EHS installation?",context:"November 13 public team update · E1 is the only reported addition; the existing section already describes a configuration entry and redeployment.",docVersion:"2.8",runtimeVersion:"",sourceFrozen:false,deviceTested:false,
+sourceRecords:[
+{id:"EHS-TEAM",label:"Published team update",text:"The public summary says E1 is the only addition and original code examples remain unchanged.",limit:"The device's actual EHS version and runtime result are unverified.",url:"https://github.com/1235357/zebra-public-site-archive/blob/main/README.md"},
+{id:"EHS-PROPOSAL",label:"EHS 2.8 revised article",text:"The existing link-removal section reportedly already identifies the configuration entry and redeployment step.",limit:"The app has not independently compared the full baseline and revised article.",url:"https://zebra-techdocs-practicum.vercel.app/document-reader/ehs28-revised.html#linkremoval"}
+],pending:["Confirm E1 explains something not already stated in the link-removal section.","Check applicability against the actual EHS version and the link-removal scenario."],safeCore:"The team reports a narrowly scoped EHS link-removal clarification, while noting that the current documentation already covers configuration and redeployment.",
+draft:"This revision guarantees link removal works on all EHS devices."
+},
+{
+id:"WEB",title:"Android web scanning · DataWedge",kind:"Public forum research",question:"Can an Android Chrome web app control Zebra scanning using a documented native DataWedge command?",context:"A public developer question compares Chrome and Enterprise Browser across seven device-integration requirements.",docVersion:"15.0",runtimeVersion:"",sourceFrozen:false,deviceTested:false,coveredRequirements:1,totalRequirements:7,
+sourceRecords:[
+{id:"WEB-FORUM",label:"Original developer question",text:"The developer asks whether a web application can control scanning and meet six other integration needs.",limit:"The question itself is not evidence of a working technical solution.",url:"https://developer.zebra.com/content/zebra-android-web-application-development-datawedge-and-enterprise-browser-integration-1"},
+{id:"WEB-GUIDE",label:"Official DataWedge 15.0 guide",text:"The Soft Scan Trigger documentation describes native scan-control commands subject to profile and version conditions.",limit:"The native API does not by itself establish a route from Chrome JavaScript to that API.",url:"https://techdocs.zebra.com/datawedge/15-0/guide/api/softscantrigger/"},
+{id:"WEB-REPORT",label:"Team's earlier public research report",text:"The published review records partial documentation support for one of seven requirements.",limit:"Six requirements and independent browser-to-native device tests remain unreviewed.",url:"https://github.com/1235357/zebra-public-site-archive/blob/main/faculty-checkin-2026-11-02/demo/report.json"}
+],pending:["Determine the actual browser-to-native integration route, if one is supported.","Verify installed Android, browser and DataWedge versions."],safeCore:"DataWedge 15.0 documentation describes native software scan controls, but this does not demonstrate Chrome integration.",
+draft:"The documented native scan command proves Chrome scanning always works."
+},
+{
+id:"TC26",title:"TC26 · Xamarin scanner startup",kind:"Public forum research",question:"Why did the scanner reportedly stop responding after BarcodeManager initialization?",context:"The public thread reports a symptom during a Xamarin startup change; a reproducible root cause is not established.",docVersion:"",runtimeVersion:"",sourceFrozen:false,deviceTested:false,
+sourceRecords:[
+{id:"TC26-FORUM",label:"TC26 developer forum discussion",text:"A user reports a scanner trigger no longer responding after a startup configuration change.",limit:"Temporal sequence does not prove BarcodeManager itself caused the problem.",url:"https://developer.zebra.com/content/zebra-tc26-scanner-does-not-scan-when-config-changed-code-xamarin"},
+{id:"TC26-RESEARCH",label:"Public team project overview",text:"The team records scanner-lifecycle case research in its public overview.",limit:"The overview does not verify this thread as the specific analyzed case, nor establish a device-tested fix.",url:"https://github.com/1235357/zebra-public-site-archive/blob/main/README.md"}
+],pending:["Collect startup/lifecycle code, EMDK and Android version details.","Collect scanner status logs and reproduce the behavior on a device."],safeCore:"The forum reports scanner input stopping after a Xamarin initialization change, but it does not establish the underlying cause.",
+draft:"BarcodeManager definitely causes the failure and this fix always works."
+},
+{
+id:"TC52",title:"TC52 · MultiBarcode intent configuration",kind:"Public forum research",question:"Why does manual MultiBarcode configuration reportedly work while Xamarin intent configuration fails?",context:"Original public TC52 question about manual DataWedge settings versus programmatic SET_CONFIG behavior.",docVersion:"",runtimeVersion:"",sourceFrozen:false,deviceTested:false,
+sourceRecords:[
+{id:"TC52-FORUM",label:"Original TC52 MultiBarcode question",text:"The reporter says manual settings worked but the programmatic scanning_mode/instant_reporting_enable attempt did not.",limit:"No verified interpretation of the installed version, exact SET_CONFIG return or cause.",url:"https://developer.zebra.com/forum/25873"},
+{id:"TC52-OVERVIEW",label:"Team's public research overview",text:"The team reports a MultiBarcode case in its broader case-analysis work.",limit:"A general research overview is not evidence that the exact forum question has a confirmed fix.",url:"https://github.com/1235357/zebra-public-site-archive/blob/main/README.md"}
+],pending:["Capture DataWedge version and the exact configuration intent/result payload.","Compare manual profile state with the programmatic configuration and logs."],safeCore:"The public TC52 report distinguishes manual configuration success from a failed programmatic attempt without establishing why they differ.",
+draft:"SET_CONFIG is always broken and the scanner problem is fully resolved."
+}
+];
+const el=id=>document.getElementById(id);
+let active=0,lastResult=null,imported=0;
+function safeURL(url){
+ const value=String(url||"").trim();
+ if(value.length>1300)return "";
+ return /^https:\/\/(?:developer\.zebra\.com|techdocs\.zebra\.com|github\.com|zebra-techdocs-practicum\.vercel\.app)(?=\/|#|\?|$)/i.test(value)?value:"";
+}
+function create(tag,text,cls){
+ const n=document.createElement(tag);
+ if(text!==undefined)n.textContent=text;
+ if(cls)n.className=cls;
+ return n;
+}
+function addLink(parent,record){
+ const url=safeURL(record.url);
+ if(!url)return;
+ const a=create("a",record.label+" ↗");
+ a.href=url;a.target="_blank";a.rel="noopener noreferrer";
+ parent.append(a);
+}
+function renderSelect(){
+ const dropdown=el("case-select");dropdown.replaceChildren();
+ CASES.forEach((c,i)=>{const o=create("option",c.title);o.value=String(i);dropdown.append(o)});
+ dropdown.value=String(active);renderCase();
+}
+function renderCase(){
+ const c=CASES[active];el("case-type").textContent=c.kind.toUpperCase();
+ el("case-question").textContent=c.question;
+ el("case-context").textContent=c.context;
+ const box=el("case-links");box.replaceChildren();
+ c.sourceRecords.slice(0,2).forEach(r=>addLink(box,r));
+ el("draft-input").value=c.draft||"";
+ el("report").hidden=true;el("waiting").hidden=false;lastResult=null;el("result-action").textContent="";
+}
+function scanText(text,docVersion){
+ const flags=[];
+ const s=String(text||"");
+ if(/\b(always|guarantee(?:d|s)?|definitely|fully resolved|completely fixes?|proves?|fixed on all|works on all)\b/i.test(s))
+   flags.push({code:"absolute_claim",title:"Overconfident wording detected",detail:"The draft uses absolute language, but no device or end-to-end validation is recorded."});
+ if(/\b(verified|tested|confirmed)\s+(?:on|with|by)\s+(?:a|the)?\s*(?:real\s+)?device\b/i.test(s))
+   flags.push({code:"device_claim",title:"Unverified device-test claim",detail:"A device-test statement cannot be supported without a recorded reproduction and test receipt."});
+ const versions=[...s.matchAll(/\b(?:DataWedge|EHS)\s*(\d+(?:\.\d+)?)\b/gi)].map(m=>m[1]);
+ if(docVersion&&versions.some(v=>v!==docVersion))
+   flags.push({code:"version_conflict",title:"Potential version mismatch",detail:"The draft references a product version different from the cited documentation version "+docVersion+"."});
+ return flags;
+}
+function analyzeCase(c,draft){
+ const open=[];
+ if(!c.runtimeVersion)open.push({code:"version",priority:1,title:"Confirm installed software version",detail:"The cited document version"+(c.docVersion?" is "+c.docVersion:" is not fixed here")+", but the affected device's installed version has not been verified."});
+ if(!c.sourceFrozen)open.push({code:"baseline",priority:2,title:"Verify the exact original document",detail:"This app uses source-linked research summaries; it has not retrieved and frozen the full source text or verified a line-by-line revision."});
+ for(const issue of c.pending||[])open.push({code:"context",priority:2,title:issue,detail:"Requires independent review against the original technical evidence."});
+ if(c.totalRequirements&&c.coveredRequirements<c.totalRequirements)
+   open.push({code:"coverage",priority:1,title:"Review "+(c.totalRequirements-c.coveredRequirements)+" other requirements",detail:"Only "+c.coveredRequirements+" of "+c.totalRequirements+" requirements has partial research-note coverage in the cited public report."});
+ if(!c.deviceTested)open.push({code:"device",priority:3,title:"Device validation not run",detail:"A documentation or wording improvement does not establish a working scanner fix."});
+ const words=scanText(draft,c.docVersion);
+ words.forEach(f=>open.unshift({...f,priority:0}));
+ open.sort((a,b)=>a.priority-b.priority);
+ const refs=(c.sourceRecords||[]).filter(r=>safeURL(r.url));
+ const note=c.safeCore+" The public evidence available to this review does not independently verify the affected runtime, the full document change or a working device fix. Next checks: "+open.filter(f=>f.code!=="absolute_claim"&&f.code!=="device_claim").slice(0,3).map(f=>f.title.charAt(0).toLowerCase()+f.title.slice(1)).join("; ")+".";
+ return{
+ schema:"zebra-one-click-evidence-review/v1",
+ case_id:c.id,case_title:c.title,case_kind:c.kind,question:c.question,
+ analysis_method:"Deterministic local metadata and wording checks on curated public-source summaries; no live fetch, model inference, source-content verification or device run.",
+ evidence:refs.map(r=>({id:r.id,label:r.label,recorded_claim:r.text,scope_limit:r.limit,url:safeURL(r.url),verified_in_this_run:false})),
+ open_checks:open,wording_flags:words,document_version:c.docVersion||null,runtime_version:c.runtimeVersion||null,
+ research_note_suggestion:note,review_status:"NEEDS_INDEPENDENT_TECHNICAL_REVIEW",technical_fix_confirmed:false,model_executed:false,device_test_executed:false,customer_approved:false,
+ draft_examined:draft
+ };
+}
+function renderReport(result){
+ lastResult=result;el("report").hidden=false;el("waiting").hidden=true;
+ el("source-count").textContent=String(result.evidence.length);
+ el("gap-count").textContent=String(result.open_checks.length);
+ el("result-intro").textContent="Local rule checks completed for "+result.case_title+". Source links and stated limits are organized below; unresolved questions remain open for a reviewer.";
+ const ev=el("evidence-list");ev.replaceChildren();
+ result.evidence.forEach(r=>{
+  const row=create("div",undefined,"row-item");
+  row.append(create("strong",r.label),create("p",r.recorded_claim),create("p","Limit: "+r.scope_limit));
+  addLink(row,{label:"Open cited source",url:r.url});ev.append(row)
+ });
+ const gaps=el("gap-list");gaps.replaceChildren();
+ result.open_checks.forEach(r=>{
+  const row=create("div",undefined,"risk");
+  row.append(create("strong",r.title),create("p",r.detail));gaps.append(row)
+ });
+ el("draft-output").textContent=result.research_note_suggestion;
+ el("result-action").textContent="Automatic checks finished. Publication and device validation remain separate.";
+}
+function run(){
+ const c=CASES[active];const draft=el("draft-input").value.trim().slice(0,3000);
+ const report=analyzeCase(c,draft);
+ renderReport(report);
+ el("report").scrollIntoView?.({behavior:"smooth",block:"start"});
+}
+function markdownReport(r){
+ return ["# "+r.case_title,"","**Status:** Needs independent technical review.","**Method:** "+r.analysis_method,
+ "**Question:** "+r.question,"","## Source-linked records",...r.evidence.flatMap(s=>["- **"+s.label+"** — "+s.recorded_claim,"  - Limit: "+s.scope_limit,"  - Source: "+s.url]),"",
+ "## Open checks",...r.open_checks.map((c,i)=>String(i+1)+". "+c.title+" — "+c.detail),"",
+ "## Automatically suggested research-note wording",r.research_note_suggestion,"",
+ "## Checked draft text",r.draft_examined||"(none)","",
+ "**Scope:** No model execution, device validation, customer approval or official documentation edit.",""].join("\n");
+}
+function downloadFile(name,text,mime){
+ const blob=new Blob([text],{type:mime});
+ const url=URL.createObjectURL(blob);
+ const a=create("a");a.href=url;a.download=name;document.body.append(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),500);
+}
+function parseCSV(text){
+ if(typeof text!=="string"||text.length>500000||!text.trim())throw Error("CSV empty or larger than 500 KB");
+ const s=text.replace(/^\uFEFF/,"");const rows=[];let row=[],val="",quote=false,atStart=true;
+ for(let i=0;i<s.length;i++){
+  const ch=s[i];
+  if(quote){if(ch==='"'){if(s[i+1]==='"'){val+='"';i++}else quote=false}else val+=ch;continue}
+  if(ch==='"'&&atStart){quote=true;atStart=false;continue}
+  if(ch==='"'&&!atStart)throw Error("Malformed quoted CSV field");
+  if(ch===","){row.push(val);val="";atStart=true;continue}
+  if(ch==="\r"||ch==="\n"){
+   if(ch==="\r"&&s[i+1]==="\n")i++;
+   row.push(val);if(row.some(x=>x.trim()))rows.push(row);
+   row=[];val="";atStart=true;continue;
+  }
+  val+=ch;atStart=false;
+ }
+ if(quote)throw Error("Unclosed quoted field");
+ if(val||row.length){row.push(val);if(row.some(x=>x.trim()))rows.push(row)}
+ if(rows.length<2)throw Error("CSV must have headers and case rows");
+ const headers=rows.shift().map(x=>x.trim().toLowerCase());
+ if(headers.length<2||headers.length>64||rows.length>200||rows.some(r=>r.length!==headers.length))throw Error("Inconsistent table");
+ return{headers,rows};
+}
+function findCol(headers,patterns){
+ for(const re of patterns){const i=headers.findIndex(x=>re.test(x));if(i>=0)return i}
+ return -1;
+}
+function importCSV(text){
+ const parsed=parseCSV(text),h=parsed.headers;
+ const cols={
+ title:findCol(h,[/^(case[\s_-]?)?(title|name)$/i,/^case$/i,/issue/i]),
+ question:findCol(h,[/question/i,/problem/i,/issue.*(summary|description)/i,/summary/i,/description/i]),
+ version:findCol(h,[/version/i]),
+ source:findCol(h,[/source.*(url|link)/i,/original.*(url|link)/i,/forum.*(url|link)/i]),
+ proposal:findCol(h,[/revision.*(url|link)/i,/propos.*(url|link)/i,/revised.*(url|link)/i])
+ };
+ const get=(r,k)=>cols[k]<0?"":String(r[cols[k]]||"").trim().slice(0,1200);
+ const newCases=parsed.rows.slice(0,30).map((r,i)=>{
+   const title=get(r,"title")||"Imported case "+(i+1);
+   const question=get(r,"question")||"The imported record does not contain a recognized issue/question field.";
+   const version=get(r,"version");
+   const src=safeURL(get(r,"source")),proposal=safeURL(get(r,"proposal"));
+   const rec=[];
+   if(src)rec.push({id:"CSV-SOURCE",label:"Source link from imported CSV",text:"The case-table row links to a source.",limit:"Link content, version and applicability have not been independently reviewed.",url:src});
+   if(proposal)rec.push({id:"CSV-PROPOSAL",label:"Proposal link from imported CSV",text:"The case-table row links to a proposed revision.",limit:"Its exact diff and technical correctness have not been verified.",url:proposal});
+   return{id:"IMPORT-"+(++imported)+"-"+(i+1),title:title.slice(0,120),kind:"Locally imported case · unverified",question:question.slice(0,1600),context:"Imported from a local CSV. Unknown columns and technical contents have not been independently validated.",docVersion:version.slice(0,80),runtimeVersion:"",sourceFrozen:false,deviceTested:false,sourceRecords:rec,pending:["Check that this CSV row matches an original public question and approved document version.","Compare the proposal text to the original full source and collect a technical review."],safeCore:"The imported case-table row identifies a potential documentation review item: "+question.slice(0,450),draft:question.slice(0,700)}
+ });
+ if(!newCases.length)throw Error("No usable case rows");
+ CASES.push(...newCases);
+ active=CASES.length-newCases.length;renderSelect();
+ return{count:newCases.length,headerNames:h,columns:cols};
+}
+el("case-select").addEventListener("change",e=>{active=Number(e.target.value);renderCase()});
+el("run").addEventListener("click",run);
+el("copy").addEventListener("click",async()=>{
+ if(!lastResult)return;
+ try{
+  if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(lastResult.research_note_suggestion)}
+  else{
+   const ta=create("textarea");ta.value=lastResult.research_note_suggestion;document.body.append(ta);ta.select();
+   if(!document.execCommand("copy"))throw Error("Clipboard unavailable");ta.remove();
+  }
+  el("result-action").textContent="Research note copied.";
+ }catch{el("result-action").textContent="Copy is unavailable here. Select the generated note manually."}
+});
+el("download").addEventListener("click",()=>{
+ if(!lastResult)return;
+ const safe=lastResult.case_id.replace(/[^a-z0-9-]/gi,"-").toLowerCase();
+ downloadFile(safe+"-review.md",markdownReport(lastResult),"text/markdown;charset=utf-8");
+ el("result-action").textContent="Report downloaded locally; original technical source was not modified.";
+});
+el("csv-file").addEventListener("change",async e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ try{
+  if(file.size>500000||file.size<=0)throw Error("File must be 1–500 KB");
+  const result=importCSV(await file.text());
+  el("csv-status").textContent="Imported "+result.count+" case rows locally. Select one and run checks. No original document contents were fetched.";
+ }catch(err){el("csv-status").textContent="Import rejected: "+err.message}
+ el("csv-file").value="";
+});
+renderSelect();
+</script>
 </body>
 </html>
