@@ -1,5 +1,12 @@
 # Evidence Framework — Public-source research release
 
+## Live AI document comparison (optional secure backend)
+
+The home page now includes **Run AI document review**. This button is connected to committed code at `api/review.js`, but **the public GitHub Pages site is static**. To run a real model, deploy the same repo to Vercel and set server-only `AI_API_KEY` plus a separate `AI_REVIEW_ACCESS_TOKEN`, then enter the review passcode on the Vercel-hosted homepage. From GitHub Pages, enter that HTTPS backend URL under **AI connection**. The service retrieves an official original and a public team revision for DataWedge 13.0 or EHS 2.8, extracts relevant sections and asks the model to compare them. Alternative: upload approved original and revision text files. See [AI_REVIEW_SETUP.md](../AI_REVIEW_SETUP.md). **Offline checks** work without any backend.
+
+---
+
+
 ## Simplified one-click homepage (current default)
 
 **[Open the new homepage](https://tmkbs.github.io/zebra-evidence-framework/classroom/)** → choose a preloaded case → press **Run evidence check** → read the source links, unresolved issues, and automatically drafted research note → optionally **Download report**. This default flow has no manual approval gates and requires no account, local server, API key, or file upload.
