@@ -1,0 +1,12 @@
+{
+  "name": "zebra-evidence-framework",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node classroom/test_one_click.cjs && node classroom/test_ai_review.cjs && node classroom/test_end_to_end.cjs"
+  }
+}
