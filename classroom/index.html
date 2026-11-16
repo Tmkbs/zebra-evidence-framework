@@ -498,6 +498,7 @@ el("csv-file").addEventListener("change",async e=>{
  el("csv-file").value="";
 });
 renderSelect();
+if(apiFromHost())setAIStatus("Secure AI route detected on this host. Enter your private review passcode under AI connection, then run the comparison.");
 </script>
 </body>
 </html>
