@@ -91,3 +91,14 @@ This makes the research connection without claiming evolutionary neural networks
 **Why is it in an evolutionary computation class?** “I'm exploring the validation strategy and search problem that appears naturally in the workflow, but I'm not claiming a completed evolutionary experiment.”
 
 **Where are sources and code?** “The public-source manifest and the complete classroom demo live in the same [GitHub repository](https://github.com/Tmkbs/zebra-evidence-framework). Source references are linked from the case itself.”
+
+## Course-only evolutionary extension (two presentation versions)
+
+- **Zebra client (default):** https://tmkbs.github.io/zebra-evidence-framework/classroom/ — the existing evidence intake, review, bounded revision and retest. The evolutionary experiment is hidden from the client-facing navigation.
+- **Evolutionary Computation edition:** https://tmkbs.github.io/zebra-evidence-framework/classroom/course.html — the *same Framework* plus a visible **Evolution lab** entry and an optional final presenter step.
+
+**45–60 second optional demonstration:** Click **Evolution lab**, leave the illustrative budget at 20 toy minutes, press **Next generation** once, then **Run 25 generations**. The chart displays best-so-far fitness for a genuine seeded binary genetic algorithm. Compare it with the greedy baseline and an exact optimum from all 4,096 combinations. Change the time budget or seed to demonstrate that the heuristic is not guaranteed to be optimal.
+
+**One-sentence bridge to class:** “Our evidence framework tells us what is uncertain. Evolutionary search is one possible way to prioritize what to verify first under a limited review budget.”
+
+**Scope:** 12 fictitious actions, arbitrary minutes and points, a feasible 12-bit chromosome, tournament selection, one-point crossover, 6% per-bit mutation, and elitism. No real case costs, verification benefits, device results, benchmark superiority or confirmed evolutionary gain for Zebra are claimed. The exact optimum is toy-only, not production acceptance.
