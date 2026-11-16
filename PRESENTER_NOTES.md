@@ -5,52 +5,51 @@
 
 **Positioning:** An independent, reusable evidence-review framework built alongside the team's public technical documentation research. The framework has a working offline draft-to-copy revision flow and JSON handoff contract. It does **not** contain the teammate's private editing program, live model inference, measured optimization gains, verified device fixes or generated video.
 
-## Five-minute walkthrough (English)
+## Five-minute walkthrough (English) — updated November 16
 
-**00:00–00:25 | Architecture — Why build this?**  
-*Click:* Architecture (the opening view).  
-*Say:* “We have been working with real developer questions, and one thing became clear: a plausible technical answer is not always a supported answer. I wanted a way to track what the documentation actually says, where the uncertainty is, and what should happen next.”
+This walkthrough keeps **nine steps** while replacing the old speculative developer-preview step with a direct, distinct contribution to the team's seven-case release. The strongest default presentation needs **no CSV import**: use one of two publicly linked proposal examples. For a complete seven-case review, download and locally import the team's CSV beforehand.
 
-**00:25–00:55 | Question — A real case**  
-*Click:* Question. Keep **Real public report · Android web integration** selected.  
-*Say:* “This is a real public question about controlling scanning from an Android web application. Instead of guessing a solution, the framework separates the reported need from what we can actually establish.”  
-*Show:* Original public question and the published team report. The case is grounded in public materials, not a private customer ticket.
+**00:00–00:20 | Architecture**  
+*Say:* “The team now has concrete documentation revision proposals. My independent contribution is an evaluation layer that tracks what can actually be supported before the revision moves forward.”  
+*Show:* The visual case → evidence → review → bounded revision → local retest pipeline.
 
-**00:55–01:30 | Evidence — What does the source support?**  
-*Click:* Evidence. Point to the official DataWedge 15.0 guide and the scope limit beneath it.  
-*Say:* “The official guide documents native software scan controls. But that does not prove that Chrome can invoke them, or that the device has that particular version. A useful answer needs to preserve those conditions.”
+**00:20–01:05 | Team review intake**  
+*Click:* **Team review intake**. Select the EHS 2.8 or SET_CONFIG 13.0 public proposal.  
+*Say:* “Rather than duplicating their editor, I take an existing proposal and check whether its source, device version and editing scope have been verified.”  
+*Show:* All reviewer gates initially unknown. Do **not** mark them as checked without evidence. Click **Continue in our Framework**.
 
-**01:30–02:00 | Review — Do not invent model results**  
-*Click:* Review. Under Human review, choose **Documentation-only review · no model run**.  
-*Say:* “The forum question and document evidence are real, but we haven't run a controlled model comparison on this case. I can still review the documentation without pretending two AI outputs have been tested.”  
-*Show:* A/B fields remain empty. Scores are human-entered, not automatic benchmarks.
+**01:05–01:25 | Question**  
+*Say:* “The imported record is a research-review question, not a verified original forum transcript or confirmed solution.”  
+*Show:* Title, issue summary and open context questions.
 
-**02:00–02:30 | Diagnosis — A hypothesis, not a diagnosis of the device**  
-*Click:* Failure diagnosis. Select **Possible documentation clarity gap**.  
-*Say:* “A poor answer may come from missing context, retrieval, a version mismatch, or unclear documentation. We should first decide which kind of problem we are investigating rather than rewriting a manual automatically.”
+**01:25–02:00 | Evidence**  
+*Say:* “A source link isn't proof by itself. Every record has explicit limits, so we can see what still needs verification.”  
+*Show:* The team's proposal link and the general public release note (which is not case-specific proof).
 
-**02:30–03:25 | Document revision — The meaningful action**  
-*Click:* Document revision. Examine the original and proposed note, check the local-test acknowledgment, and click **Approve for local retest**.  
-*Say:* “Here is a minimal clarification to our research note. The source is preserved, and the change needs an explicit review before we apply it. This is not an edit to Zebra's official documentation.”  
-*Show:* Original versus proposed paragraph. If you want a second example, use a permitted TXT/Markdown file, but **do not open NDA-restricted files while screen sharing**.
+**02:00–02:35 | Human review**  
+*Click:* **Documentation-only review · no model run**.  
+*Say:* “We can review the proposed wording without pretending a model or device has been tested.”  
+*Show:* Empty model-output fields.
 
-**03:25–04:00 | Retest — A real local document operation**  
-*Click:* Retest → **Apply to temporary copy**.  
-*Say:* “We can apply the proposed wording to a disposable document copy and export it without touching the original. That's a working documentation handoff. It is not a model-performance result or a verified scanner fix.”  
-*Show:* Revised paragraph and held-out checks marked **NOT RUN**.
+**02:35–03:00 | Failure diagnosis**  
+*Click:* **Possible documentation clarity gap**.  
+*Say:* “This labels a possible documentation issue, not a confirmed scanner root cause.”
 
-**04:00–04:35 | Developer preview — Where this could lead**  
-*Click:* Developer preview.  
-*Say:* “This is the developer-facing view: a question, its evidence, missing-context prompts, and a possible visual explanation. The model answer isn't generated here, and the video is only a storyboard.”  
-*Show:* Evidence and the three storyboard frames, not an imaginary generated video.
+**03:00–03:55 | Document revision**  
+*Click:* Review the research-note before/after. Acknowledge local-only testing, then approve for local retest.  
+*Say:* “This is a bounded clarification to our review note, not a change to Zebra's published manual.”
 
-**04:35–05:00 | Delivery — What is reusable?**  
-*Click:* Delivery packet → **Download complete JSON** or **Download case report**.  
-*Say:* “The case, source limitations, review decision, proposed document change and outstanding checks all travel in one structured record. This is the boundary where my framework can connect to a separate documentation implementation.”
+**03:55–04:35 | Retest**  
+*Click:* **Apply to temporary copy**.  
+*Say:* “The original remains untouched. The copy workflow works, but device validation remains NOT RUN.”
+
+**04:35–04:55 | Delivery packet**  
+*Click:* **Download complete JSON** or **Download case report**.  
+*Say:* “We can hand off a traceable decision record without claiming the edit is approved for publication.”
 
 ## Optional: demonstrate the actual Agent Continue handoff (30 seconds)
 
-In **Review**, point to the **Agent Continue · real extension bridge** panel. Click **Export plugin task (.json)**, showing how the selected real public case and its evidence can become a **one-send queue task** in 叶真同's Chrome extension. The extension's Settings import can load this real file; it requires a separate, explicit user Start in an existing ChatGPT conversation. The webpage can then accept a case-matching JSON response as **MANUAL_ENTRY_NOT_VERIFIED**.
+For the three preloaded public research fixtures only, open **Review** and point to the **Agent Continue · real extension bridge** panel. This path is intentionally disabled for arbitrary CSV-imported team cases until their public data scope is independently cleared. Click **Export plugin task (.json)**, showing how the selected real public case and its evidence can become a **one-send queue task** in 叶真同's Chrome extension. The extension's Settings import can load this real file; it requires a separate, explicit user Start in an existing ChatGPT conversation. The webpage can then accept a case-matching JSON response as **MANUAL_ENTRY_NOT_VERIFIED**.
 
 *Say:* “This is the plugin handoff from our research case into Zhentong's actual Agent Continue scheduler. It uses the extension's JSON import contract, so we're not pretending that a Chrome extension can run inside our website. We still review the answer here.”
 
@@ -66,17 +65,16 @@ This makes the research connection without claiming evolutionary neural networks
 
 ## Emergency 90-second version
 
-1. **Question (15 s):** “Here is a real public developer issue, with a link to the original report.”
-2. **Evidence (20 s):** “The versioned official source supports one part of the problem but leaves the browser integration unresolved.”
-3. **Diagnosis (15 s):** “We distinguish incomplete evidence from a possible documentation clarity issue.”
-4. **Revision + Retest (25 s):** “We propose an edit to a research-note copy, require review, and apply it without changing the original.”
-5. **Delivery (15 s):** “We export what was checked, what was changed, and what remains unverified. The framework is reusable; production integration comes later.”
+1. **Team review intake (30 s):** “The team has seven selected public cases. I use its published proposals as input, not as a duplicate editor.” Open one of the two verified proposal links.
+2. **Evidence and gates (25 s):** “Source, device/version and scope have to be checked. Unknown means unknown.”
+3. **Revision and retest (20 s):** “Our framework proposes a bounded research-note change and applies it only to a disposable copy.”
+4. **Delivery (15 s):** “The exported JSON records decisions and missing tests without claiming an approved product fix.”
 
 ## Before class
 
 - Open the [hosted demo](https://tmkbs.github.io/zebra-evidence-framework/classroom/) in Chrome/Edge. Use **Presenter mode** for practice; hide it for a clean audience view if needed.
-- Keep the default Android web integration case. It is the strongest preloaded connection to a **published team case report** and a specific official guide.
-- Test the sequence **Review → Documentation-only → Diagnosis → Clarity → Revision → Ack → Approve → Retest → Apply** once; reload the page before class so that the review starts clean.
+- For the current demonstration, open **Team review intake** and use the EHS 2.8 or SET_CONFIG 13.0 public example. If demonstrating the full seven cases, download the CSV earlier, then verify its column mappings. Do not assume the CSV file is automatically synced or bundled.
+- Test **Team intake → Continue in Framework → Documentation-only review → Diagnosis → Clarity → Revision → Ack → Approve → Retest → Apply** once; reload the page before class to start clean.
 - Do **not** show passwords, campus model endpoints, private internal reports, NDA attachments or restricted screenshots.
 - Backup: download [standalone HTML](classroom/evidence-framework-sandbox.html) from GitHub Raw and open it offline; copy the short script above into your own notes.
 
