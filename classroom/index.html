@@ -88,10 +88,33 @@ select{border:1px solid #cadbdd;border-radius:9px;background:white;color:#1d4654
 .footer a{color:#687f8a}
 @media(max-width:850px){.hero{display:block}.flow{justify-content:start;margin-top:20px;min-width:0}.select-row{grid-template-columns:1fr}.report-head{display:block}.report-count{max-width:270px;margin-top:18px}.report-grid{grid-template-columns:1fr}}
 @media(max-width:520px){.top-note{display:none}.top .inside{padding:0 16px}main{padding:26px 16px 48px}.card{padding:18px}.hero h1{font-size:31px}.report-head{padding:20px}.report-grid .card{padding:18px}.flow{gap:6px}.flow b{font-size:10px}}
+
+.run-actions{display:flex;gap:9px;align-items:end;flex-wrap:wrap}.run-actions>.btn{white-space:nowrap}.run-actions .btn{min-height:49px}
+.ai-connect{background:#fff;border:1px solid #d9e6e3;border-radius:12px;padding:13px 17px;margin:14px 0}.ai-connect summary{cursor:pointer;font-size:12px;font-weight:800;color:#176f67}
+.ai-connect .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.ai-connect label{font-size:11px;font-weight:800;color:#3c636d}.ai-connect input,.ai-connect textarea{width:100%;display:block;border:1px solid #c8dcda;border-radius:8px;padding:11px;margin-top:7px;color:#204451;background:#fff;font-size:12px}
+.ai-connect textarea{min-height:95px;resize:vertical;line-height:1.6}.ai-connect p{font-size:11px;line-height:1.65;color:#6b858d}
+.ai-connect input[type=file]{padding:7px}
+.ai-info{font-size:12px;margin:12px 0 0;color:#456971;line-height:1.65}
+.ai-info.error{color:#a34c30}.ai-info.ok{color:#187367}
+.ai-report{margin-top:22px}.ai-report[hidden]{display:none}
+.ai-result-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.92fr);gap:14px;margin-top:16px}
+.ai-found{border-left:3px solid #d7ad65;padding:11px 12px;margin:8px 0;background:#fffaf1;border-radius:0 8px 8px 0}
+.ai-found.high{border-color:#c56c56}.ai-found.low{border-color:#64b9a6}
+.ai-found strong{font-size:12px;color:#4e514e}.ai-found p{font-size:11px;line-height:1.6;color:#617a83;margin:6px 0}
+.ai-found small{font-size:10px;color:#8b8174}
+.ai-quote{font-family:ui-monospace,monospace;font-size:11px!important;background:#edf4f2;padding:7px;border-radius:5px;color:#285c59!important}
+.ai-steps{padding-left:19px;font-size:12px;line-height:1.75;color:#46636e}
+.ai-receipts{margin-top:14px;padding:13px;background:#eff5f3;border-radius:9px}
+.ai-receipts p{font-size:10px;line-height:1.65;color:#5d7982;overflow-wrap:anywhere}
+.ai-busy{opacity:.55;cursor:wait}
+@media(max-width:900px){.select-row{grid-template-columns:1fr}.run-actions{justify-content:start}.ai-result-body{grid-template-columns:1fr}}
+@media(max-width:580px){.ai-connect .pair{grid-template-columns:1fr}.run-actions{display:grid;grid-template-columns:1fr 1fr}.run-actions .btn{white-space:normal;font-size:11px;padding:11px}}
+
 </style>
 </head>
 <body>
-<header class="top"><div class="inside"><div class="brand"><div class="brand-mark">Z</div><span>Zebra Evidence Review</span></div><span class="top-note">Independent research prototype · No live model or device test</span></div></header>
+<header class="top"><div class="inside"><div class="brand"><div class="brand-mark">Z</div><span>Zebra Evidence Review</span></div><span class="top-note">Offline checks + optional secure AI comparison · No device testing</span></div></header>
 <main>
 <section class="hero">
 <div><div class="kicker">One-click research review</div><h1>One case. One check. A clear result.</h1><p>Start with a public Zebra developer case or a teammate's published documentation proposal. The framework automatically organizes source limits, missing information and a safer research-note draft.</p></div>
@@ -101,12 +124,35 @@ select{border:1px solid #cadbdd;border-radius:9px;background:white;color:#1d4654
 <div class="stage-head"><span class="stage-num">01</span><h2 id="case-title">Choose a case</h2><span class="sub">No setup needed</span></div>
 <div class="select-row">
 <div><label class="field-label" for="case-select">Public case or documentation proposal</label><select id="case-select" aria-label="Choose a case"></select></div>
-<button class="btn primary" id="run" type="button">Run evidence check <span aria-hidden="true">→</span></button>
+<div class="run-actions">
+<button class="btn primary" id="ai-run" type="button">Run AI document review →</button>
+<button class="btn" id="run" type="button">Offline checks</button>
+</div>
 </div>
 <div class="case-preview"><span class="label" id="case-type">PUBLIC PROPOSAL</span><h3 id="case-question"></h3><p id="case-context"></p><div class="case-links" id="case-links"></div></div>
-<p class="hint">The check runs locally on cited, preloaded research summaries. It does not retrieve live pages, call an AI model, or certify technical correctness.</p>
+<p class="hint">AI mode requests the official original and team revision through a secure model server. Offline checks work without a server. Neither path validates a physical device.</p>
+<p class="ai-info" id="ai-status" role="status">AI mode needs the secure backend deployed. On this GitHub Pages link, you can enter its Vercel endpoint below.</p>
+<details class="ai-connect" id="ai-connect"><summary>AI connection and optional original/revision files</summary>
+<div class="pair"><label for="ai-endpoint">Secure API endpoint<input id="ai-endpoint" type="url" autocomplete="off" placeholder="https://your-project.vercel.app/api/review"></label>
+<label for="ai-pass">Private review access code<input id="ai-pass" type="password" autocomplete="off" placeholder="Access code configured on the server"></label></div>
+<p>On the Vercel-hosted version, the endpoint is automatic. The access code is never stored or included in reports. API keys remain server-side.</p>
+<div class="pair"><label for="ai-original-file">Optional original (.txt / .md / .html)<input id="ai-original-file" type="file" accept=".txt,.md,.html,text/plain,text/markdown,text/html"></label>
+<label for="ai-revised-file">Optional revision (.txt / .md / .html)<input id="ai-revised-file" type="file" accept=".txt,.md,.html,text/plain,text/markdown,text/html"></label></div>
+<p>For EHS 2.8 and SET_CONFIG 13.0, leave both files empty to fetch public source pages automatically. For other cases, supply both files. Only click Run AI when you are authorized to submit their text to the model provider; do not upload confidential customer data.</p>
+<p id="ai-file-status" role="status">No files selected. Local uploads are not sent until you explicitly run AI.</p>
+</details>
 </section>
-<div id="waiting" class="waiting"><strong>Ready to analyze.</strong> Choose a case and click <b>Run evidence check</b>. No manual review gates.</div>
+<div id="waiting" class="waiting"><strong>Ready.</strong> Use AI document review with a connected backend, or run offline checks without one.</div>
+<section id="ai-report" class="ai-report" hidden aria-live="polite">
+<div class="report-head"><div><div class="kicker">AI document comparison · Source-grounded draft</div><h2 id="ai-verdict">Review result</h2><p id="ai-summary"></p></div>
+<div class="report-count"><div><strong id="ai-evidence-count">0</strong><span>Retrieved texts</span></div><div><strong id="ai-finding-count">0</strong><span>Findings</span></div></div></div>
+<div class="ai-result-body">
+<div class="card"><h3 class="panel-title"><i>!</i> Findings and supporting quotations</h3><div id="ai-findings"></div></div>
+<div class="card"><h3 class="panel-title"><i>→</i> Suggested wording and checks</h3>
+<div class="generated" id="ai-rewrite"></div><h3 style="margin-top:15px">What still needs verification</h3><ol class="ai-steps" id="ai-next"></ol><div id="ai-receipts" class="ai-receipts"></div></div></div>
+<div class="action-row" style="margin-top:14px"><span class="caption">AI-generated review of supplied/extracted text. Requires independent technical approval; no device was tested.</span><button class="btn primary" id="ai-download" type="button">Export AI review JSON</button></div>
+</section>
+
 <section id="report" class="report" hidden aria-live="polite">
 <div class="report-head"><div><div class="kicker">02 / Automated review complete</div><h2>Needs technical verification</h2><p id="result-intro"></p></div><div class="report-count"><div><strong id="source-count">0</strong><span>Linked sources</span></div><div><strong id="gap-count">0</strong><span>Checks still open</span></div></div></div>
 <div class="report-grid">
@@ -202,7 +248,7 @@ function renderCase(){
  const box=el("case-links");box.replaceChildren();
  c.sourceRecords.slice(0,2).forEach(r=>addLink(box,r));
  el("draft-input").value=c.draft||"";
- el("report").hidden=true;el("waiting").hidden=false;lastResult=null;el("result-action").textContent="";
+ el("report").hidden=true;el("ai-report").hidden=true;el("waiting").hidden=false;lastResult=null;lastAI=null;el("result-action").textContent="";el("ai-status").className="ai-info";
 }
 function scanText(text,docVersion){
  const flags=[];
@@ -265,6 +311,97 @@ function run(){
  renderReport(report);
  el("report").scrollIntoView?.({behavior:"smooth",block:"start"});
 }
+
+let lastAI=null,aiRunning=false;
+const AUTO_SOURCE_IDS=new Set(["SC13","EHS28"]);
+const apiFromHost=()=>{
+ const loc=window.location;
+ if(!loc)return "";
+ return /(^|\.)vercel\.app$/.test(loc.hostname||"")||loc.hostname==="localhost"||loc.hostname==="127.0.0.1"?loc.origin+"/api/review":"";
+};
+function backendURL(){
+ const value=el("ai-endpoint").value.trim()||apiFromHost();
+ if(!value)throw Error("AI backend is not connected. Deploy the secure Vercel function and enter its HTTPS URL under AI connection.");
+ let u;try{u=new URL(value)}catch{throw Error("Enter a valid AI backend URL")}
+ if(u.username||u.password||(!["https:"].includes(u.protocol)&&!(u.protocol==="http:"&&["localhost","127.0.0.1"].includes(u.hostname)))||!u.pathname.endsWith("/api/review"))throw Error("Use an HTTPS endpoint ending in /api/review.");
+ return u.href;
+}
+function setAIStatus(text,kind=""){el("ai-status").className="ai-info"+(kind?" "+kind:"");el("ai-status").textContent=text}
+async function documentInput(name){
+ const file=el(name).files?.[0];
+ if(!file)return "";
+ if(file.size>78000||file.size<=0)throw Error("Each document must be 1–78 KB in .txt, .md or .html.");
+ if(!/\.(txt|md|html)$/i.test(file.name))throw Error("Only .txt, .md and .html are supported.");
+ let text=await file.text();
+ if(/\.html$/i.test(file.name))text=new DOMParser().parseFromString(text,"text/html").body?.textContent||"";
+ if(text.length>26000)throw Error("Text has more than 26,000 characters; provide the relevant section without silently truncating it.");
+ return text.trim();
+}
+function renderAI(data){
+ lastAI=data;el("ai-report").hidden=false;el("report").hidden=true;el("waiting").hidden=true;
+ const r=data.review||{};
+ const titles={likely_supported:"Possibly supported · confirm manually",needs_revision:"Revision needs attention",inconclusive:"Evidence remains inconclusive"};
+ el("ai-verdict").textContent=titles[r.verdict]||"Review inconclusive";
+ el("ai-summary").textContent=String(r.summary||"No summary returned");
+ el("ai-evidence-count").textContent=String((data.source_receipts||[]).length);
+ el("ai-finding-count").textContent=String((r.findings||[]).length);
+ const box=el("ai-findings");box.replaceChildren();
+ if(!(r.findings||[]).length)box.append(create("p","The model did not return specific findings. Check the source coverage before interpreting this result.","hint"));
+ for(const f of r.findings||[]){
+  const row=create("div",undefined,"ai-found "+f.severity);
+  row.append(create("strong",f.issue||"Review finding"),create("p",f.reasoning||""));
+  if(f.quote_verified&&f.quote)row.append(create("p",f.source+": “"+f.quote+"”","ai-quote"));
+  else row.append(create("small","No verified verbatim quote in the submitted excerpt."));
+  if(f.next_check)row.append(create("p","Next: "+f.next_check));
+  box.append(row);
+ }
+ el("ai-rewrite").textContent=r.suggested_revision||"No revised wording returned.";
+ const checks=el("ai-next");checks.replaceChildren();
+ (r.next_checks||[]).forEach(s=>checks.append(create("li",s)));
+ const receipts=el("ai-receipts");receipts.replaceChildren(create("strong","Source receipts · "+String(data.model||"model")));
+ (data.source_receipts||[]).forEach(s=>{
+  const row=create("p",(s.kind||"Document")+": "+s.chars+" characters; source "+(s.url||"manually supplied")+(s.truncated?"; extraction truncated":"")+".");
+  receipts.append(row);
+ });
+ receipts.append(create("p","AI has not tested a device or approved documentation."));
+ setAIStatus("Live model response received. Findings are an AI assessment, not a technical certification.","ok");
+ el("ai-report").scrollIntoView?.({behavior:"smooth",block:"start"});
+}
+async function runAI(){
+ if(aiRunning)return;
+ const c=CASES[active];
+ try{
+  const endpoint=backendURL(),access=el("ai-pass").value;
+  if(!access)throw Error("Enter the private review access code under AI connection.");
+  const a=el("ai-original-file").files?.[0],b=el("ai-revised-file").files?.[0];
+  if(Boolean(a)!==Boolean(b))throw Error("Upload BOTH original and revised documents, or leave both empty.");
+  if(!a&&!AUTO_SOURCE_IDS.has(c.id))throw Error("For this case, upload both original and revised text files.");
+  const payload={case_id:c.id,question:c.question};
+  if(a){payload.original_text=await documentInput("ai-original-file");payload.proposal_text=await documentInput("ai-revised-file")}
+  aiRunning=true;el("ai-run").disabled=true;el("ai-run").textContent="Reading documents and analyzing…";
+  setAIStatus("Requesting public documents and running the model. Nothing is approved automatically.");
+  const control=new AbortController(),timer=setTimeout(()=>control.abort(),65000);
+  let response,body;
+  try{
+   response=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json","X-Review-Access":access},body:JSON.stringify(payload),signal:control.signal,cache:"no-store"});
+   body=await response.json();
+  }finally{clearTimeout(timer)}
+  if(!response.ok||!body?.ok)throw Error(body?.error||"AI backend request failed (HTTP "+response.status+").");
+  if(body.mode!=="live_ai_document_comparison"||!body.review)throw Error("Backend did not return a model review.");
+  renderAI(body);
+ }catch(e){
+  setAIStatus(String(e.message||e).slice(0,400),"error");
+  el("ai-connect").open=true;
+ }finally{aiRunning=false;el("ai-run").disabled=false;el("ai-run").textContent="Run AI document review →";}
+}
+function exportAI(){
+ if(!lastAI)return;
+ const name=String(lastAI.case_id||"review").replace(/[^a-z0-9-]/gi,"-").toLowerCase();
+ downloadFile(name+"-ai-comparison.json",JSON.stringify(lastAI,null,2)+"\n","application/json;charset=utf-8");
+}
+el("ai-run").addEventListener("click",runAI);
+el("ai-download").addEventListener("click",exportAI);
+
 function markdownReport(r){
  return ["# "+r.case_title,"","**Status:** Needs independent technical review.","**Method:** "+r.analysis_method,
  "**Question:** "+r.question,"","## Source-linked records",...r.evidence.flatMap(s=>["- **"+s.label+"** — "+s.recorded_claim,"  - Limit: "+s.scope_limit,"  - Source: "+s.url]),"",
