@@ -145,7 +145,7 @@ async function main() {
     assert.ok(element("presenter-do").textContent.includes("accuracy"));
   });
   test("all nine presenter steps navigate working app sections", () => {
-    const crumbs=["Architecture","Question","Evidence","Human review","Failure diagnosis","Document revision","Retest","Developer preview","Delivery"];
+    const crumbs=["Architecture","Team review intake","Question","Evidence","Human review","Failure diagnosis","Document revision","Retest","Delivery"];
     for(let i=0;i<crumbs.length;i++){
       assert.equal(element("crumb").textContent,crumbs[i]);
       assert.ok(element("presenter-count").textContent.startsWith(String(i+1).padStart(2,"0")+" / 09"));
