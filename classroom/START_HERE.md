@@ -1,5 +1,14 @@
 # Evidence Framework — Public-source research release
 
+## Simplified one-click homepage (current default)
+
+**[Open the new homepage](https://tmkbs.github.io/zebra-evidence-framework/classroom/)** → choose a preloaded case → press **Run evidence check** → read the source links, unresolved issues, and automatically drafted research note → optionally **Download report**. This default flow has no manual approval gates and requires no account, local server, API key, or file upload.
+
+The automatic engine currently performs deterministic checks over cited public research summaries, version metadata and optional wording. It **does not** fetch full TechDocs pages, run an LLM, test a device, or validate a production fix; those statuses remain open. If you need original source comparison or more controls, use the [advanced demo](evidence-framework-sandbox.html). The [Evolutionary Computation version](course.html) remains separate.
+
+---
+
+
 ## Open the site
 
 **Interactive webpage:** https://tmkbs.github.io/zebra-evidence-framework/classroom/
