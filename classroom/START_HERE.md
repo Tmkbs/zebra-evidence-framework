@@ -55,3 +55,7 @@ The [revision JSON example](revision_adapter_example.json) matches the default p
 **Not completed/claimed:** the teammate's inaccessible private editor source code, exact private website report data, restricted customer/support cases, live model comparisons, actual optimization outcomes, official documentation approval, device-level verification, or generated video.
 
 [Engineering handoff](INTEGRATION_HANDOFF.md) · [Automated tests](test_end_to_end.cjs) · [QA boundaries](QA.md)
+
+## Team case review intake (November 16)
+
+Use the sidebar's **Team review intake** entry, or the home-page button. Download the team's [public seven-row case CSV](https://zebra-techdocs-practicum.vercel.app/document-reader/zebra-cases.csv), then import the downloaded CSV in the browser. Confirm the title/question/link column mappings. The board displays reviewer-recorded evidence, version, and scope gates and exports a local review JSON packet. **Continue in our Framework** loads the selected row as an *unverified question* into the existing case evaluation flow. It does not claim the teammate's proposed documentation is approved. The complete dataset is not bundled or fetched automatically.
