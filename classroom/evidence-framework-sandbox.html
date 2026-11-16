@@ -33,6 +33,26 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 @media(max-width:800px){.presenter-panel{right:12px;top:76px;max-height:calc(100vh - 88px)}.bar-actions{gap:7px}}
 @media(max-width:490px){.bar-actions .flag{display:none}.presenter-toggle{padding:9px 10px;font-size:11px}}
 @media(max-width:1030px){.grid4{grid-template-columns:repeat(2,1fr)}}@media(max-width:800px){.side{width:72px;flex-basis:72px;padding:18px 8px}.brand h2,.brand span,.sidefoot,.nav .name{display:none}.brand{padding:0 8px 15px}.nav button{justify-content:center}.grid{grid-template-columns:1fr}.content{padding:30px 22px}.hero{padding:28px}.bar{padding:0 20px}}@media(max-width:490px){.grid4{grid-template-columns:1fr}.flag{font-size:9px}}
+
+/* Visual presentation layer: uses the existing case, evidence, review, and revision state. */
+.viz-hero{position:relative;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:25px;align-items:center;background:linear-gradient(120deg,#132a3d 0%,#17565c 80%,#267f77 100%);border-radius:20px;padding:clamp(26px,4vw,46px);color:white;overflow:hidden;min-height:365px;box-shadow:0 16px 38px rgba(17,58,65,.12)}
+.viz-hero:before{content:"";position:absolute;right:-100px;top:-180px;width:480px;height:480px;border:1px solid rgba(255,255,255,.12);border-radius:50%;box-shadow:0 0 0 60px rgba(255,255,255,.025),0 0 0 130px rgba(255,255,255,.025);pointer-events:none}
+.viz-hero-main,.viz-hero-art{position:relative;z-index:1}.viz-hero h1{font-size:clamp(31px,3.7vw,51px);letter-spacing:-.06em;line-height:1.12;margin:0 0 16px}.viz-hero .eyebrow{color:#9fe3d5}.viz-hero p{color:#d4eae8;max-width:550px;line-height:1.7;font-size:14px;margin:0}.viz-hero .btn.primary{background:#d8f6ec;border-color:#d8f6ec;color:#07594f}.viz-hero .btn:not(.primary){background:transparent;border:1px solid #77aca7;color:#eafff9}
+.viz-hero-art{padding:14px;border-radius:16px;background:rgba(9,33,44,.32);backdrop-filter:blur(4px)}
+.viz-art-node{display:flex;align-items:center;gap:13px;border:1px solid rgba(185,244,234,.32);background:rgba(221,255,250,.08);border-radius:12px;padding:15px}.viz-art-node.center{background:rgba(66,230,186,.22);border-color:#93e5d0}
+.viz-art-number{flex:0 0 30px;display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:rgba(216,255,247,.14);color:#bdf6e9;font-size:11px;font-weight:850}
+.viz-art-node strong{display:block;font-size:12px;letter-spacing:.07em}.viz-art-node small{display:block;color:#c3ddd9;font-size:11px;margin-top:5px;line-height:1.45}.viz-art-link{display:flex;align-items:center;gap:10px;padding-left:29px;height:19px;color:#a0e9d9}.viz-art-link span{width:1px;height:16px;background:#72b8aa}.viz-art-link b{font-size:11px;font-weight:400}
+.viz-header{display:flex;align-items:end;justify-content:space-between;gap:18px;flex-wrap:wrap;margin:32px 0 18px}.viz-header h2{font-size:24px;margin:0}.viz-case-picker{display:flex;flex-direction:column;gap:7px;color:#66808e;font-size:10px;font-weight:850;letter-spacing:.07em}.viz-case-picker select{background:white;color:#244657;border:1px solid #cadae0;border-radius:9px;padding:11px 13px;min-width:250px;max-width:100%;font-size:12px;font-weight:700}
+.viz-flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:11px;margin-bottom:17px}.viz-stage{position:relative;min-height:139px;border:1px solid #d8e4e8;border-radius:12px;background:#fff;padding:16px 13px;text-align:left;color:#213e50;box-shadow:0 4px 11px rgba(31,63,78,.025);transition:transform .15s,border-color .15s,box-shadow .15s}.viz-stage:not(:last-child):after{content:"→";position:absolute;right:-15px;top:34px;z-index:2;color:#0d8075;font-size:21px;font-weight:900}.viz-stage:hover{transform:translateY(-3px);border-color:#399e8c;box-shadow:0 11px 23px rgba(16,86,82,.11)}.viz-stage-number{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:#e8f6f1;color:#087e73;font-weight:900;font-size:11px;margin-bottom:10px}.viz-stage strong{display:block;font-size:15px;margin-bottom:5px}.viz-stage small{display:block;color:#6c7f89;font-size:10px;font-weight:650;line-height:1.35;min-height:26px}.viz-stage-go{display:block;color:#087b71;font-size:11px;font-weight:850;margin-top:9px}
+.viz-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.viz-card{border:1px solid #dce6e9;border-radius:15px;background:white;padding:24px;min-width:0}.viz-card-head,.viz-subhead{display:flex;align-items:center;justify-content:space-between;gap:10px}.viz-card-head{margin-bottom:13px}.viz-card .eyebrow{margin:0}.viz-live-tag{display:inline-block;border-radius:30px;padding:6px 9px;background:#e8f6ef;color:#007c6b;font-size:9px;font-weight:850;white-space:nowrap}.viz-live-tag.muted-tag{background:#f1f4f6;color:#657b86}.viz-card h3{font-size:19px;margin:0 0 12px}.viz-question{background:#ecf8f4;border-left:3px solid #189284;padding:14px 16px;border-radius:8px;color:#284952;font-size:13px;line-height:1.7;margin:0 0 19px}.viz-subhead{margin:16px 0 10px;font-size:11px;font-weight:850;color:#3d5966}.viz-subhead span:last-child{font-size:10px;color:#0d8579}.viz-source-list{display:grid;gap:8px}.viz-source{display:flex;align-items:start;gap:10px;padding:12px;border:1px solid #e0e9ec;border-radius:9px;background:#fafcfc;transition:border-color .15s}.viz-source.selected{border-color:#95d6c4;background:#f0faf5}.viz-source input{margin-top:2px;accent-color:#158a7d;cursor:pointer;width:17px;height:17px;flex:0 0 auto}.viz-source-content{flex:1;min-width:0}.viz-source strong{display:block;font-size:12px;color:#2c4c57;line-height:1.45}.viz-source p{margin:4px 0;color:#617581;font-size:11px;line-height:1.6}.viz-source .scope{color:#8b6a3d;font-size:10px;line-height:1.55}.viz-source a{color:#087c73;font-size:11px;white-space:nowrap}.viz-small{font-size:10px;color:#748591;line-height:1.6;margin:12px 0 0}
+.viz-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.viz-metrics>div{background:#f1f7f6;border:1px solid #e2efec;border-radius:10px;padding:14px 9px;text-align:center}.viz-metrics strong{display:block;font-size:26px;letter-spacing:-.05em;color:#0b726b}.viz-metrics span{display:block;font-size:10px;color:#67808c;line-height:1.45;margin-top:5px}.viz-gap-list{display:grid;grid-template-columns:1fr 1fr;gap:7px}.viz-gap{display:flex;align-items:start;gap:7px;padding:11px;border:1px solid #f2e7d1;border-radius:9px;background:#fffaf2;font-size:11px;color:#765e3a;line-height:1.5}.viz-gap:before{content:"?";border-radius:50%;background:#ebd4a8;color:#785a24;width:16px;height:16px;display:grid;place-items:center;flex:0 0 16px;font-size:10px;font-weight:900}
+.viz-decision{background:#173e4c;border-radius:13px;padding:19px;color:#e8f8f4;margin-top:19px}.viz-decision>div{display:flex;align-items:center;gap:9px}.viz-decision strong{font-size:13px}.viz-decision p{color:#c1dcd9;font-size:11px;line-height:1.65;margin:9px 0 15px}.viz-pulse{height:9px;width:9px;background:#f2cc76;border-radius:50%;box-shadow:0 0 0 4px rgba(242,204,118,.15)}.viz-decision .btn.primary{background:#c9f1e6;border-color:#c9f1e6;color:#125d55;font-size:11px;padding:9px 12px}
+.viz-handoff{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1.15fr) 28px minmax(0,1fr);gap:10px;align-items:center;background:#e8f1f2;border:1px solid #d2e2e6;border-radius:14px;margin-top:17px;padding:19px}.viz-handoff>div:not(.viz-handoff-arrow){padding:6px}.viz-handoff h3{font-size:13px;margin:6px 0 6px}.viz-handoff p{font-size:11px;color:#5d7380;line-height:1.6;margin:0}.viz-handoff-arrow{text-align:center;color:#0d867a;font-size:25px;font-weight:850}.viz-handoff-arrow small{display:block;font-size:8px;letter-spacing:.08em;margin-top:1px}
+.viz-foot-actions{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;padding:20px 0 6px;font-size:11px;color:#657986}.viz-compare{border:1px solid #dce8e9;background:#f6faf9;border-radius:9px;padding:15px;margin:14px 0}.viz-compare h3{font-size:13px}.viz-compare-row{display:grid;grid-template-columns:50px minmax(0,1fr) 60px;align-items:center;gap:9px;margin:10px 0;font-size:11px}.viz-compare-track{height:13px;background:#dfeaea;border-radius:20px;overflow:hidden}.viz-compare-track span{display:block;height:100%;border-radius:20px;width:0;transition:width .25s;background:#9bb8bc}.viz-compare-row.exact .viz-compare-track span{background:#0d8c7d}.viz-compare-row strong{text-align:right;color:#256b66}
+@media(max-width:1000px){.viz-hero{grid-template-columns:1fr}.viz-hero-art{display:grid;grid-template-columns:1fr 20px 1.15fr 20px 1fr;align-items:center}.viz-art-link{height:auto;padding:0;justify-content:center}.viz-art-link span{display:none}.viz-art-link b{transform:rotate(-90deg)}.viz-art-node{min-height:95px;padding:10px;gap:7px}.viz-art-number{display:none}.viz-art-node strong{font-size:10px}.viz-art-node small{font-size:9px}.viz-flow{gap:8px}.viz-stage{padding:12px 9px;min-height:125px}.viz-stage strong{font-size:13px}.viz-stage:not(:last-child):after{right:-11px}}
+@media(max-width:740px){.viz-grid{grid-template-columns:1fr}.viz-flow{grid-template-columns:repeat(5,minmax(125px,1fr));overflow-x:auto;padding-bottom:10px}.viz-stage:not(:last-child):after{display:none}.viz-card{padding:18px}.viz-handoff{grid-template-columns:1fr;gap:4px}.viz-handoff-arrow{transform:rotate(90deg)}.viz-handoff-arrow small{display:none}}
+@media(max-width:520px){.viz-hero{padding:24px}.viz-hero-art{display:none}.viz-case-picker,.viz-case-picker select{width:100%;min-width:0}.viz-gap-list{grid-template-columns:1fr}.viz-metrics strong{font-size:22px}}
+
 </style>
 </head>
 <body>
@@ -54,12 +74,76 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
    <div class="presenter-controls"><button type="button" class="btn" id="presenter-prev">← Previous</button><button type="button" class="btn primary" id="presenter-next">Next step →</button></div>
    <div class="presenter-foot">Presenter steps navigate the real app; they never fabricate model results or approve edits. Use the on-screen controls when the step says to review or patch. <a href="https://github.com/Tmkbs/zebra-evidence-framework/blob/main/PRESENTER_NOTES.md" target="_blank" rel="noopener noreferrer">Full script</a>.</div>
  </aside>
+
  <section class="page active" id="architecture">
-  <div class="hero"><div class="eyebrow">REUSABLE FRAMEWORK · NOT A DOCUMENT EDITOR</div><h1>Evaluate answers before documents change.</h1><p>Walk from a developer question through evidence, answer review, diagnosis, a revision proposal, copy-only retest, a user-facing guide preview, and an auditable delivery package.</p><button class="btn" data-next="case">Explore a real public case →</button></div>
-  <div class="card" style="margin-top:16px"><div class="eyebrow">REAL PROJECT INPUT · PUBLIC STATUS NOVEMBER 5</div><h3>2,854 unique archived questions · 8 development case packets · 12 official source URLs</h3><p>These are source-processing figures from the team's public technical status, not answer accuracy or verified solutions. <a href="https://github.com/1235357/zebra-public-site-archive/blob/main/TECHNICAL_STATUS.md" target="_blank" rel="noopener noreferrer">Read status</a> · <a href="https://zebra-techdocs-practicum.vercel.app/" target="_blank" rel="noopener noreferrer">Team website</a></p></div><div class="eyebrow" style="margin-top:32px">ARCHITECTURE</div><h2>One connected research workflow, distinct responsibilities</h2>
-  <div class="grid4"><div class="step"><b>01 · INPUT</b><h3>Define a case</h3><p>Normalize the question and list known information.</p></div><div class="step"><b>02 · EVIDENCE</b><h3>Record support & gaps</h3><p>Keep provenance and applicability visible.</p></div><div class="step"><b>03 · REVIEW</b><h3>Human evaluation</h3><p>Check claims rather than invent model scores.</p></div><div class="step future"><b>04 · REVISION / HANDOFF</b><h3>Minimal doc change</h3><p>Try a controlled revision on an offline copy. Real editor integration remains separate.</p></div></div>
-  <div class="grid"><div class="card"><h3>Framework layer · in scope</h3><p>Case structure, evidence packet, explicit unknowns, manual comparison, and portable handoff format.</p></div><div class="card"><h3>Document-editing layer · separate</h3><p>Rewriting source documents, document versions, publication workflow and any product-specific behavior belong to a separate implementation.</p></div></div>
-  <div class="card" style="margin-top:14px"><h3>Optional computational exploration</h3><p>Review time is limited. Which missing details should the framework verify first? A separate QA lab compares Greedy and exact subset search on toy data only. It is disabled for real cases until review costs and outcomes are measured; no evolutionary or model-performance claim is made. <button class="btn" data-next="strategy" style="margin-top:8px">Open search lab →</button></p></div><div class="warning">Classroom boundary: the first three cases are paraphrased from publicly accessible research and forum records. Links point to those public sources only. No restricted support materials, keys, internal endpoints, live model calls or verified device fixes are included.</div>
+  <div class="viz-hero">
+   <div class="viz-hero-main">
+    <div class="eyebrow">ZEBRA TECHDOCS · INDEPENDENT EVIDENCE FRAMEWORK</div>
+    <h1>From a question<br>to a defensible next step.</h1>
+    <p>One reusable layer for evaluating evidence, exposing uncertainty, and deciding what to check or revise. The separate team implementation can supply inputs or receive a review packet.</p>
+    <div class="row" style="margin-top:22px"><button class="btn primary" data-next="case">Start with the real question →</button><button class="btn" data-next="review">Jump to review</button></div>
+   </div>
+   <div class="viz-hero-art" aria-label="Three layer architecture: input, evaluation and controlled handoff">
+    <div class="viz-art-node"><span class="viz-art-number">01</span><div><strong>INPUT</strong><small>Public case + optional imported result</small></div></div>
+    <div class="viz-art-link"><span></span><b>↓</b></div>
+    <div class="viz-art-node center"><span class="viz-art-number">02</span><div><strong>EVALUATION</strong><small>Source limits · Unknowns · Human review</small></div></div>
+    <div class="viz-art-link"><span></span><b>↓</b></div>
+    <div class="viz-art-node"><span class="viz-art-number">03</span><div><strong>CONTROLLED HANDOFF</strong><small>Proposed revision · Copy test · Export</small></div></div>
+   </div>
+  </div>
+  <div class="viz-header">
+   <div><div class="eyebrow">LIVE WORKFLOW · THE SAME UNDERLYING CASE DATA</div><h2>One case, five decisions.</h2></div>
+   <label class="viz-case-picker">SELECT A CASE
+    <select id="viz-scenario" aria-label="Choose a case for the visual workflow">
+     <option value="0">Public · Android web integration</option>
+     <option value="1">Public · TC26 Xamarin</option>
+     <option value="2">Public · TC52 MultiBarcode</option>
+     <option value="3">Synthetic QA · Reconnect</option>
+     <option value="4">Synthetic QA · CSV encoding</option>
+    </select>
+   </label>
+  </div>
+  <div class="viz-flow" aria-label="Clickable live workflow stages">
+   <button type="button" class="viz-stage" data-next="case"><span class="viz-stage-number">01</span><strong>Question</strong><small id="viz-stage-case">PUBLIC CASE</small><span class="viz-stage-go">Open →</span></button>
+   <button type="button" class="viz-stage" data-next="evidence"><span class="viz-stage-number">02</span><strong>Evidence</strong><small id="viz-stage-evidence">2 / 3 references</small><span class="viz-stage-go">Inspect →</span></button>
+   <button type="button" class="viz-stage" data-next="review"><span class="viz-stage-number">03</span><strong>Review</strong><small id="viz-stage-review">NOT RUN</small><span class="viz-stage-go">Evaluate →</span></button>
+   <button type="button" class="viz-stage" data-next="revision"><span class="viz-stage-number">04</span><strong>Revision</strong><small id="viz-stage-revision">DRAFT ONLY</small><span class="viz-stage-go">Compare →</span></button>
+   <button type="button" class="viz-stage" data-next="retest"><span class="viz-stage-number">05</span><strong>Retest</strong><small id="viz-stage-retest">NOT RUN</small><span class="viz-stage-go">Verify →</span></button>
+  </div>
+  <div class="viz-grid">
+   <div class="viz-card">
+    <div class="viz-card-head"><span class="eyebrow">CASE / AVAILABLE RESEARCH</span><span class="viz-live-tag" id="viz-kind">PUBLIC RECORD</span></div>
+    <h3 id="viz-case-title">Android web integration</h3>
+    <p class="viz-question" id="viz-case-question"></p>
+    <div class="viz-subhead"><span>Source references</span><span id="viz-src-count">2 of 3 selected</span></div>
+    <div class="viz-source-list" id="viz-source-list" aria-label="Evidence references; checkboxes update the same case state as the Evidence page"></div>
+    <p class="viz-small">Selection means included in a review packet, <b>not verified truth</b>. Click the boxes; the Evidence page updates with them.</p>
+   </div>
+   <div class="viz-card">
+    <div class="viz-card-head"><span class="eyebrow">UNCERTAINTY MAP / DECISION STATE</span><span class="viz-live-tag muted-tag">REVIEWER CONTROLLED</span></div>
+    <div class="viz-metrics">
+     <div><strong id="viz-metric-evidence">2/3</strong><span>References selected</span></div>
+     <div><strong id="viz-metric-gaps">4</strong><span>Open context gaps</span></div>
+     <div><strong id="viz-metric-test">0</strong><span>Verified model runs here</span></div>
+    </div>
+    <div class="viz-subhead"><span>What the sources do not establish</span><span>OPEN QUESTIONS</span></div>
+    <div id="viz-gap-list" class="viz-gap-list"></div>
+    <div class="viz-decision">
+     <div><span class="viz-pulse"></span><strong id="viz-decision-title">Next: documentation-only review</strong></div>
+     <p id="viz-decision-note">No controlled model comparison has been performed for this public case.</p>
+     <button class="btn primary" data-next="review">Open decision gate →</button>
+    </div>
+   </div>
+  </div>
+  <div class="viz-handoff">
+   <div><div class="eyebrow">SEPARATE TOOL</div><h3>Agent Continue / team demo</h3><p>Can provide a result via manual JSON export and import. No live extension connection is claimed.</p></div>
+   <div class="viz-handoff-arrow">→<small>INPUT</small></div>
+   <div><div class="eyebrow">THIS FRAMEWORK</div><h3>Evaluate → decide → hand off</h3><p>Source trace, human approval, bounded revision, copy-only retest and a portable case packet.</p></div>
+   <div class="viz-handoff-arrow">→<small>OUTPUT</small></div>
+   <div><div class="eyebrow">SEPARATE IMPLEMENTATION</div><h3>Documentation workstream</h3><p>May consume a review packet. Production edits and actual device fixes are outside this prototype.</p></div>
+  </div>
+  <div class="viz-foot-actions"><span>OPTIONAL COURSE CONNECTION · The Search Lab illustrates constrained review prioritization on <b>synthetic data only</b>.</span><button class="btn" data-next="strategy">See optimization visualization →</button></div>
+  <div class="warning">Research prototype. Public-source summaries are not verified device fixes. The first three cases have no controlled model outputs; synthetic cases are clearly marked. A local copy test is not a production document update or a validated model improvement.</div>
  </section>
  <section class="page" id="case">
   <div class="eyebrow">01 · FRAME THE QUESTION</div><h1>Describe uncertainty before making claims.</h1><p class="lead">Start with real, public-source developer questions and versioned research findings. The final two cases are synthetic test fixtures. Restricted support data is not included.</p>
@@ -188,6 +272,11 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
     <div class="plan"><h3>Exact best set under budget</h3><p id="optimal-plan"></p></div>
     <div class="plan" style="background:#f8f9fa"><h3>Greedy impact-per-minute baseline</h3><p id="greedy-plan"></p></div>
     <div class="search-metric"><span>Extra priority points found by exact search</span><strong id="search-difference">0</strong></div>
+     <div class="viz-compare" aria-label="Illustrative optimization score comparison">
+      <h3>Priority coverage, side by side <span class="pill amber">TOY INPUTS ONLY</span></h3>
+      <div class="viz-compare-row"><span>Greedy</span><div class="viz-compare-track"><span id="viz-greedy-bar"></span></div><strong id="viz-greedy-value">N/A</strong></div>
+      <div class="viz-compare-row exact"><span>Exact</span><div class="viz-compare-track"><span id="viz-exact-bar"></span></div><strong id="viz-exact-value">N/A</strong></div>
+     </div>
     <p class="search-note">Objective: maximize <b>illustrative uncertainty-priority points</b> without exceeding available minutes. Priority points and time estimates were assigned for this fictional demonstration; they are not empirical risk reduction or accuracy measurements.</p>
    </div>
   </div>
@@ -328,7 +417,7 @@ function restoreSource(){
 
 function by(id){return document.getElementById(id)}
 function node(tag,txt){const x=document.createElement(tag);x.textContent=txt;return x}
-function show(page){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===page));document.querySelectorAll("[data-page]").forEach(b=>{b.classList.toggle("active",b.dataset.page===page);b.setAttribute("aria-current",b.dataset.page===page?"page":"false")});by("crumb").textContent={architecture:"Architecture",case:"Question",evidence:"Evidence",review:"Human review",diagnosis:"Failure diagnosis",revision:"Document revision",retest:"Retest",guide:"Developer preview",strategy:"Search lab",handoff:"Delivery"}[page];if(page==="strategy")renderStrategy();if(page==="diagnosis")renderDiagnosis();if(page==="revision")renderRevision();if(page==="retest")renderRetest();if(page==="guide")renderGuide();if(page==="handoff")renderDelivery();window.scrollTo(0,0)}
+function show(page){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===page));document.querySelectorAll("[data-page]").forEach(b=>{b.classList.toggle("active",b.dataset.page===page);b.setAttribute("aria-current",b.dataset.page===page?"page":"false")});by("crumb").textContent={architecture:"Architecture",case:"Question",evidence:"Evidence",review:"Human review",diagnosis:"Failure diagnosis",revision:"Document revision",retest:"Retest",guide:"Developer preview",strategy:"Search lab",handoff:"Delivery"}[page];if(page==="architecture")renderArchitecture();if(page==="strategy")renderStrategy();if(page==="diagnosis")renderDiagnosis();if(page==="revision")renderRevision();if(page==="retest")renderRetest();if(page==="guide")renderGuide();if(page==="handoff")renderDelivery();window.scrollTo(0,0)}
 
 const PRESENTER_STEPS=[
  {page:"architecture",time:"0:25",title:"Why a review framework?",say:"We are working with real developer questions, but a plausible technical answer is not always a supported one. I built a framework to track evidence, uncertainty, and what needs to be checked next.",action:"Start with the public-source research overview. Point to the research counts as collection progress, not accuracy results."},
@@ -551,10 +640,10 @@ function renderStrategy(){
   by("action-list").replaceChildren();by("plan-count").textContent="N/A";
   by("optimal-plan").textContent="NOT RUN — no measured task costs";
   by("greedy-plan").textContent="NOT RUN — no measured baseline";
-  by("search-difference").textContent="N/A";by("frontier").replaceChildren();return;
+  by("search-difference").textContent="N/A";by("frontier").replaceChildren();by("viz-greedy-bar").style.width="0";by("viz-exact-bar").style.width="0";by("viz-greedy-value").textContent="N/A";by("viz-exact-value").textContent="N/A";return;
  }
  by("budget").disabled=false;
- const items=STRATEGY_CHECKS[idx],res=searchResults(),total=items.reduce((n,x)=>n+x.points,0);
+ const items=STRATEGY_CHECKS[idx],res=searchResults(),total=items.reduce((n,x)=>n+x.points,0);by("viz-greedy-bar").style.width=(res.greedy.points/total*100)+"%";by("viz-exact-bar").style.width=(res.optimal.points/total*100)+"%";by("viz-greedy-value").textContent=res.greedy.points+" pts";by("viz-exact-value").textContent=res.optimal.points+" pts";
  by("strategy-case").textContent=EXAMPLES[idx].id+" · "+EXAMPLES[idx].question;
  by("strategy-context").textContent="SYNTHETIC QA ONLY. "+chosen.size+" of "+EXAMPLES[idx].evidence.length+" toy records selected. Priority points and minutes are illustrative, NOT measured research results.";
  by("budget").value=String(budget);by("budget-value").textContent=budget+" illustrative minutes";
@@ -724,7 +813,51 @@ by("download-guide").addEventListener("click",()=>downloadText(EXAMPLES[idx].syn
 by("download").addEventListener("click",()=>downloadText(EXAMPLES[idx].synthetic?"synthetic-research-handoff.json":"public-case-research-handoff.json",JSON.stringify(payload(),null,2)+"\n","application/json"));
 by("download-report").addEventListener("click",()=>downloadText(EXAMPLES[idx].synthetic?"synthetic-documentation-case-report.md":"public-case-documentation-report.md",reportMarkdown(),"text/markdown"));
 by("copy").addEventListener("click",async()=>{const data=JSON.stringify(payload(),null,2);try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(data)}else{const ta=document.createElement("textarea");ta.value=data;document.body.append(ta);ta.select();if(!document.execCommand("copy"))throw Error("unsupported");ta.remove()}by("copy-status").textContent="Copied"}catch(e){by("copy-status").textContent="Please use Download JSON"}});
+
+function renderArchitecture(){
+ const c=EXAMPLES[idx];
+ by("viz-scenario").value=String(idx);
+ by("viz-case-title").textContent=c.title||("Synthetic QA fixture "+String(idx-2));
+ by("viz-case-question").textContent=c.question;
+ by("viz-kind").textContent=c.synthetic?"SYNTHETIC · NOT A PRODUCT CASE":"PUBLIC CASE · NOT A VERIFIED FIX";
+ by("viz-src-count").textContent=chosen.size+" of "+c.evidence.length+" selected";
+ by("viz-metric-evidence").textContent=chosen.size+"/"+c.evidence.length;
+ by("viz-metric-gaps").textContent=String(c.gaps.length);
+ by("viz-metric-test").textContent="0";
+ by("viz-stage-case").textContent=c.synthetic?"SYNTHETIC QA":"PUBLIC RECORD";
+ by("viz-stage-evidence").textContent=chosen.size+" / "+c.evidence.length+" REFERENCES";
+ by("viz-stage-review").textContent=decision!=="not_decided"?"HUMAN DECISION RECORDED":(c.synthetic?"EXAMPLES ONLY":"NO MODEL RUN");
+ by("viz-stage-revision").textContent=revision.status==="approved_for_retest"?"LOCAL TEST APPROVED":revision.status==="rejected"?"REJECTED":"DRAFT ONLY";
+ by("viz-stage-retest").textContent=previewStatus==="applied_to_copy"?"LOCAL COPY APPLIED":"NOT RUN";
+ const sources=by("viz-source-list");sources.replaceChildren();
+ c.evidence.forEach((e,i)=>{
+  const row=document.createElement("div");row.className="viz-source"+(chosen.has(i)?" selected":"");
+  const ck=document.createElement("input");ck.type="checkbox";ck.checked=chosen.has(i);ck.setAttribute("aria-label","Include "+e.source+" in review packet");
+  ck.addEventListener("change",()=>{
+   if(ck.checked)chosen.add(i);else chosen.delete(i);
+   revokeApproval();renderEvidence();renderRevision();renderRetest();renderDelivery();renderArchitecture();
+  });
+  const details=document.createElement("div");details.className="viz-source-content";
+  details.append(node("strong",e.source),node("p",e.claim));
+  const scope=node("div","LIMIT: "+e.limit);scope.className="scope";details.append(scope);
+  row.append(ck,details);
+  if(e.url&&/^https:\/\/(developer\.zebra\.com|techdocs\.zebra\.com|github\.com)\//.test(e.url)){
+   const a=document.createElement("a");a.href=e.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent="Source ↗";a.setAttribute("aria-label","Open source for "+e.source);row.append(a);
+  }
+  sources.append(row);
+ });
+ const gaps=by("viz-gap-list");gaps.replaceChildren(...c.gaps.map(g=>{const el=node("div",g);el.className="viz-gap";return el}));
+ let title,note;
+ if(previewStatus==="applied_to_copy"){title="Local copy generated";note="The proposed text was applied only to a temporary document copy. Device checks and measured model retests are still pending."}
+ else if(revision.status==="approved_for_retest"){title="Next: local copy test";note="A human reviewer approved this bounded draft for offline retest, not publication."}
+ else if(decision==="not_decided"){title=c.synthetic?"Next: explore the QA fixture":"Next: documentation-only review";note=c.synthetic?"Illustrative candidate answers are available for a manual rubric exercise, not model benchmarking.":"The public sources contain no controlled model outputs. Record a documentation-only decision before proposing any change."}
+ else{title="Next: diagnose and revise";note="Inspect the evidence scope, classify the likely failure, and propose a traceable edit to the research note."}
+ by("viz-decision-title").textContent=title;by("viz-decision-note").textContent=note;
+}
+by("viz-scenario").addEventListener("change",e=>reset(Number(e.target.value)));
+
 reset(0);
+renderArchitecture();
 updatePresenter();
 </script>
 </body></html>
