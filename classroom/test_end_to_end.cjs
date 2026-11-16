@@ -8,7 +8,7 @@ const assert = require("node:assert/strict");
 const html = fs.readFileSync(path.join(__dirname, "evidence-framework-sandbox.html"), "utf8");
 const script = html.split("<script>")[1]?.split("</script>")[0];
 assert.ok(script, "Expected one inline application script");
-assert.equal((html.match(/<section class="page/g) || []).length, 10);
+assert.equal((html.match(/<section class="page/g) || []).length, 11);
 assert.ok(!/fetch\s*\(|XMLHttpRequest|WebSocket/i.test(html), "No automatic network requests; public sources are only click-through links");
 
 class FakeElement {
@@ -47,7 +47,7 @@ const fakeWindow = { scrollTo() {}, isSecureContext: false };
 const fakeBlob = class { constructor(parts, opts) { this.parts = parts; this.opts = opts; } };
 const fakeURL = { createObjectURL: () => "blob:fake", revokeObjectURL() {} };
 const sandbox = { document, window: fakeWindow, Blob: fakeBlob, URL: fakeURL, setTimeout: () => 1 };
-vm.runInNewContext(script + "\nthis.app={payload,gateReasons,sourceHits,importDocument,importRevision,reset,revisedFilename,revisionAdapter,searchResults,show,buildAgentContinueConfig,parseAgentContinueResponse};", sandbox, { timeout: 5000 });
+vm.runInNewContext(script + "\nthis.app={payload,gateReasons,sourceHits,importDocument,importRevision,reset,revisedFilename,revisionAdapter,searchResults,show,buildAgentContinueConfig,parseAgentContinueResponse,parseTeamCSV,teamGateState,importTeamFile,teamPacket,loadTeamCase,teamSafeURL};", sandbox, { timeout: 5000 });
 const app = sandbox.app;
 const element = id => {
   assert.ok(elements.has(id), "Missing element " + id);
@@ -286,6 +286,64 @@ async function main() {
     assert.equal(p.case.id,"SYN-02");
     assert.equal(p.patch_execution.status,"not_run");
   });
+
+  test("team CSV bridge parses quoted multiline fields without rewriting case data", () => {
+    const csv="title,question,version,source,proposal\n"+
+      '"Sample, quoted","Some question\nwith newline",13.0,https://github.com/1235357/zebra-public-site-archive,https://zebra-techdocs-practicum.vercel.app/document-reader/sc13-revised.html\n';
+    const parsed=app.parseTeamCSV(csv);
+    assert.equal(parsed.headers.length,5);
+    assert.equal(parsed.rows.length,1);
+    assert.equal(parsed.rows[0][0],"Sample, quoted");
+    assert.equal(parsed.rows[0][1],"Some question\nwith newline");
+    assert.throws(()=>app.parseTeamCSV('title,question\n"open field,unclosed'),/Unterminated/);
+    assert.equal(app.teamSafeURL("javascript:alert(1)"),"");
+  });
+  test("manual review gate cannot authorize publication or validate a device fix", () => {
+    const state=app.teamGateState({source:"checked",version:"checked",scope:"checked",device:"pass"});
+    assert.equal(state.checked,3);
+    assert.equal(state.approved,false);
+    assert.equal(state.device_fix_validated,false);
+    assert.ok(state.issues.some(x=>x.includes("self-reported")));
+  });
+  const importCsv="title,question,version,source,proposal\n"+
+    "EHS 2.8,How does link removal behave?,2.8,https://github.com/1235357/zebra-public-site-archive,https://zebra-techdocs-practicum.vercel.app/document-reader/ehs28-revised.html\n"+
+    "SET_CONFIG,How are parameters scoped?,13.0,https://github.com/1235357/zebra-public-site-archive,https://zebra-techdocs-practicum.vercel.app/document-reader/sc13-revised.html\n";
+  await app.importTeamFile({name:"team-cases.csv",size:Buffer.byteLength(importCsv),text:async()=>importCsv});
+  test("team case CSV import preserves local scope and requires explicit review", () => {
+    assert.equal(element("team-mapping").hidden,false);
+    assert.equal(element("team-case-list").children.length,2);
+    assert.ok(element("team-import-status").textContent.includes("2 case rows"));
+    const packet=app.teamPacket();
+    assert.equal(packet.case.label,"EHS 2.8");
+    assert.equal(packet.case.issue,"How does link removal behave?");
+    assert.equal(packet.gates.checked,0);
+    assert.equal(packet.release.publication_authorized,false);
+  });
+  change("team-source-status","checked");
+  change("team-version-status","checked");
+  change("team-scope-status","checked");
+  test("reviewer checkmarks only make the case ready to request technical review", () => {
+    const p=app.teamPacket();
+    assert.equal(p.gates.checked,3);
+    assert.equal(p.gates.approved,false);
+    assert.equal(p.gates.device_fix_validated,false);
+    assert.equal(p.gates.readiness,"READY TO REQUEST TECHNICAL REVIEW");
+  });
+  click("team-load-framework");
+  test("imported team case enters original review pipeline with no fabricated model run", () => {
+    const p=app.payload();
+    assert.equal(p.case.id,"TEAM-CASE-1");
+    assert.equal(p.case.question,"How does link removal behave?");
+    assert.equal(p.case.model_execution_status,"NOT_RUN");
+    assert.equal(p.recorded_answers[0].source,"NOT_RUN");
+    assert.equal(p.release.publication,false);
+    assert.equal(p.optional_search_experiment,null);
+    assert.ok(p.evidence.every(e=>e.scope_limit));
+    assert.equal(element("crumb").textContent,"Question");
+    assert.equal(element("agent-export").disabled,true);
+    assert.throws(()=>app.buildAgentContinueConfig(),/not independently cleared/);
+  });
+
   process.stdout.write("\n" + tests + " regression assertions passed.\n");
 }
 main().catch(err => { console.error(err); process.exitCode=1; });
