@@ -194,7 +194,7 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
    <label class="team-note-label">Evidence or next verification step<textarea id="team-note" class="field" rows="3" placeholder="Write what the reviewer actually checked, or which evidence is still missing."></textarea></label>
    <div class="team-result">
     <div class="row" style="justify-content:space-between"><strong id="team-readiness">HOLD · CHECK EVIDENCE</strong><span id="team-gate-count" class="pill amber">0 / 3 gates checked</span></div>
-    <div id="team-gate-progress" class="team-gate-progress"><span></span></div>
+    <div id="team-gate-progress" class="team-gate-progress"><span id="team-gate-fill"></span></div>
     <ul class="facts" id="team-next-checks"></ul>
     <p class="step-note">Technical-review readiness is not publication approval. A self-recorded device result is not independent validation.</p>
    </div>
@@ -1013,15 +1013,15 @@ function renderTeamBoard(){
  by("team-selected-question").textContent=teamCell(r,"question")||"No issue/summary field mapped. Choose the correct column before review.";
  by("team-selected-version").textContent=teamCell(r,"version")||"Not independently established";
  const src=teamSafeURL(teamCell(r,"source")),proposal=teamSafeURL(teamCell(r,"proposal"));
- const a=by("team-source-link");a.hidden=!src;if(src)a.href=src;else a.removeAttribute("href");
- const b=by("team-proposal-link");b.hidden=!proposal;if(proposal)b.href=proposal;else b.removeAttribute("href");
+ const a=by("team-source-link");a.hidden=!src;a.href=src||"#";
+ const b=by("team-proposal-link");b.hidden=!proposal;b.href=proposal||"#";
  const review=teamReview();
  for(const key of ["source","version","scope","device"])by("team-"+key+"-status").value=review[key];
  by("team-note").value=review.note;
  const state=teamGateState(review);
  by("team-readiness").textContent=state.readiness;
  by("team-gate-count").textContent=state.checked+" / 3 reviewer gates";
- by("team-gate-progress").firstElementChild.style.width=(state.checked/state.total*100)+"%";
+ by("team-gate-fill").style.width=(state.checked/state.total*100)+"%";
  by("team-next-checks").replaceChildren(...state.issues.map(v=>node("li",v)));
 }
 async function importTeamFile(file){
