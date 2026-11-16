@@ -1,5 +1,21 @@
 # Zebra Evidence Framework — research workbench and classroom demo
 
+## Nov 16: review the team's latest work without duplicating its editor
+
+The team's [public November 13 overview](https://github.com/1235357/zebra-public-site-archive/blob/main/README.md) reports **7 selected public cases**, **7 complete linked documentation articles**, and a **7-row / 19-column CSV/XLSX export**. These are *research and documentation proposals*, not independent device fixes or approvals. The separate application repository is not connected to this workbench.
+
+The [classroom demo](https://tmkbs.github.io/zebra-evidence-framework/classroom/) now includes **Team review intake**, a focused evidence-gate board:
+
+1. Open the team's own [public case CSV export](https://zebra-techdocs-practicum.vercel.app/document-reader/zebra-cases.csv), download it manually, and import it through the browser's local file input. The board **does not request, fetch, upload, or sync the CSV**. Two publicly linked proposal examples (EHS 2.8 and SET_CONFIG 13.0) are offered when no file is available; they are **not** a replica of the seven-row source.
+2. Confirm column mapping, select the case and record whether its source, version applicability, and edit scope were actually reviewed. The readiness indicator never authorizes publication or claims a device fix, even if the reviewer self-records a pass.
+3. Export a portable zebra-team-case-review/v1 JSON packet, or click **Continue in our Framework**. This creates a clearly identified *unverified research question* in the existing Question → Evidence → Review → Revision → Retest flow (without editing the teammate's production content).
+4. Agent Continue task export is intentionally **disabled for arbitrary imported CSV cases**, because locally supplied materials are not automatically cleared for submission to an external chat.
+
+The original three public-case fixtures remain available and unchanged. This addition is a local, manual integration point—not a direct connection to the private editor, production website, extension runtime, lab API, or an approved Zebra review.
+
+---
+
+
 ## Start here: the integrated presentation
 
 **[Open the live, source-grounded classroom demo](https://tmkbs.github.io/zebra-evidence-framework/classroom/)**
