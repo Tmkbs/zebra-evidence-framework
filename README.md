@@ -16,6 +16,13 @@ The original three public-case fixtures remain available and unchanged. This add
 ---
 
 
+
+## Two demo versions (November 16)
+
+**Client version:** [Zebra evidence demo](https://tmkbs.github.io/zebra-evidence-framework/classroom/), with the optional academic search lab hidden.
+
+**Course version:** [Same framework + Genetic Algorithm lab](https://tmkbs.github.io/zebra-evidence-framework/classroom/course.html). The additional view runs a real deterministic toy genetic search over twelve hypothetical verification actions, compares greedy selection and exhaustive optimum, and visualizes best-so-far fitness across generations. Its input costs and benefits are invented, not measured; the real case-review workflow remains the same.
+
 ## Start here: the integrated presentation
 
 **[Open the live, source-grounded classroom demo](https://tmkbs.github.io/zebra-evidence-framework/classroom/)**
