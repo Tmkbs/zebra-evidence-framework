@@ -196,7 +196,7 @@ function renderSelect(){
  dropdown.value=String(active);renderCase();
 }
 function renderCase(){
- const c=CASES[active];el("case-type").textContent=c.kind.toUpperCase();
+ const c=CASES[active];el("case-select").value=String(active);el("case-type").textContent=c.kind.toUpperCase();
  el("case-question").textContent=c.question;
  el("case-context").textContent=c.context;
  const box=el("case-links");box.replaceChildren();
@@ -207,7 +207,7 @@ function renderCase(){
 function scanText(text,docVersion){
  const flags=[];
  const s=String(text||"");
- if(/\b(always|guarantee(?:d|s)?|definitely|fully resolved|completely fixes?|proves?|fixed on all|works on all)\b/i.test(s))
+ if(/\b(always|guarantee(?:d|s)?|definitely|definitively|fully resolved|completely fixes?|proves?|fixed on all|works on all)\b/i.test(s))
    flags.push({code:"absolute_claim",title:"Overconfident wording detected",detail:"The draft uses absolute language, but no device or end-to-end validation is recorded."});
  if(/\b(verified|tested|confirmed)\s+(?:on|with|by)\s+(?:a|the)?\s*(?:real\s+)?device\b/i.test(s))
    flags.push({code:"device_claim",title:"Unverified device-test claim",detail:"A device-test statement cannot be supported without a recorded reproduction and test receipt."});
@@ -218,6 +218,7 @@ function scanText(text,docVersion){
 }
 function analyzeCase(c,draft){
  const open=[];
+ if(!(c.sourceRecords||[]).some(r=>safeURL(r.url)))open.push({code:"source_missing",priority:0,title:"No traceable public source URL",detail:"The imported case has no recognized public source link. Find and verify its original source before drawing technical conclusions."});
  if(!c.runtimeVersion)open.push({code:"version",priority:1,title:"Confirm installed software version",detail:"The cited document version"+(c.docVersion?" is "+c.docVersion:" is not fixed here")+", but the affected device's installed version has not been verified."});
  if(!c.sourceFrozen)open.push({code:"baseline",priority:2,title:"Verify the exact original document",detail:"This app uses source-linked research summaries; it has not retrieved and frozen the full source text or verified a line-by-line revision."});
  for(const issue of c.pending||[])open.push({code:"context",priority:2,title:issue,detail:"Requires independent review against the original technical evidence."});
