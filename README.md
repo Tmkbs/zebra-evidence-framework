@@ -1,5 +1,14 @@
 # Zebra Evidence Framework — research workbench and classroom demo
 
+## Quick Review: simplified default (November 16)
+
+Open **[Zebra Evidence Review](https://tmkbs.github.io/zebra-evidence-framework/classroom/)**. The default site is now a one-page **Select case → Run evidence check → View results** workflow. Five grounded public cases are preloaded (two team proposals and three public research cases); no setup, manual reviewer gate, CSV import, or model key is required to run the default demonstration. A user can optionally import a local public CSV or edit a test claim under a collapsed section. The engine generates a source-linked review, flags missing versions, unverified technical assumptions and unsupported absolute language, and exports a Markdown research report.
+
+**Method boundary:** this is *deterministic local rule-based review of publicly summarized source metadata*, not a live LLM inference, document crawl, complete source comparison, verified scanner fix, or customer acceptance. The source documents were not downloaded or independently checked during the automatic run. The legacy [advanced research demo](classroom/evidence-framework-sandbox.html) and the [course-only evolution lab](classroom/course.html) remain available separately; they are no longer the default client UI.
+
+---
+
+
 ## Nov 16: review the team's latest work without duplicating its editor
 
 The team's [public November 13 overview](https://github.com/1235357/zebra-public-site-archive/blob/main/README.md) reports **7 selected public cases**, **7 complete linked documentation articles**, and a **7-row / 19-column CSV/XLSX export**. These are *research and documentation proposals*, not independent device fixes or approvals. The separate application repository is not connected to this workbench.
