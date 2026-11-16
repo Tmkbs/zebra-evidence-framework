@@ -62,14 +62,28 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 .team-gate-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.team-gate-grid label{display:grid;gap:7px;font-size:11px;color:#45606b;font-weight:800}.team-gate-grid select{font-size:12px;font-weight:500;max-width:100%}.team-note-label{display:grid;gap:8px;font-size:11px;color:#486471;font-weight:800;margin-top:15px}.team-result{background:#f0f7f6;border:1px solid #cfe7df;border-radius:11px;padding:17px;margin-top:15px}.team-result strong{font-size:13px;color:#255e59}.team-result ul{margin:10px 0;padding-left:20px;font-size:11px;color:#526b72;line-height:1.65}.team-gate-progress{height:7px;border-radius:20px;background:#d8eae5;overflow:hidden;margin-top:12px}.team-gate-progress span{display:block;width:0;height:100%;background:#118879;transition:width .2s}.team-action-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 @media(max-width:1030px){.team-head{display:block}.team-buttons{justify-content:start;max-width:none;margin-top:15px}.team-map-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:750px){.team-layout{grid-template-columns:1fr}.team-list-panel,.team-main-panel{padding:15px}}@media(max-width:510px){.team-map-fields,.team-gate-grid{grid-template-columns:1fr}.team-head{padding:15px}}
 
+
+body[data-demo-mode="client"] .course-only{display:none!important}
+.course-back{font-size:11px;color:#08796b;font-weight:800;text-decoration:none;border:1px solid #c6dfda;padding:8px;border-radius:8px}
+.course-ribbon{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #b8dfd3;background:#eaf7f1;padding:15px 18px;margin-bottom:16px;border-radius:12px;font-size:12px;color:#355e5b}
+.course-ribbon b{font-size:13px}
+.evo-top{background:linear-gradient(110deg,#163247,#1d6c6a);color:white;border-radius:14px;padding:27px;margin-bottom:18px}.evo-top .eyebrow{color:#a5ead8}.evo-top p{color:#e1f2ec;font-size:12px;line-height:1.7;margin:6px 0 0}
+.evo-layout{display:grid;grid-template-columns:minmax(240px,.82fr) minmax(0,1.18fr);gap:14px;margin-bottom:20px}.evo-panel{min-width:0;background:white;border:1px solid #d6e5e4;border-radius:13px;padding:21px}
+.evo-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.evo-stat-row>div{text-align:center;background:#f0f6f4;border-radius:10px;padding:13px 5px}.evo-stat-row strong{display:block;font-size:26px;color:#0a756b}.evo-stat-row span{font-size:10px;color:#657e87}
+.evo-bar-row{display:grid;grid-template-columns:57px 1fr 48px;align-items:center;gap:8px;font-size:11px;margin:10px 0}.evo-bar-track{background:#e3eeeb;height:11px;border-radius:20px;overflow:hidden}.evo-bar-track>span{display:block;background:#91b1b1;height:100%;width:0}.evo-bar-row.genetic .evo-bar-track>span{background:#179a83}.evo-bar-row.exact .evo-bar-track>span{background:#214f68}
+.evo-plot{display:flex;align-items:flex-end;height:112px;gap:3px;border-bottom:1px solid #b8ccca;margin:15px 0 7px;padding-top:8px}.evo-plot>div{flex:1;height:100%;min-width:2px;display:flex;align-items:flex-end}.evo-plot>div>span{background:linear-gradient(#62cbb2,#148a76);display:block;width:100%;min-height:2px;border-radius:3px 3px 0 0}
+.evo-check{display:grid;grid-template-columns:22px 1fr 85px;gap:5px;align-items:center;border-bottom:1px solid #ecf0f1;padding:8px 0;font-size:11px;color:#56707a}.evo-check.selected{color:#097a6d;font-weight:800}.evo-check small{text-align:right;color:#667e88}.evo-chromosome{padding:12px 13px;background:#e8f6f0;border:1px solid #c7e5da;border-radius:8px;font-family:monospace;font-size:17px;letter-spacing:.22em;color:#13766b;font-weight:850;overflow-wrap:anywhere}
+.evo-controls{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.evo-hint{font-size:11px;line-height:1.65;color:#667e88;margin:11px 0}.evo-legacy{background:white;border:1px solid #d6e5e4;border-radius:11px;padding:18px;margin-top:15px}.evo-legacy>summary{font-size:12px;color:#436c72;cursor:pointer;font-weight:800}
+@media(max-width:980px){.evo-layout{grid-template-columns:1fr}.course-ribbon{flex-direction:column;align-items:start}}@media(max-width:520px){.evo-panel{padding:14px}.evo-stat-row strong{font-size:22px}}
+
 </style>
 </head>
 <body>
 <div class="app"><aside class="side">
  <div class="brand"><div class="mark">F</div><h2>Evidence Framework</h2><span>PUBLIC CASE RESEARCH / OFFLINE REVIEW</span></div>
- <nav class="nav"><button class="active" data-page="architecture"><b>00</b><span class="name">Architecture</span></button><button data-page="team-board"><b>↳</b><span class="name">Team review intake</span></button><button data-page="case"><b>01</b><span class="name">Question</span></button><button data-page="evidence"><b>02</b><span class="name">Evidence</span></button><button data-page="review"><b>03</b><span class="name">Review</span></button><button data-page="diagnosis"><b>04</b><span class="name">Failure diagnosis</span></button><button data-page="revision"><b>05</b><span class="name">Document revision</span></button><button data-page="retest"><b>06</b><span class="name">Retest</span></button><button data-page="guide"><b>07</b><span class="name">Developer preview</span></button><button data-page="handoff"><b>08</b><span class="name">Delivery packet</span></button><button data-page="strategy"><b>+</b><span class="name">Optional search lab</span></button></nav>
+ <nav class="nav"><button class="active" data-page="architecture"><b>00</b><span class="name">Architecture</span></button><button data-page="team-board"><b>↳</b><span class="name">Team review intake</span></button><button data-page="case"><b>01</b><span class="name">Question</span></button><button data-page="evidence"><b>02</b><span class="name">Evidence</span></button><button data-page="review"><b>03</b><span class="name">Review</span></button><button data-page="diagnosis"><b>04</b><span class="name">Failure diagnosis</span></button><button data-page="revision"><b>05</b><span class="name">Document revision</span></button><button data-page="retest"><b>06</b><span class="name">Retest</span></button><button data-page="guide"><b>07</b><span class="name">Developer preview</span></button><button data-page="handoff"><b>08</b><span class="name">Delivery packet</span></button><button class="course-only" data-page="strategy"><b>+</b><span class="name">Evolution lab</span></button></nav>
  <div class="sidefoot">Framework evaluation and documentation revision remain separate workstreams. This sandbox connects them using a local draft contract, not private source code.</div>
- </aside><main><div class="bar"><span>Research prototype / <strong id="crumb">Architecture</strong></span><div class="bar-actions"><button type="button" class="presenter-toggle" id="presenter-toggle" aria-expanded="false" aria-controls="presenter-panel">Presenter mode · 5 min</button><span class="flag">OFFLINE · PUBLIC SOURCE SUMMARIES</span></div></div>
+ </aside><main><div class="bar"><span>Research prototype / <strong id="crumb">Architecture</strong></span><div class="bar-actions"><button type="button" class="presenter-toggle" id="presenter-toggle" aria-expanded="false" aria-controls="presenter-panel">Presenter mode · 5 min</button><a href="./evidence-framework-sandbox.html" class="course-back course-only">Zebra version ↗</a><span class="flag">OFFLINE · PUBLIC SOURCE SUMMARIES</span></div></div>
  <div class="content">
  <aside id="presenter-panel" class="presenter-panel" hidden aria-labelledby="presenter-heading">
    <div class="panel-bar"><span class="panel-title" id="presenter-heading">Live demo cue cards</span><button type="button" id="presenter-close" class="panel-close" aria-label="Close presenter notes">×</button></div>
@@ -85,6 +99,7 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
  </aside>
 
  <section class="page active" id="architecture">
+  <div class="course-ribbon course-only"><span><b>Course add-on · Evolutionary Computation</b> — Actual genetic search on hypothetical review tasks; same evidence workflow below.</span><button class="btn primary" data-next="strategy">Open genetic lab →</button></div>
   <div class="viz-hero">
    <div class="viz-hero-main">
     <div class="eyebrow">ZEBRA TECHDOCS · INDEPENDENT EVIDENCE FRAMEWORK</div>
@@ -152,7 +167,7 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
    <div class="viz-handoff-arrow">→<small>OUTPUT</small></div>
    <div><div class="eyebrow">SEPARATE IMPLEMENTATION</div><h3>Documentation workstream</h3><p>May consume a review packet. Production edits and actual device fixes are outside this prototype.</p></div>
   </div>
-  <div class="viz-foot-actions"><span>OPTIONAL COURSE CONNECTION · The Search Lab illustrates constrained review prioritization on <b>synthetic data only</b>.</span><button class="btn" data-next="strategy">See optimization visualization →</button></div>
+  <div class="viz-foot-actions course-only"><span>OPTIONAL COURSE CONNECTION · The Search Lab illustrates constrained review prioritization on <b>synthetic data only</b>.</span><button class="btn" data-next="strategy">See optimization visualization →</button></div>
   <div class="warning">Research prototype. Public-source summaries are not verified device fixes. The first three cases have no controlled model outputs; synthetic cases are clearly marked. A local copy test is not a production document update or a validated model improvement.</div>
  </section>
  
@@ -251,7 +266,7 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 <label class="eyebrow" for="diagnosis-note" style="display:block;margin-top:17px">REVIEWER NOTES</label><textarea class="field" id="diagnosis-note" rows="4" placeholder="What evidence supports this classification? What remains unknown?"></textarea>
 </div><div class="card"><div class="eyebrow">GATE LOGIC</div><h3 id="diagnosis-title">Unassessed</h3><p id="diagnosis-explanation"></p><div class="gate" id="diagnosis-gate"></div>
 <p>The classification is always a hypothesis until a discriminating test supports it. A proposed documentation clarification is not a verified device fix.</p></div></div>
-<div class="row" style="margin-top:17px"><button class="btn" data-next="strategy">Optional: explore review priorities →</button></div>
+<div class="row course-only" style="margin-top:17px"><button class="btn" data-next="strategy">Optional: explore review priorities →</button></div>
 <div class="next"><span>4 / 8 · Review the cause</span><button class="btn primary" data-next="revision">Propose a minimal documentation change →</button></div>
 </section>
 <section class="page" id="revision">
@@ -315,8 +330,31 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 <div class="next"><span>7 / 8 · Developer-facing concept</span><button class="btn primary" data-next="handoff">Export research delivery packet →</button></div>
 </section>
  <section class="page" id="strategy">
-  <div class="eyebrow">04 · OPTIONAL COMPUTATIONAL EXPLORATION</div><h1>Which unknown should we check first?</h1>
-  <p class="lead">With a limited human-review budget, the framework must decide which verification actions to prioritize. Compare a transparent greedy rule against an exact search of possible action sets. This is combinatorial optimization—not a genetic algorithm, neural-network training, or a measured project result.</p>
+  <div class="eyebrow">EVOLUTIONARY COMPUTATION · REAL ALGORITHM / SYNTHETIC INPUTS</div>
+<h1>Which uncertainty should we verify first?</h1>
+<p class="lead">Twelve hypothetical review actions, a limited time budget, and an actual genetic algorithm. Each binary chromosome selects verification actions; selection, one-point crossover, mutation and elitism search for high-value feasible plans. An exhaustive exact search over 4,096 subsets gives a toy ground truth.</p>
+<div class="evo-top"><div class="eyebrow">THE CONNECTION TO THE FRAMEWORK</div><h2>Evidence gaps become a constrained search problem.</h2><p>The existing Framework identifies what is missing. This optional experiment asks which checks would be worth doing first if their costs and expected benefits were known. Values below are invented for teaching, not measured from the Zebra team.</p></div>
+<div class="evo-layout" id="evo-lab"><div class="evo-panel">
+<div class="eyebrow">01 · SELECT VERIFICATION ACTIONS</div><h3>Budget and candidate checks</h3>
+<label for="evo-budget" class="row" style="justify-content:space-between;font-size:12px"><strong>Toy time budget</strong><b id="evo-budget-label">20 minutes</b></label>
+<input id="evo-budget" type="range" min="10" max="34" step="1" value="20" class="search-range">
+<p class="evo-hint">12 actions · 4,096 subsets · arbitrary time and priority points</p><div id="evo-checks"></div></div>
+<div class="evo-panel"><div class="eyebrow">02 · SEARCH & COMPARE</div><h3>Best priority score under budget</h3>
+<div class="evo-stat-row"><div><strong id="evo-greedy">—</strong><span>Greedy</span></div><div><strong id="evo-ga">—</strong><span>Genetic</span></div><div><strong id="evo-exact">—</strong><span>Exact</span></div></div>
+<div class="evo-bar-row"><span>Greedy</span><div class="evo-bar-track"><span id="evo-greedy-bar"></span></div><strong id="evo-greedy-text">—</strong></div>
+<div class="evo-bar-row genetic"><span>Genetic</span><div class="evo-bar-track"><span id="evo-ga-bar"></span></div><strong id="evo-ga-text">—</strong></div>
+<div class="evo-bar-row exact"><span>Exact</span><div class="evo-bar-track"><span id="evo-exact-bar"></span></div><strong id="evo-exact-text">—</strong></div>
+<div class="row" style="justify-content:space-between;margin-top:16px"><strong style="font-size:12px">Best-so-far fitness</strong><span class="pill" id="evo-gen">Gen 0 / 25</span></div>
+<div class="evo-plot" id="evo-plot" role="img" aria-label="Best feasible fitness across genetic generations"></div>
+<div class="row" style="justify-content:space-between"><small class="evo-hint">Generation 0</small><small class="evo-hint">Generation 25</small></div>
+<div class="evo-controls"><button class="btn" type="button" id="evo-step">Next generation →</button><button class="btn primary" type="button" id="evo-run">Run 25 generations</button><button class="btn" type="button" id="evo-reseed">New seed</button></div>
+<p class="evo-hint" id="evo-description"></p><div class="eyebrow" style="margin-top:15px">BEST CHROMOSOME</div><div class="evo-chromosome" id="evo-chromosome">000000000000</div><p class="evo-hint" id="evo-selected"></p>
+<p class="evo-hint">Population 28 · elitism 2 · crossover probability 0.8 · bit mutation probability 0.06. Fitness maximizes invented points within the time constraint. Evolution may not reach the exact optimum.</p>
+</div></div>
+<div class="warning"><b>Academic boundary:</b> Algorithmic computation is real; the data and utility scores are fictional. No claims about real Zebra review time, error reduction, model accuracy or evolutionary superiority.</div>
+<details class="evo-legacy"><summary>Earlier five-check greedy/exact exercise (synthetic only)</summary>
+<p class="evo-hint">The original baseline remains available. It does not use a genetic algorithm.</p>
+
   <div class="grid">
    <div class="card">
     <div class="eyebrow">SYNTHETIC INPUTS · CURRENT CASE</div><h3 id="strategy-case">Fictional case</h3>
@@ -346,7 +384,8 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
    <div id="frontier"></div>
   </div>
   <div class="warning"><b>Connection to the course:</b> the framework has a discrete search space, an explicit objective, a resource constraint and a baseline algorithm. Evolutionary search could be evaluated later on larger, real and permitted datasets; this small example deliberately uses exact search as its ground truth and makes no evolutionary-computation performance claims.</div>
-  <div class="next"><span>Optional optimization exploration</span><button class="btn" data-next="diagnosis">Return to the main workflow →</button></div>
+  </details>
+<div class="next"><span>Course-only optimization lab</span><button class="btn" data-next="handoff">Return to framework →</button></div>
  </section>
  <section class="page" id="handoff">
 <div class="eyebrow">08 · DELIVERY PACKAGE</div><h1>A traceable record from question to proposed revision.</h1>
@@ -361,6 +400,76 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
  </div></main></div>
 <script>
 "use strict";
+
+const COURSE_MODE=/(?:^|[?&])mode=course(?:&|$)/.test(window.location?.search||"");
+document.body.dataset.demoMode=COURSE_MODE?"course":"client";
+const EVO_TASKS=[
+["Confirm software version",3,8],["Read original report",4,8],["Cross-check official API",6,14],
+["Inspect request payload",5,11],["Collect response logs",5,12],["Compare saved profiles",4,8],
+["Reproduce minimal fixture",7,15],["Check code example",6,10],["Check source applicability",3,5],
+["Review alternative causes",5,9],["Inspect runtime environment",4,7],["Prepare reviewer summary",4,6]
+].map(([name,minutes,points])=>({name,minutes,points}));
+let evoBudget=20,evoSeed=20261116,evoGeneration=0;
+function makePlan(items,mask){let minutes=0,points=0;const labels=[];items.forEach((t,i)=>{if(mask&(1<<i)){minutes+=t.minutes;points+=t.points;labels.push(t.name)}});return {mask,minutes,points,labels}}
+function comparePlan(a,b){return b.points-a.points||a.minutes-b.minutes||a.mask-b.mask}
+function exactPlan(items,budget){if(items.length>16)throw Error("Too many toy tasks");let best=makePlan(items,0);for(let mask=1;mask<(1<<items.length);mask++){const p=makePlan(items,mask);if(p.minutes<=budget&&comparePlan(p,best)<0)best=p}return best}
+function greedyPlan(items,budget){let mask=0,minutes=0;const sorted=items.map((t,i)=>({...t,i})).sort((a,b)=>b.points/b.minutes-a.points/a.minutes||a.i-b.i);for(const t of sorted)if(minutes+t.minutes<=budget){minutes+=t.minutes;mask|=(1<<t.i)}return makePlan(items,mask)}
+function geneticSearch(items,budget,seed,generations){
+ if(items.length<2||items.length>16||!Number.isInteger(budget)||budget<0||!Number.isInteger(generations)||generations<0||generations>25)throw Error("Invalid genetic search configuration");
+ let st=seed>>>0;const rng=()=>{st=(Math.imul(st,1664525)+1013904223)>>>0;return st/4294967296};
+ const n=items.length,full=(1<<n)-1,size=28;
+ function repair(mask){let p=makePlan(items,mask);while(p.minutes>budget){const bits=[];for(let i=0;i<n;i++)if(mask&(1<<i))bits.push(i);if(!bits.length)break;mask&=~(1<<bits[Math.floor(rng()*bits.length)]);p=makePlan(items,mask)}return mask}
+ function tournament(ranked){let v=ranked[Math.floor(rng()*size)];for(let k=0;k<2;k++){const x=ranked[Math.floor(rng()*size)];if(comparePlan(x,v)<0)v=x}return v.mask}
+ let population=Array.from({length:size},()=>repair(Math.floor(rng()*(full+1))));
+ let best=makePlan(items,0);const history=[];
+ for(let gen=0;gen<=generations;gen++){
+  const ranked=population.map(mask=>makePlan(items,mask)).sort(comparePlan);
+  if(comparePlan(ranked[0],best)<0)best=ranked[0];
+  history.push(best.points);
+  if(gen===generations)break;
+  const next=[ranked[0].mask,ranked[1].mask];
+  while(next.length<size){
+   const a=tournament(ranked),b=tournament(ranked);
+   let child=a;
+   if(rng()<.8){const cut=1+Math.floor(rng()*(n-1)),low=(1<<cut)-1;child=(a&low)|(b&(~low&full))}
+   for(let bit=0;bit<n;bit++)if(rng()<.06)child^=1<<bit;
+   next.push(repair(child&full));
+  }
+  population=next;
+ }
+ return {best,history,evaluations:size*(generations+1)};
+}
+function renderEvo(){
+ const greedy=greedyPlan(EVO_TASKS,evoBudget),exact=exactPlan(EVO_TASKS,evoBudget),ga=geneticSearch(EVO_TASKS,evoBudget,evoSeed,evoGeneration);
+ const optimum=exact.points||1;
+ by("evo-budget").value=String(evoBudget);by("evo-budget-label").textContent=evoBudget+" toy minutes";
+ by("evo-gen").textContent="Gen "+evoGeneration+" / 25";
+ for(const [key,p] of [["greedy",greedy],["ga",ga.best],["exact",exact]]){
+  by("evo-"+key).textContent=String(p.points);
+  by("evo-"+key+"-text").textContent=p.points+" pts";
+  by("evo-"+key+"-bar").style.width=(100*p.points/optimum)+"%";
+ }
+ const chart=by("evo-plot");chart.replaceChildren();
+ for(let i=0;i<ga.history.length;i++){
+  const col=document.createElement("div"),bar=document.createElement("span");
+  bar.style.height=(100*ga.history[i]/optimum)+"%";
+  col.title="Generation "+i+": "+ga.history[i]+" toy points";col.append(bar);chart.append(col);
+ }
+ const checks=by("evo-checks");checks.replaceChildren();
+ EVO_TASKS.forEach((task,i)=>{
+  const row=document.createElement("div");row.className="evo-check"+(ga.best.mask&(1<<i)?" selected":"");
+  row.append(node("span",ga.best.mask&(1<<i)?"✓":"○"),node("span",task.name),node("small",task.minutes+" min · "+task.points+" pts"));checks.append(row)
+ });
+ by("evo-chromosome").textContent=ga.best.mask.toString(2).padStart(EVO_TASKS.length,"0");
+ by("evo-selected").textContent="Selected "+ga.best.labels.length+" checks in "+ga.best.minutes+"/"+evoBudget+" toy minutes: "+(ga.best.labels.join(", ")||"None")+".";
+ by("evo-description").textContent="Seed "+(evoSeed>>>0)+" · "+ga.evaluations+" candidate evaluations · GA is "+(exact.points-ga.best.points)+" toy points below the exact optimum.";
+ by("evo-step").disabled=evoGeneration===25;by("evo-run").disabled=evoGeneration===25;
+}
+by("evo-budget").addEventListener("input",e=>{evoBudget=Number(e.target.value);evoGeneration=0;renderEvo()});
+by("evo-step").addEventListener("click",()=>{evoGeneration=Math.min(25,evoGeneration+1);renderEvo()});
+by("evo-run").addEventListener("click",()=>{evoGeneration=25;renderEvo()});
+by("evo-reseed").addEventListener("click",()=>{evoSeed=(evoSeed+1009)>>>0;evoGeneration=0;renderEvo()});
+
 const EXAMPLES=[
 {"id":"ZF-WEB-INTEGRATION","synthetic":false,"title":"Android web integration","record_kind":"PUBLIC_PROJECT_REPORT","case_url":"https://developer.zebra.com/content/zebra-android-web-application-development-datawedge-and-enterprise-browser-integration-1","report_url":"https://github.com/1235357/zebra-public-site-archive/blob/main/faculty-checkin-2026-11-02/demo/report.json","source_status":"Public case report, 2026-11-02; not adjudicated","model_status":"NOT_RUN","question":"For an Android web app, which of seven device-integration requirements have documentation support, including on-screen scan control?","facts":["Original developer question compares Chrome with Enterprise Browser.","The public team report records partial documentation evidence for software scan commands in DataWedge 15.0.","The reported device identifiers, installed versions and browser-to-native integration are unverified."],"gaps":["Installed DataWedge/Android versions","Chrome-to-native integration route","Six other requirements not reviewed in this report","Independent device test"],"evidence":[{"id":"WEB-FORUM","source":"Original public developer question","claim":"A developer asks about Android web app scan control and six other device-integration needs.","limit":"No independent compatibility or runtime verification.","url":"https://developer.zebra.com/content/zebra-android-web-application-development-datawedge-and-enterprise-browser-integration-1"},{"id":"WEB-DW15","source":"Official DataWedge 15.0 Soft Scan Trigger","claim":"Documents native scan commands subject to active profile configuration.","limit":"Does not prove Chrome can invoke them or that installed software supports the cited version.","url":"https://techdocs.zebra.com/datawedge/15-0/guide/api/softscantrigger/"},{"id":"WEB-REVIEW","source":"Public case-review report (November 2)","claim":"One requirement has partial document evidence; six are not assessed.","limit":"Editorial review, not a model run, device test or client acceptance.","url":"https://github.com/1235357/zebra-public-site-archive/blob/main/faculty-checkin-2026-11-02/demo/report.json"}],"a":"","b":""},
 {"id":"PUBLIC-TC26-XAMARIN","synthetic":false,"title":"TC26 Xamarin scanner configuration","record_kind":"PUBLIC_ARCHIVED_FORUM","case_url":"https://developer.zebra.com/content/zebra-tc26-scanner-does-not-scan-when-config-changed-code-xamarin","report_url":"https://github.com/1235357/zebra-public-site-archive/blob/main/README.md","source_status":"Original public forum capture; fix not independently tested","model_status":"NOT_RUN","question":"Why does the TC26 scanner reportedly stop responding after obtaining BarcodeManager during Xamarin startup?","facts":["The reporter says scanning worked before the startup configuration change.","Their report associates a nonresponsive trigger with BarcodeManager initialization.","A later forum reply points to an outside discussion without providing a verified device test record."],"gaps":["Full startup/lifecycle code","Installed EMDK and Android versions","Scanner status logs","Device reproduction"],"evidence":[{"id":"TC26-QUESTION","source":"Public TC26 Xamarin forum question","claim":"Reports a nonresponsive scanner after a configuration change.","limit":"Original report records a symptom, not a confirmed cause.","url":"https://developer.zebra.com/content/zebra-tc26-scanner-does-not-scan-when-config-changed-code-xamarin"},{"id":"TC26-REPLIES","source":"Replies in the same thread","claim":"A responder refers readers to a separate technical discussion.","limit":"Reply is not an independently tested resolution.","url":"https://developer.zebra.com/content/zebra-tc26-scanner-does-not-scan-when-config-changed-code-xamarin"},{"id":"TC26-OVERVIEW","source":"Team public project overview (November 10)","claim":"The team reports a TC26 scanner-lifecycle case analysis on its read-only website.","limit":"The public overview does not identify this archived thread as the same analyzed case.","url":"https://github.com/1235357/zebra-public-site-archive/blob/main/README.md"}],"a":"","b":""},
@@ -489,13 +598,14 @@ const PRESENTER_STEPS=[
  {page:"revision",time:"0:55",title:"Propose a bounded research-note edit",say:"We can make the uncertainty explicit in a research-note draft without modifying Zebra's original manual. A reviewer must acknowledge the scope before a local copy check.",action:"Show before versus after, acknowledge copy-only testing and approve the note for local retest."},
  {page:"retest",time:"0:40",title:"Retest what we can actually test",say:"The proposed text is applied to a temporary copy. This verifies our handoff mechanism, but not a device fix, model improvement or production publication.",action:"Apply to temporary copy. Keep the held-out and device checks marked NOT RUN unless independently performed."},
  {page:"handoff",time:"0:20",title:"Finish with one review record",say:"The exported packet preserves the question, evidence limits, reviewer decision, proposed note and what remains unverified. That's what the separate documentation implementation could consume.",action:"Export a case report or JSON. If showing a CSV imported case, the original source stays separate from this review packet."}
-];
+ ];
+if(COURSE_MODE)PRESENTER_STEPS.push({page:"strategy",time:"0:55",title:"An evolutionary decision experiment",say:"Our framework identifies missing evidence. Prioritizing which checks to perform first is a constrained search problem. This small seeded genetic algorithm uses hypothetical action costs and benefits. We compare it with greedy selection and an exact solution.",action:"Run 25 generations and show the changing best chromosome. It is a working algorithm, not measured improvement on Zebra data."});
 let presenterStep=0,presenterOpen=false;
 function updatePresenter(){
  const step=PRESENTER_STEPS[presenterStep];
  by("presenter-panel").hidden=!presenterOpen;
  by("presenter-toggle").setAttribute("aria-expanded",presenterOpen?"true":"false");
- by("presenter-toggle").textContent=presenterOpen?"Hide presenter notes":"Presenter mode · 5 min";
+ by("presenter-toggle").textContent=presenterOpen?"Hide presenter notes":(COURSE_MODE?"Presenter mode · 6 min":"Presenter mode · 5 min");
  by("presenter-count").textContent=String(presenterStep+1).padStart(2,"0")+" / "+String(PRESENTER_STEPS.length).padStart(2,"0")+" · "+step.time;
  by("presenter-progress").style.width=((presenterStep+1)/PRESENTER_STEPS.length*100)+"%";
  by("presenter-title").textContent=step.title;
@@ -1102,6 +1212,7 @@ renderTeamBoard();
 
 reset(0);
 renderArchitecture();
+renderEvo();
 updatePresenter();
 </script>
 </body></html>
