@@ -53,12 +53,21 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
 @media(max-width:740px){.viz-grid{grid-template-columns:1fr}.viz-flow{grid-template-columns:repeat(5,minmax(125px,1fr));overflow-x:auto;padding-bottom:10px}.viz-stage:not(:last-child):after{display:none}.viz-card{padding:18px}.viz-handoff{grid-template-columns:1fr;gap:4px}.viz-handoff-arrow{transform:rotate(90deg)}.viz-handoff-arrow small{display:none}}
 @media(max-width:520px){.viz-hero{padding:24px}.viz-hero-art{display:none}.viz-case-picker,.viz-case-picker select{width:100%;min-width:0}.viz-gap-list{grid-template-columns:1fr}.viz-metrics strong{font-size:22px}}
 
+
+/* Team case intake: deliberate, bounded bridge into the existing review pipeline. */
+.team-head{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:22px;background:#e8f3f2;border:1px solid #d5e6e3;border-radius:14px;margin:23px 0 12px}
+.team-head h2{margin:7px 0}.team-head p{font-size:12px;max-width:660px;color:#617883;line-height:1.6}.team-buttons{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;max-width:390px}.team-buttons a.btn{text-decoration:none;display:inline-flex;align-items:center}.team-upload{position:relative;cursor:pointer;display:inline-flex;align-items:center}.team-mapping{background:#fff;border:1px solid #dce7e7;border-radius:13px;padding:18px;margin-top:16px}.team-mapping[hidden]{display:none}.team-map-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.team-map-fields label{font-size:11px;font-weight:800;color:#5e7582;display:grid;gap:7px}
+.team-layout{display:grid;grid-template-columns:minmax(210px,.38fr) minmax(0,1fr);gap:15px;margin-top:16px;align-items:start}.team-list-panel,.team-main-panel{background:#fff;border:1px solid #dbe7ea;border-radius:14px;padding:20px}.team-case-list{display:grid;gap:8px}.team-case-button{width:100%;display:flex;gap:9px;text-align:left;border:1px solid #e1e9ec;background:#f9fbfb;color:#254858;border-radius:9px;padding:12px;cursor:pointer}.team-case-button.active{border-color:#78c7b4;background:#e9f8f3}.team-case-button .team-num{font-size:11px;color:#0a8879;font-weight:900;flex:0 0 21px}.team-case-button strong{font-size:12px;line-height:1.4;display:block}.team-case-button small{display:block;font-size:10px;color:#748794;margin-top:5px}
+.team-main-panel h2{font-size:24px;margin:4px 0 13px}.team-case-question{font-size:13px;line-height:1.7;background:#eef7f5;border-left:3px solid #189282;padding:14px;color:#385864;border-radius:8px;overflow-wrap:anywhere}.team-meta{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.team-meta>div{background:#f7fafb;border:1px solid #e4ecee;padding:12px;border-radius:9px}.team-meta small{display:block;color:#68808b;font-size:10px}.team-meta strong{display:block;color:#385764;font-size:12px;margin-top:5px;overflow-wrap:anywhere}.team-doc-link{font-size:11px;font-weight:800;color:#097e71}.team-doc-link[hidden]{display:none}.team-divider{height:1px;background:#e4eded;margin:19px 0}
+.team-gate-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.team-gate-grid label{display:grid;gap:7px;font-size:11px;color:#45606b;font-weight:800}.team-gate-grid select{font-size:12px;font-weight:500;max-width:100%}.team-note-label{display:grid;gap:8px;font-size:11px;color:#486471;font-weight:800;margin-top:15px}.team-result{background:#f0f7f6;border:1px solid #cfe7df;border-radius:11px;padding:17px;margin-top:15px}.team-result strong{font-size:13px;color:#255e59}.team-result ul{margin:10px 0;padding-left:20px;font-size:11px;color:#526b72;line-height:1.65}.team-gate-progress{height:7px;border-radius:20px;background:#d8eae5;overflow:hidden;margin-top:12px}.team-gate-progress span{display:block;width:0;height:100%;background:#118879;transition:width .2s}.team-action-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+@media(max-width:1030px){.team-head{display:block}.team-buttons{justify-content:start;max-width:none;margin-top:15px}.team-map-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:750px){.team-layout{grid-template-columns:1fr}.team-list-panel,.team-main-panel{padding:15px}}@media(max-width:510px){.team-map-fields,.team-gate-grid{grid-template-columns:1fr}.team-head{padding:15px}}
+
 </style>
 </head>
 <body>
 <div class="app"><aside class="side">
  <div class="brand"><div class="mark">F</div><h2>Evidence Framework</h2><span>PUBLIC CASE RESEARCH / OFFLINE REVIEW</span></div>
- <nav class="nav"><button class="active" data-page="architecture"><b>00</b><span class="name">Architecture</span></button><button data-page="case"><b>01</b><span class="name">Question</span></button><button data-page="evidence"><b>02</b><span class="name">Evidence</span></button><button data-page="review"><b>03</b><span class="name">Review</span></button><button data-page="diagnosis"><b>04</b><span class="name">Failure diagnosis</span></button><button data-page="revision"><b>05</b><span class="name">Document revision</span></button><button data-page="retest"><b>06</b><span class="name">Retest</span></button><button data-page="guide"><b>07</b><span class="name">Developer preview</span></button><button data-page="handoff"><b>08</b><span class="name">Delivery packet</span></button><button data-page="strategy"><b>+</b><span class="name">Optional search lab</span></button></nav>
+ <nav class="nav"><button class="active" data-page="architecture"><b>00</b><span class="name">Architecture</span></button><button data-page="team-board"><b>↳</b><span class="name">Team review intake</span></button><button data-page="case"><b>01</b><span class="name">Question</span></button><button data-page="evidence"><b>02</b><span class="name">Evidence</span></button><button data-page="review"><b>03</b><span class="name">Review</span></button><button data-page="diagnosis"><b>04</b><span class="name">Failure diagnosis</span></button><button data-page="revision"><b>05</b><span class="name">Document revision</span></button><button data-page="retest"><b>06</b><span class="name">Retest</span></button><button data-page="guide"><b>07</b><span class="name">Developer preview</span></button><button data-page="handoff"><b>08</b><span class="name">Delivery packet</span></button><button data-page="strategy"><b>+</b><span class="name">Optional search lab</span></button></nav>
  <div class="sidefoot">Framework evaluation and documentation revision remain separate workstreams. This sandbox connects them using a local draft contract, not private source code.</div>
  </aside><main><div class="bar"><span>Research prototype / <strong id="crumb">Architecture</strong></span><div class="bar-actions"><button type="button" class="presenter-toggle" id="presenter-toggle" aria-expanded="false" aria-controls="presenter-panel">Presenter mode · 5 min</button><span class="flag">OFFLINE · PUBLIC SOURCE SUMMARIES</span></div></div>
  <div class="content">
@@ -81,7 +90,7 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
     <div class="eyebrow">ZEBRA TECHDOCS · INDEPENDENT EVIDENCE FRAMEWORK</div>
     <h1>From a question<br>to a defensible next step.</h1>
     <p>One reusable layer for evaluating evidence, exposing uncertainty, and deciding what to check or revise. The separate team implementation can supply inputs or receive a review packet.</p>
-    <div class="row" style="margin-top:22px"><button class="btn primary" data-next="case">Start with the real question →</button><button class="btn" data-next="review">Jump to review</button></div>
+    <div class="row" style="margin-top:22px"><button class="btn primary" data-next="team-board">Start from the team's latest cases →</button><button class="btn" data-next="review">Jump to review</button></div>
    </div>
    <div class="viz-hero-art" aria-label="Three layer architecture: input, evaluation and controlled handoff">
     <div class="viz-art-node"><span class="viz-art-number">01</span><div><strong>INPUT</strong><small>Public case + optional imported result</small></div></div>
@@ -91,6 +100,7 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
     <div class="viz-art-node"><span class="viz-art-number">03</span><div><strong>CONTROLLED HANDOFF</strong><small>Proposed revision · Copy test · Export</small></div></div>
    </div>
   </div>
+  <div class="viz-foot-actions"><span><strong>Team update · November 13:</strong> 7 selected public cases and 7 complete articles reported. Revisions remain proposals, not confirmed fixes.</span><button class="btn" data-next="team-board">Import & review team cases →</button></div>
   <div class="viz-header">
    <div><div class="eyebrow">LIVE WORKFLOW · THE SAME UNDERLYING CASE DATA</div><h2>One case, five decisions.</h2></div>
    <label class="viz-case-picker">SELECT A CASE
@@ -145,7 +155,57 @@ textarea.field{font-family:inherit;line-height:1.65;resize:vertical;min-height:1
   <div class="viz-foot-actions"><span>OPTIONAL COURSE CONNECTION · The Search Lab illustrates constrained review prioritization on <b>synthetic data only</b>.</span><button class="btn" data-next="strategy">See optimization visualization →</button></div>
   <div class="warning">Research prototype. Public-source summaries are not verified device fixes. The first three cases have no controlled model outputs; synthetic cases are clearly marked. A local copy test is not a production document update or a validated model improvement.</div>
  </section>
- <section class="page" id="case">
+ 
+<section class="page" id="team-board">
+ <div class="eyebrow">TEAM INTAKE · NOVEMBER 13 PUBLIC RELEASE</div>
+ <h1>Review a proposal, not just its wording.</h1>
+ <p class="lead">The team's latest public status reports 7 case rows and 7 complete documentation articles. Our separate layer checks what still needs verification before technical review. <strong>Nothing here approves a device fix or a documentation release.</strong></p>
+ <div class="team-head">
+  <div><div class="eyebrow">INPUT / NOT A SECOND CASE DATABASE</div><h2>Use the team's own case export.</h2><p>Download the team's 7-row CSV, then import it locally. The browser reads it without uploading. Two links verified in the public release notes are available below as a fallback.</p></div>
+  <div class="team-buttons"><a class="btn primary" href="https://zebra-techdocs-practicum.vercel.app/document-reader/zebra-cases.csv" target="_blank" rel="noopener noreferrer">1 · Team case CSV ↗</a><label class="btn team-upload">2 · Import downloaded CSV<input id="team-file" type="file" accept=".csv,text/csv" hidden></label><button class="btn" id="team-sample" type="button">Use public examples</button></div>
+ </div>
+ <p id="team-import-status" class="step-note" role="status">Showing two independently linked public proposals. The team's complete 7-row export is not bundled here.</p>
+ <div class="team-mapping" id="team-mapping" hidden>
+  <div class="eyebrow">CHECK COLUMN MAPPING · UNKNOWN CSV HEADERS ARE NOT GUESSED AS FACTS</div>
+  <div class="team-map-fields">
+   <label>Case title<select id="team-map-label" class="field"></select></label>
+   <label>Question / issue<select id="team-map-question" class="field"></select></label>
+   <label>Source URL<select id="team-map-source" class="field"></select></label>
+   <label>Version<select id="team-map-version" class="field"></select></label>
+   <label>Proposed revision URL<select id="team-map-proposal" class="field"></select></label>
+  </div>
+ </div>
+ <div class="team-layout">
+  <div class="team-list-panel"><div class="eyebrow">CASE QUEUE</div><div id="team-case-list" class="team-case-list"></div></div>
+  <div class="team-main-panel">
+   <div class="row" style="justify-content:space-between"><div class="eyebrow">SELECTED CASE · EVIDENCE LIMITS</div><span class="pill amber" id="team-case-origin">PUBLIC EXAMPLE</span></div>
+   <h2 id="team-selected-title">EHS 2.8</h2>
+   <div class="team-case-question" id="team-selected-question"></div>
+   <div class="team-meta"><div><small>Version (as recorded)</small><strong id="team-selected-version">Not established</strong></div><div><small>Proposal ≠ verified fix</small><strong>Unapproved draft</strong></div></div>
+   <div class="row" style="margin-top:12px"><a id="team-source-link" class="team-doc-link" href="#" target="_blank" rel="noopener noreferrer">Original source ↗</a><a id="team-proposal-link" class="team-doc-link" href="#" target="_blank" rel="noopener noreferrer">Open team proposal ↗</a></div>
+   <div class="team-divider"></div>
+   <div class="eyebrow">REVIEWER GATES · MANUALLY RECORDED, NOT AUTOMATIC VALIDATION</div>
+   <div class="team-gate-grid">
+    <label>1 · Source trace<select id="team-source-status" class="field"><option value="unknown">Not checked</option><option value="checked">Reviewer checked</option><option value="disputed">Needs correction</option></select></label>
+    <label>2 · Version applicability<select id="team-version-status" class="field"><option value="unknown">Unknown</option><option value="checked">Reviewer checked</option><option value="disputed">Mismatch / unresolved</option></select></label>
+    <label>3 · Scope of edit<select id="team-scope-status" class="field"><option value="unknown">Not assessed</option><option value="checked">Reviewer checked bounded change</option><option value="disputed">Overbroad / unsafe</option></select></label>
+    <label>4 · Independent device test<select id="team-device-status" class="field"><option value="not_run">NOT RUN</option><option value="pass">Reported pass · proof not uploaded</option><option value="fail">Reported failure</option></select></label>
+   </div>
+   <label class="team-note-label">Evidence or next verification step<textarea id="team-note" class="field" rows="3" placeholder="Write what the reviewer actually checked, or which evidence is still missing."></textarea></label>
+   <div class="team-result">
+    <div class="row" style="justify-content:space-between"><strong id="team-readiness">HOLD · CHECK EVIDENCE</strong><span id="team-gate-count" class="pill amber">0 / 3 gates checked</span></div>
+    <div id="team-gate-progress" class="team-gate-progress"><span></span></div>
+    <ul class="facts" id="team-next-checks"></ul>
+    <p class="step-note">Technical-review readiness is not publication approval. A self-recorded device result is not independent validation.</p>
+   </div>
+   <div class="team-action-row"><button id="team-load-framework" class="btn primary" type="button">Continue in our Framework →</button><button id="team-export" class="btn" type="button">Export review packet (.json)</button></div>
+   <p class="step-note" id="team-action-status" role="status"></p>
+  </div>
+ </div>
+ <div class="warning">Public-source research only. Imported CSV cells are untrusted source metadata, not independently verified answers. This page makes no network requests, does not upload the file, and does not connect to the private editing repository. Use the approved public subset only; do not import restricted customer data.</div>
+</section>
+
+<section class="page" id="case">
   <div class="eyebrow">01 · FRAME THE QUESTION</div><h1>Describe uncertainty before making claims.</h1><p class="lead">Start with real, public-source developer questions and versioned research findings. The final two cases are synthetic test fixtures. Restricted support data is not included.</p>
   <div class="grid"><div class="card"><label for="scenario" class="eyebrow">SELECT A CASE · REAL PUBLIC SOURCES FIRST</label><select class="field" id="scenario"><option value="0">Real public report · Android web integration</option><option value="1">Real public forum · TC26 Xamarin scanner</option><option value="2">Real public forum · TC52 MultiBarcode</option><option value="3">Synthetic QA only · reconnect</option><option value="4">Synthetic QA only · CSV</option></select><div class="question" id="question"></div><div class="row" style="margin:10px 0"><span class="pill" id="case-status"></span><span class="step-note" id="model-status"></span></div><div class="row" id="case-links"></div><h3>Known information</h3><ul class="facts" id="facts"></ul></div><div class="card"><div class="eyebrow">MISSING CONTEXT</div><h3>Don't fill the gaps with guesses.</h3><div class="tags" id="gaps"></div><p style="margin-top:20px">The goal is to preserve uncertainty for reviewers, not quietly replace it with a persuasive answer.</p></div></div>
   <div class="next"><span>1 / 8 · Normalize case</span><button class="btn primary" data-next="evidence">Build evidence packet →</button></div>
@@ -417,7 +477,7 @@ function restoreSource(){
 
 function by(id){return document.getElementById(id)}
 function node(tag,txt){const x=document.createElement(tag);x.textContent=txt;return x}
-function show(page){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===page));document.querySelectorAll("[data-page]").forEach(b=>{b.classList.toggle("active",b.dataset.page===page);b.setAttribute("aria-current",b.dataset.page===page?"page":"false")});by("crumb").textContent={architecture:"Architecture",case:"Question",evidence:"Evidence",review:"Human review",diagnosis:"Failure diagnosis",revision:"Document revision",retest:"Retest",guide:"Developer preview",strategy:"Search lab",handoff:"Delivery"}[page];if(page==="architecture")renderArchitecture();if(page==="strategy")renderStrategy();if(page==="diagnosis")renderDiagnosis();if(page==="revision")renderRevision();if(page==="retest")renderRetest();if(page==="guide")renderGuide();if(page==="handoff")renderDelivery();window.scrollTo(0,0)}
+function show(page){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===page));document.querySelectorAll("[data-page]").forEach(b=>{b.classList.toggle("active",b.dataset.page===page);b.setAttribute("aria-current",b.dataset.page===page?"page":"false")});by("crumb").textContent={architecture:"Architecture","team-board":"Team review intake",case:"Question",evidence:"Evidence",review:"Human review",diagnosis:"Failure diagnosis",revision:"Document revision",retest:"Retest",guide:"Developer preview",strategy:"Search lab",handoff:"Delivery"}[page];if(page==="architecture")renderArchitecture();if(page==="team-board")renderTeamBoard();if(page==="strategy")renderStrategy();if(page==="diagnosis")renderDiagnosis();if(page==="revision")renderRevision();if(page==="retest")renderRetest();if(page==="guide")renderGuide();if(page==="handoff")renderDelivery();window.scrollTo(0,0)}
 
 const PRESENTER_STEPS=[
  {page:"architecture",time:"0:25",title:"Why a review framework?",say:"We are working with real developer questions, but a plausible technical answer is not always a supported one. I built a framework to track evidence, uncertainty, and what needs to be checked next.",action:"Start with the public-source research overview. Point to the research counts as collection progress, not accuracy results."},
@@ -459,14 +519,14 @@ function renderCase(){
  by("model-status").textContent=c.synthetic?"Illustrative answers only":(c.source_status+" · Model: "+c.model_status);
  const links=by("case-links");links.replaceChildren();
  if(!c.synthetic){
-  for(const [name,url] of [["Public original question",c.case_url],["Public team report",c.report_url]]){
-   if(!/^https:\/\/(developer\.zebra\.com|github\.com)\//.test(url))continue;
+  for(const [name,url] of [[idx>=5?"Case source / team overview":"Public original question",c.case_url],["Public team report",c.report_url]]){
+   if(!/^https:\/\/(developer\.zebra\.com|github\.com|techdocs\.zebra\.com|zebra-techdocs-practicum\.vercel\.app)\//.test(url))continue;
    const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=name+" ↗";a.style.fontSize="12px";a.style.color="#087e76";links.append(a);
   }
  }
 }
 function renderEvidence(){const box=by("evidence-list");box.replaceChildren();EXAMPLES[idx].evidence.forEach((x,i)=>{const label=document.createElement("label");label.className="item";const ck=document.createElement("input");ck.type="checkbox";ck.checked=chosen.has(i);ck.addEventListener("change",()=>{if(ck.checked)chosen.add(i);else chosen.delete(i);revokeApproval();renderCount();renderRevision();renderRetest();renderDelivery()});const content=document.createElement("div");content.append(node("h3",x.id+" · "+x.source),node("p",x.claim),node("small","Scope: "+x.limit));
- if(x.url&&/^https:\/\/(developer\.zebra\.com|github\.com|techdocs\.zebra\.com)\//.test(x.url)){const a=document.createElement("a");a.href=x.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent="Open public source ↗";a.style.display="block";a.style.marginTop="8px";a.style.fontSize="12px";content.append(a)}
+ if(x.url&&/^https:\/\/(developer\.zebra\.com|github\.com|techdocs\.zebra\.com|zebra-techdocs-practicum\.vercel\.app)\//.test(x.url)){const a=document.createElement("a");a.href=x.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent="Open public source ↗";a.style.display="block";a.style.marginTop="8px";a.style.fontSize="12px";content.append(a)}
  label.append(ck,content);box.append(label)});renderCount()}
 function renderCount(){by("count").textContent=chosen.size+" / "+EXAMPLES[idx].evidence.length+(EXAMPLES[idx].synthetic?" synthetic example records":" publicly traceable research records")+" selected"}
 
@@ -503,6 +563,7 @@ function agentContinuePrompt(){
  ].join("\n\n");
 }
 function buildAgentContinueConfig(){
+ if(idx>=5)throw Error("Team CSV intake is not independently cleared for Agent Continue export; use the verified public-case fixtures.");
  const c=EXAMPLES[idx],prompt=agentContinuePrompt();
  return {
   format:"agent-continue-settings",version:1,includesPrompt:true,
@@ -690,7 +751,7 @@ function storyboard(){
  if(idx===0)return ["Show the real web-integration question and its seven requirements","Highlight the version-limited native Soft Scan Trigger documentation","Ask for the missing browser bridge and installed versions"];
  if(idx===1)return ["Display the public TC26 symptom report","Separate BarcodeManager initialization from demonstrated root cause","List the runtime logs and lifecycle details required"];
  if(idx===2)return ["Compare reported manual and programmatic MultiBarcode configuration","Highlight unverified SET_CONFIG parameter applicability","Show required version, result-code and profile checks"];
- if(idx===3)return ["Show the fictional dashboard during reconnect","Contrast transport status with displayed data","Illustrate the refresh check"];
+ if(idx>=5)return ["Open the imported team case summary and its unverified sources","Point out version applicability and unanswered verification steps","Request a human review before any publication"];if(idx===3)return ["Show the fictional dashboard during reconnect","Contrast transport status with displayed data","Illustrate the refresh check"];
  return ["Show accented characters in invented CSV","Compare export and import encoding","Show a reversible before/after check"];
 }
 function renderGuide(){
@@ -855,6 +916,189 @@ function renderArchitecture(){
  by("viz-decision-title").textContent=title;by("viz-decision-note").textContent=note;
 }
 by("viz-scenario").addEventListener("change",e=>reset(Number(e.target.value)));
+
+
+// A local-only intake bridge: the team's document editor remains a separate application.
+const TEAM_OVERVIEW_URL="https://github.com/1235357/zebra-public-site-archive/blob/main/README.md";
+const TEAM_RELEASE_SAMPLES=[
+ {label:"EHS 2.8 · link removal",question:"Review the team's E1 addition: is the documented link-removal procedure applicable to the reported device and version?",version:"EHS 2.8 (source article); reported device version unverified",source:"",proposal:"https://zebra-techdocs-practicum.vercel.app/document-reader/ehs28-revised.html#linkremoval"},
+ {label:"DataWedge 13.0 · SET_CONFIG",question:"Review the team's S1 clarification: does the combined explanation preserve the exact documented parameter behavior and version scope?",version:"DataWedge 13.0 (source article); reported device version unverified",source:"",proposal:"https://zebra-techdocs-practicum.vercel.app/document-reader/sc13-revised.html#plugin_configbundle"}
+];
+let teamRows=TEAM_RELEASE_SAMPLES.map(x=>({...x})),teamCsvRows=null,teamHeaders=[],teamDatasetName="Public release examples · November 13",teamSelected=0,teamReviews={};
+let teamMappings={label:-1,question:-1,source:-1,version:-1,proposal:-1};
+function teamSafeURL(v){
+ const t=String(v||"").trim();
+ return /^https:\/\/(?:developer\.zebra\.com|techdocs\.zebra\.com|github\.com|zebra-techdocs-practicum\.vercel\.app)(?=[/?#]|$)/i.test(t)&&t.length<=1200?t:"";
+}
+function parseTeamCSV(text){
+ if(typeof text!=="string"||!text.trim()||text.length>500000)throw Error("Empty or oversized CSV (max 500 KB).");
+ const s=text.replace(/^\uFEFF/,""),rows=[];let row=[],field="",quoted=false,atStart=true;
+ for(let i=0;i<s.length;i++){
+  const ch=s[i];
+  if(quoted){if(ch==='"'){if(s[i+1]==='"'){field+='"';i++}else quoted=false}else field+=ch;continue}
+  if(ch==='"'&&atStart){quoted=true;atStart=false;continue}
+  if(ch==='"'&&!atStart)throw Error("Invalid quote in unquoted field.");
+  if(ch===","){row.push(field);field="";atStart=true;continue}
+  if(ch==="\n"||ch==="\r"){
+   if(ch==="\r"&&s[i+1]==="\n")i++;
+   row.push(field);if(row.some(v=>v.trim()))rows.push(row);
+   row=[];field="";atStart=true;continue
+  }
+  field+=ch;atStart=false;
+ }
+ if(quoted)throw Error("Unterminated quoted field.");
+ if(field.length||row.length){row.push(field);if(row.some(v=>v.trim()))rows.push(row)}
+ if(rows.length<2)throw Error("CSV must have headers and at least one case.");
+ const headers=rows.shift().map(v=>v.trim());
+ if(headers.length<2||headers.length>64||headers.some(v=>!v||v.length>200))throw Error("Invalid header row.");
+ if(rows.length>200||rows.some(row=>row.length!==headers.length))throw Error("CSV has too many rows or inconsistent column counts.");
+ return {headers,rows};
+}
+function suggestTeamColumn(headers,kind){
+ const patterns={
+  label:[/^case[\s_-]?(title|name)$/i,/^title$/i,/^case$/i,/^issue$/i,/name/i],
+  question:[/question/i,/issue[\s_-]?(summary|description)/i,/problem/i,/description/i,/summary/i],
+  source:[/^(original[\s_-]?)?(source|forum)[\s_-]?(url|link)$/i,/source.*(url|link)/i],
+  version:[/version/i],
+  proposal:[/revision.*(url|link)/i,/proposal.*(url|link)/i,/revised.*(url|link)/i]
+ };
+ for(const re of patterns[kind]){const n=headers.findIndex(h=>re.test(h));if(n>=0)return n}
+ return -1;
+}
+function teamCell(row,kind){
+ if(!teamCsvRows)return row[kind]||"";
+ const n=teamMappings[kind];return Number.isInteger(n)&&n>=0?String(row[n]||"").trim():"";
+}
+function activeTeamRow(){return teamRows[teamSelected]||null}
+function teamReview(){
+ if(!teamReviews[teamSelected])teamReviews[teamSelected]={source:"unknown",version:"unknown",scope:"unknown",device:"not_run",note:""};
+ return teamReviews[teamSelected]
+}
+function teamGateState(review){
+ const checks=[
+  [review.source==="checked",review.source==="disputed"?"Source evidence disputed":"Verify original source and citation"],
+  [review.version==="checked",review.version==="disputed"?"Reported version may not match":"Confirm the version and device applicability"],
+  [review.scope==="checked",review.scope==="disputed"?"Change is overbroad or unsafe":"Check the exact bounded change against the original"]
+ ];
+ const ok=checks.filter(x=>x[0]).length,issues=checks.filter(x=>!x[0]).map(x=>x[1]);
+ if(review.device==="not_run")issues.push("Independent device test NOT RUN; do not claim a fix");
+ if(review.device==="fail")issues.push("Investigate reported device test failure; no fix claim");
+ if(review.device==="pass")issues.push("Recorded pass is self-reported; attach a reproducible independent test record");
+ return {checked:ok,total:3,issues,readiness:ok===3?"READY TO REQUEST TECHNICAL REVIEW":"HOLD · CHECK EVIDENCE",approved:false,device_fix_validated:false};
+}
+function mapTeamColumns(){
+ if(!teamCsvRows)return;
+ for(const kind of Object.keys(teamMappings)){
+  const select=by("team-map-"+kind);select.replaceChildren();
+  const none=node("option","— not mapped —");none.value="-1";select.append(none);
+  teamHeaders.forEach((header,i)=>{const opt=node("option",header);opt.value=String(i);select.append(opt)});
+  select.value=String(teamMappings[kind]);
+ }
+}
+function renderTeamBoard(){
+ const csv=!!teamCsvRows;
+ by("team-mapping").hidden=!csv;
+ by("team-case-origin").textContent=csv?"IMPORTED LOCAL CSV":"PUBLIC RELEASE EXAMPLE";
+ const list=by("team-case-list");list.replaceChildren();
+ teamRows.forEach((r,i)=>{
+  const title=teamCell(r,"label")||"Unmapped case "+(i+1);
+  const item=document.createElement("button");item.type="button";item.className="team-case-button"+(i===teamSelected?" active":"");
+  const num=node("span",String(i+1).padStart(2,"0"));num.className="team-num";
+  const content=document.createElement("div");content.append(node("strong",title),node("small",teamReviews[i]&&teamGateState(teamReviews[i]).checked===3?"Ready for review request":"Unverified / review pending"));
+  item.append(num,content);item.addEventListener("click",()=>{teamSelected=i;renderTeamBoard()});list.append(item);
+ });
+ const r=activeTeamRow();
+ if(!r)return;
+ by("team-selected-title").textContent=teamCell(r,"label")||"Case "+(teamSelected+1)+" · title not mapped";
+ by("team-selected-question").textContent=teamCell(r,"question")||"No issue/summary field mapped. Choose the correct column before review.";
+ by("team-selected-version").textContent=teamCell(r,"version")||"Not independently established";
+ const src=teamSafeURL(teamCell(r,"source")),proposal=teamSafeURL(teamCell(r,"proposal"));
+ const a=by("team-source-link");a.hidden=!src;if(src)a.href=src;else a.removeAttribute("href");
+ const b=by("team-proposal-link");b.hidden=!proposal;if(proposal)b.href=proposal;else b.removeAttribute("href");
+ const review=teamReview();
+ for(const key of ["source","version","scope","device"])by("team-"+key+"-status").value=review[key];
+ by("team-note").value=review.note;
+ const state=teamGateState(review);
+ by("team-readiness").textContent=state.readiness;
+ by("team-gate-count").textContent=state.checked+" / 3 reviewer gates";
+ by("team-gate-progress").firstElementChild.style.width=(state.checked/state.total*100)+"%";
+ by("team-next-checks").replaceChildren(...state.issues.map(v=>node("li",v)));
+}
+async function importTeamFile(file){
+ if(!file)return;
+ const out=by("team-import-status");
+ if(file.size>500000){out.textContent="Import rejected: CSV larger than 500 KB.";return}
+ try{
+  const csv=parseTeamCSV(await file.text());
+  teamCsvRows=csv.rows;teamHeaders=csv.headers;teamRows=csv.rows;
+  teamDatasetName=String(file.name||"local-cases.csv").slice(0,100);
+  for(const kind of Object.keys(teamMappings))teamMappings[kind]=suggestTeamColumn(teamHeaders,kind);
+  teamSelected=0;teamReviews={};mapTeamColumns();renderTeamBoard();
+  out.textContent="Imported "+teamRows.length+" case rows with "+teamHeaders.length+" columns from "+teamDatasetName+". Check column mapping before continuing. Local only; no remote sync.";
+ }catch(e){out.textContent="Import rejected: "+e.message}
+ by("team-file").value="";
+}
+function teamPacket(){
+ const r=activeTeamRow(),review=teamReview(),status=teamGateState(review);
+ return{
+  schema:"zebra-team-case-review/v1",source:{type:teamCsvRows?"USER_IMPORTED_CSV_UNVERIFIED":"PUBLIC_README_EXAMPLE",dataset_label:teamDatasetName,public_overview:TEAM_OVERVIEW_URL,case_row:teamSelected+1},
+  case:{label:teamCell(r,"label"),issue:teamCell(r,"question"),source_url:teamSafeURL(teamCell(r,"source"))||null,document_version_as_recorded:teamCell(r,"version")||null,revision_proposal_url:teamSafeURL(teamCell(r,"proposal"))||null},
+  review:{...review,source_checked_by_user_only:review.source==="checked",version_checked_by_user_only:review.version==="checked",scope_checked_by_user_only:review.scope==="checked"},
+  gates:status,release:{device_fix_validated:false,publication_authorized:false,customer_acceptance:"NOT_ESTABLISHED"},
+  timestamp:new Date().toISOString()
+ }
+}
+function loadTeamCase(){
+ const r=activeTeamRow(),label=teamCell(r,"label"),question=teamCell(r,"question");
+ const out=by("team-action-status");
+ if(!label.trim()||!question.trim()){out.textContent="Select title and issue columns first; no case loaded.";return}
+ if(label.length>350||question.length>6000){out.textContent="Case title or issue too long for the review workflow.";return}
+ const source=teamSafeURL(teamCell(r,"source")),proposal=teamSafeURL(teamCell(r,"proposal")),version=teamCell(r,"version");
+ const review=teamReview(),status=teamGateState(review),slot=5;
+ const evidence=[
+  {id:"TEAM-STATUS",source:"Team public release overview · general scope",claim:"The November 13 public report describes seven selected cases and seven documentation articles. It does not validate this row.",limit:"High-level provenance only; NOT direct technical support for this case.",url:TEAM_OVERVIEW_URL},
+  {id:"TEAM-INPUT",source:teamCsvRows?"Locally imported case-table row":"Public release description",claim:question,limit:"Summary from the selected source; not independent verification or a confirmed device fix.",url:proposal||source||""}
+ ];
+ if(source&&source!==proposal)evidence.push({id:"TEAM-ORIGINAL",source:"Case source URL from imported record",claim:"A source link was provided in the case table.",limit:"Its content, version and applicability require direct review.",url:source});
+ const versionSummary=version?"Recorded version: "+version+". ":"No version supplied. ";
+ const baseline="The imported review question is: "+question+" "+versionSummary+"The public case and proposal are not independently verified as a device fix.";
+ const revised="The selected case raises the following review question: "+question+" "+versionSummary+"Before accepting any proposed wording, independently verify the original source, device and software versions, and the intended scope of the change. Any runtime improvement remains untested here.";
+ const c={id:"TEAM-CASE-"+String(teamSelected+1),synthetic:false,title:label,record_kind:"TEAM_CSV_INTAKE_UNVERIFIED",case_url:source||TEAM_OVERVIEW_URL,report_url:TEAM_OVERVIEW_URL,
+  source_status:"Imported team intake; evidence gate "+status.checked+"/3 (reviewer-recorded)",model_status:"NOT_RUN",question:question,
+  facts:["This is a review question imported from the separate team's public work; it is not a confirmed original forum question.",versionSummary,"Source, version and scope checks recorded: "+status.checked+"/3 (not externally validated)."],
+  gaps:["Original source document and exact version applicability","Reproducible device or model retest","Independent owner review and publication authorization"],evidence,a:"",b:""};
+ const d={id:"TEAM-REVIEW-"+String(teamSelected+1),label:"Team-case editorial review note · not official TechDocs",version:"unverified imported source",section:"Proposed research-note clarification",before:baseline,after:revised,
+  rationale:"Clarify required verification before any external technical review; do not silently adopt the separate editor's proposed change.",
+  heldout:[{id:"H01",question:"Is the original source and version independently checked?"},{id:"H02",question:"Has the proposed change been independently validated on a device?"}]};
+ EXAMPLES[slot]=c;DOCS[slot]=d;STRATEGY_CHECKS[slot]=[];
+ for(const id of ["scenario","viz-scenario"]){
+  const select=by(id);let opt=Array.from(select.options||[]).find(o=>o.value===String(slot));
+  if(!opt){opt=node("option","");opt.value=String(slot);select.append(opt)}
+  opt.textContent="Team intake · "+label.slice(0,55);
+ }
+ reset(slot);out.textContent="Loaded into the original Question → Evidence → Review workflow. Model run and approval remain NOT RUN.";
+ show("case");
+}
+for(const key of ["source","version","scope","device"]){
+ by("team-"+key+"-status").addEventListener("change",e=>{teamReview()[key]=e.target.value;renderTeamBoard()});
+}
+by("team-note").addEventListener("input",e=>{teamReview().note=e.target.value});
+by("team-file").addEventListener("change",e=>importTeamFile(e.target.files?.[0]));
+by("team-sample").addEventListener("click",()=>{
+ teamCsvRows=null;teamHeaders=[];teamRows=TEAM_RELEASE_SAMPLES.map(x=>({...x}));teamSelected=0;teamReviews={};teamDatasetName="Public release examples · November 13";
+ by("team-import-status").textContent="Showing two public proposal links from the November 13 release notes. Complete seven-case data must be imported from the team's CSV.";
+ renderTeamBoard();
+});
+for(const kind of Object.keys(teamMappings)){
+ by("team-map-"+kind).addEventListener("change",e=>{teamMappings[kind]=Number(e.target.value);teamSelected=0;teamReviews={};renderTeamBoard();by("team-import-status").textContent="Column mapping updated. Review imported values carefully before loading a case."})
+}
+by("team-load-framework").addEventListener("click",loadTeamCase);
+by("team-export").addEventListener("click",()=>{
+ const p=teamPacket();if(!p.case.label||!p.case.issue){by("team-action-status").textContent="Map a title and issue first.";return}
+ downloadText("zebra-case-review-"+String(teamSelected+1)+".json",JSON.stringify(p,null,2)+"\n","application/json");
+ by("team-action-status").textContent="Review packet exported locally; no publication or technical signoff.";
+});
+renderTeamBoard();
 
 reset(0);
 renderArchitecture();
