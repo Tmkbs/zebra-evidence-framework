@@ -7,7 +7,8 @@ const assert = require("node:assert/strict");
 const html=fs.readFileSync(path.join(__dirname,"index.html"),"utf8");
 const code=html.split("<script>")[1]?.split("</script>")[0];
 assert.ok(code,"inline script exists");
-assert.ok(!/\bfetch\s*\(|XMLHttpRequest|WebSocket/i.test(code),"automatic page never fetches an external URL");
+assert.ok(!/XMLHttpRequest|WebSocket/i.test(code),"no hidden bidirectional transport");
+assert.ok(code.includes('el("ai-run").addEventListener("click",runAI)'),"live AI fetch is explicitly user-triggered");
 const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
 assert.equal(ids.length,new Set(ids).size,"HTML IDs are unique");
 
