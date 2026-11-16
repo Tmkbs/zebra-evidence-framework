@@ -409,7 +409,7 @@ const EVO_TASKS=[
 ["Reproduce minimal fixture",7,15],["Check code example",6,10],["Check source applicability",3,5],
 ["Review alternative causes",5,9],["Inspect runtime environment",4,7],["Prepare reviewer summary",4,6]
 ].map(([name,minutes,points])=>({name,minutes,points}));
-let evoBudget=20,evoSeed=20261116,evoGeneration=0;
+let evoBudget=20,evoSeed=1,evoGeneration=0;
 function makePlan(items,mask){let minutes=0,points=0;const labels=[];items.forEach((t,i)=>{if(mask&(1<<i)){minutes+=t.minutes;points+=t.points;labels.push(t.name)}});return {mask,minutes,points,labels}}
 function comparePlan(a,b){return b.points-a.points||a.minutes-b.minutes||a.mask-b.mask}
 function exactPlan(items,budget){if(items.length>16)throw Error("Too many toy tasks");let best=makePlan(items,0);for(let mask=1;mask<(1<<items.length);mask++){const p=makePlan(items,mask);if(p.minutes<=budget&&comparePlan(p,best)<0)best=p}return best}
