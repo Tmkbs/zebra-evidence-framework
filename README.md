@@ -1,5 +1,14 @@
 # Zebra Evidence Framework — research workbench and classroom demo
 
+## Real AI comparison added (November 16)
+
+The default [Zebra Evidence Review](https://tmkbs.github.io/zebra-evidence-framework/classroom/) now offers **Run AI document review** alongside the always-working offline evidence rules. The AI feature has a **real Vercel serverless backend** (`api/review.js`), which retrieves the pinned official DataWedge 13.0 or EHS 2.8 source page plus the teammate's revised article, sends relevant extracted sections to an approved OpenAI-compatible Chat Completions model, checks quoted snippets against the actual model input, and returns structured findings and an exportable report. Original/revised local text files are supported as a fallback for authorized use.
+
+**Deployment status:** the code has been committed but no Vercel deployment or server secrets have been connected in this repository session. The GitHub Pages frontend **cannot invoke live AI by itself**. To activate the AI button, deploy the repo on Vercel, set `AI_API_KEY` and `AI_REVIEW_ACCESS_TOKEN` **server-side**, and open that Vercel URL or enter its HTTPS `/api/review` URL on GitHub Pages. **[Exact setup and safeguards](AI_REVIEW_SETUP.md)**. No model answer or device fix is claimed without an actual call.
+
+---
+
+
 ## Quick Review: simplified default (November 16)
 
 Open **[Zebra Evidence Review](https://tmkbs.github.io/zebra-evidence-framework/classroom/)**. The default site is now a one-page **Select case → Run evidence check → View results** workflow. Five grounded public cases are preloaded (two team proposals and three public research cases); no setup, manual reviewer gate, CSV import, or model key is required to run the default demonstration. A user can optionally import a local public CSV or edit a test claim under a collapsed section. The engine generates a source-linked review, flags missing versions, unverified technical assumptions and unsupported absolute language, and exports a Markdown research report.
