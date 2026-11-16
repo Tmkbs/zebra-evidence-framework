@@ -388,6 +388,7 @@ async function runAI(){
   }finally{clearTimeout(timer)}
   if(!response.ok||!body?.ok)throw Error(body?.error||"AI backend request failed (HTTP "+response.status+").");
   if(body.mode!=="live_ai_document_comparison"||!body.review)throw Error("Backend did not return a model review.");
+  if(CASES[active].id!==c.id){setAIStatus("The case changed while AI was analyzing; the old result was discarded.");return;}
   renderAI(body);
  }catch(e){
   setAIStatus(String(e.message||e).slice(0,400),"error");
