@@ -577,12 +577,12 @@ function buildAgentContinueConfig(){
  };
 }
 function renderAgentContinueBridge(){
- const c=EXAMPLES[idx],allow=!c.synthetic;
+ const c=EXAMPLES[idx],allow=!c.synthetic&&idx<5;
  by("agent-export").disabled=!allow;
  by("agent-import").disabled=!allow;
  const defaultStatus=allow
   ?"Ready: export an Agent Continue-compatible task for "+c.id+". Importing it never starts the extension; you must manually start the task."
-  :"Synthetic QA fixture: the real-case Agent Continue bridge is disabled.";
+   :idx>=5?"Imported team case: extension export is disabled until independently cleared as public. Use the local evidence review and packet.":"Synthetic QA fixture: the real-case Agent Continue bridge is disabled.";
  by("agent-bridge-status").textContent=agentBridgeStatus||defaultStatus;
 }
 function parseAgentContinueResponse(raw){
@@ -606,7 +606,7 @@ function parseAgentContinueResponse(raw){
 }
 function importAgentContinueResult(){
  const c=EXAMPLES[idx];
- if(c.synthetic){agentBridgeStatus="Synthetic QA is not supported for extension import.";renderAgentContinueBridge();return}
+ if(c.synthetic||idx>=5){agentBridgeStatus="This case is not cleared for Agent Continue transfer. Only the three established public research fixtures support the extension bridge.";renderAgentContinueBridge();return}
  try{
   const result=parseAgentContinueResponse(by("agent-response").value);
   const dest=by("agent-dest").value;
