@@ -47,7 +47,7 @@ const fakeWindow = { scrollTo() {}, isSecureContext: false };
 const fakeBlob = class { constructor(parts, opts) { this.parts = parts; this.opts = opts; } };
 const fakeURL = { createObjectURL: () => "blob:fake", revokeObjectURL() {} };
 const sandbox = { document, window: fakeWindow, Blob: fakeBlob, URL: fakeURL, setTimeout: () => 1 };
-vm.runInNewContext(script + "\nthis.app={payload,gateReasons,sourceHits,importDocument,importRevision,reset,revisedFilename,revisionAdapter,searchResults,show,buildAgentContinueConfig,parseAgentContinueResponse,parseTeamCSV,teamGateState,importTeamFile,teamPacket,loadTeamCase,teamSafeURL};", sandbox, { timeout: 5000 });
+vm.runInNewContext(script + "\nthis.app={payload,gateReasons,sourceHits,importDocument,importRevision,reset,revisedFilename,revisionAdapter,searchResults,show,buildAgentContinueConfig,parseAgentContinueResponse,parseTeamCSV,teamGateState,importTeamFile,teamPacket,loadTeamCase,teamSafeURL,geneticSearch,exactPlan,greedyPlan,EVO_TASKS,COURSE_MODE};", sandbox, { timeout: 5000 });
 const app = sandbox.app;
 const element = id => {
   assert.ok(elements.has(id), "Missing element " + id);
@@ -342,6 +342,42 @@ async function main() {
     assert.equal(element("crumb").textContent,"Question");
     assert.equal(element("agent-export").disabled,true);
     assert.throws(()=>app.buildAgentContinueConfig(),/not independently cleared/);
+  });
+
+
+  test("default client version excludes the course-only navigation", () => {
+    assert.equal(app.COURSE_MODE,false);
+    assert.equal(document.body.dataset.demoMode,"client");
+    assert.equal(element("presenter-count").textContent.includes("/ 09"),true);
+    assert.equal(app.EVO_TASKS.length,12);
+  });
+  test("genetic review search is deterministic, feasible, and bounded by exact optimum", () => {
+    const ga=app.geneticSearch(app.EVO_TASKS,20,1,25);
+    const repeat=app.geneticSearch(app.EVO_TASKS,20,1,25);
+    const optimum=app.exactPlan(app.EVO_TASKS,20);
+    const greedy=app.greedyPlan(app.EVO_TASKS,20);
+    assert.equal(ga.history.length,26);
+    assert.equal(ga.best.minutes<=20,true);
+    assert.equal(ga.best.points<=optimum.points,true);
+    assert.equal(ga.history.every((v,i)=>i===0||v>=ga.history[i-1]),true);
+    assert.equal(JSON.stringify(ga),JSON.stringify(repeat));
+    assert.equal(ga.history[0]<ga.history[25],true);
+    assert.equal(greedy.minutes<=20,true);
+    assert.equal(optimum.points,46);
+    assert.throws(()=>app.geneticSearch(app.EVO_TASKS,20,1,26),/Invalid genetic/);
+  });
+  test("interactive evolutionary search advances generations without altering research case", () => {
+    const prior=app.payload().case.id;
+    click("evo-step");
+    assert.equal(element("evo-gen").textContent,"Gen 1 / 25");
+    click("evo-run");
+    assert.equal(element("evo-gen").textContent,"Gen 25 / 25");
+    assert.equal(element("evo-plot").children.length,26);
+    assert.equal(app.payload().case.id,prior);
+    assert.equal(app.payload().release.publication,false);
+    change("evo-budget","14","input");
+    assert.equal(element("evo-gen").textContent,"Gen 0 / 25");
+    assert.equal(element("evo-budget-label").textContent,"14 toy minutes");
   });
 
   process.stdout.write("\n" + tests + " regression assertions passed.\n");
