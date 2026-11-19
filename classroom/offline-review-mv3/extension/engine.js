@@ -116,6 +116,32 @@ export function describeLinkDiscovery(status='unknown') {
   return linkDiscoveryText[status];
 }
 
+const omissionLabels=Object.freeze({
+ invalid_url:'Invalid target URL',cross_origin:'Cross-origin target',link_budget:'Link budget',
+ depth_budget:'Depth budget',not_supplied:'Target not supplied',missing_fragment:'Section anchor not captured'
+});
+function renderCoverage(manifest,pages) {
+  const items=manifest.pages.map(row=>{
+    const title=pages.get(row.source_url).cap.title;
+    const reasons=Object.entries(omissionLabels).filter(([key])=>row.omitted_links[key]>0)
+      .map(([key,label])=>'<li>'+label+': '+row.omitted_links[key]+'</li>').join('');
+    return '<tr><th scope="row"><a href="'+row.path+'">'+escape(title)+'</a><br><code>'+escape(row.source_url)+'</code></th>'+
+      '<td>'+escape(row.captured_at)+'<br>'+row.blocks+' block(s) · '+(row.capture_truncated?'Capture truncated':'No reported text truncation')+'</td>'+
+      '<td>'+escape(describeLinkDiscovery(row.link_discovery))+(reasons?'<ul>'+reasons+'</ul>':'<p>No omitted targets among reported links.</p>')+'</td></tr>';
+  }).join('');
+  return '<section aria-labelledby="archive-coverage"><h2 id="archive-coverage">Archive coverage</h2>'+
+    '<p>'+manifest.captured_pages+' page(s) rendered · '+manifest.missing.length+' requested target(s) not supplied · '+
+    manifest.unreachable_captures+' supplied snapshot(s) not reachable within the configured graph.</p>'+
+    '<p>Counts describe this offline archive, not the original site. A capture is not a diagnosis, revision, or model result. '+
+    '<a href="manifest.json">Machine-readable coverage manifest</a></p>'+
+    '<p>Configured limits: '+manifest.budget.maxPages+' pages, depth '+manifest.budget.maxDepth+', '+
+    manifest.budget.maxLinksPerPage+' accepted links per page, '+manifest.budget.maxBytes+' bytes in the temporary cache.</p>'+
+    (items?'<table><caption>Rendered snapshots and known limits</caption><thead><tr><th scope="col">Snapshot</th><th scope="col">Captured text</th><th scope="col">Link scan and omissions</th></tr></thead><tbody>'+items+'</tbody></table>':
+      '<p>No rendered snapshots. Supply the exact root capture to start.</p>')+
+    (manifest.missing.length?'<h3>Requested targets not supplied</h3><ul>'+manifest.missing.map(row=>
+      '<li><code>'+escape(row.source_url)+'</code></li>').join('')+'</ul>':'')+'</section>';
+}
+
 export function createMirrorCache(config) {
   if(!keys(config,['allowed_origins','roots','budget'],['allowed_origins','roots'])||
      !Array.isArray(config.allowed_origins)||config.allowed_origins.length<1||config.allowed_origins.length>4||
@@ -212,10 +238,8 @@ export function createMirrorCache(config) {
       pages:records,missing,
       completeness:'Supplied structured text only. Scripts, images, assets, private pages, external links and unsupplied routes are not mirrored.'};
     files.set('index.html',head('Offline Zebra evidence mirror','site.css')+
-      '<main><h1>Offline Zebra evidence mirror</h1><p class="note">'+escape(manifest.completeness)+'</p><p>'+
-      pages.size+' page(s) rendered. <a href="manifest.json">Coverage manifest</a></p><ul>'+
-      records.map(r=>'<li><a href="'+r.path+'">'+escape(pages.get(r.source_url).cap.title)+'</a></li>').join('')+
-      '</ul></main></body></html>');
+      '<main><h1>Offline Zebra evidence mirror</h1><p class="note">'+escape(manifest.completeness)+'</p>'+
+      renderCoverage(manifest,pages)+'</main></body></html>');
     files.set('manifest.json',JSON.stringify(manifest,null,2)+'\n');
     if([...files.values()].reduce((n,s)=>n+bytes(s),0)>25_000_000)throw new Error('mirror files over hard output budget');
     return {files,manifest};

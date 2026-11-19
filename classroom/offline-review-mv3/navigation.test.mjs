@@ -43,3 +43,35 @@ test('single-page archive links only to its package index and coverage when unan
  assert.doesNotMatch(markup,/rel="(?:next|prev)"|Captured sections/);
  assert.match(markup,/Snapshot 1 of 1/);
 });
+
+test('index explains archive coverage using manifest facts without turning missing URLs into links',()=>{
+ const missing=origin+'/oeminfo/1-0/guide/missing/';
+ const orphan=origin+'/oeminfo/1-0/guide/orphan/';
+ const a=row(root,'Root <b>', [['overview','Overview']], [child+'#setup',child+'#absent',missing]);
+ a.capture.truncated=true;
+ a.link_discovery='retained_link_limit';
+ const result=build([a,second,row(orphan,'Not reachable',[[null,'Unreachable heading']])]);
+ const index=result.files.get('index.html');
+ assert.match(index,/2 page\(s\) rendered · 1 requested target\(s\) not supplied · 1 supplied snapshot\(s\) not reachable/);
+ assert.match(index,/href="pages\/001.html">Root &lt;b&gt;/);
+ assert.match(index,/Capture truncated/);
+ assert.match(index,/retaining 20 links/);
+ assert.match(index,/Section anchor not captured: 1/);
+ assert.match(index,/Target not supplied: 1/);
+ assert.match(index,/No link discovery status supplied/);
+ assert.match(index,/Machine-readable coverage manifest/);
+ assert.match(index,/not a diagnosis, revision, or model result/);
+ assert.ok(index.includes('<code>'+missing+'</code>'));
+ assert.doesNotMatch(index,/(?:href|src)="https?:/);
+ assert.equal(result.manifest.pages[0].omitted_links.missing_fragment,1);
+ assert.equal(result.manifest.missing[0].source_url,missing);
+ assert.doesNotMatch(index,/Not reachable/);
+});
+test('empty archive reports the missing root rather than implying successful coverage',()=>{
+ const result=build([]);
+ const index=result.files.get('index.html');
+ assert.match(index,/0 page\(s\) rendered/);
+ assert.match(index,/No rendered snapshots/);
+ assert.ok(index.includes('<code>'+root+'</code>'));
+ assert.doesNotMatch(index,/href="pages\//);
+});
