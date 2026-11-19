@@ -4,3 +4,11 @@ Unpack the extension ZIP and load its root as an unpacked Chrome extension in an
 The popup reads only the active tab on explicit request and uses volatile memory. It archives one selected page, including bounded same-origin link references without following them. It does not preserve original styles, images/files, interactive site code, or linked page bodies. No model, patches, publishing, persistent storage or new permissions. Browser installation and actual UI download are not verified.
 
 Dependency-free checks from this directory: `node --test extension/tests/capture.test.js`, `node popup-smoke.mjs`, and `node smoke.mjs /tmp/zebra-fixture.zip && unzip -t /tmp/zebra-fixture.zip`. Tests use synthetic content and fake browser APIs.
+
+## Separate local validation adapters
+
+`reviewed-pair.cjs` forwards two independently reviewed local popup JSON captures to the existing classroom intake. It binds each canonical source URL to the inspected capture digest and preserves the upstream NOT_RUN/non-applicable status. Explicit approval is a local caller assertion; it does not authenticate the origin or grant redistribution. This adapter is not called by the popup.
+
+`extension/collect.js` validates multiple explicitly supplied same-origin capture envelopes against an exact root; requires pre-export review and reports omitted links. It does not navigate, fetch anything, or run in the current popup. The reviewed envelope format and collector UI are not yet wired. These adapters are fixtures-verified building blocks, not the plugin-to-framework workflow.
+
+Check: `node --test reviewed-pair.test.cjs collect.test.mjs`.
