@@ -4,12 +4,13 @@ import {mirrorZip} from './zip.js';
 
 const el=id=>document.getElementById(id);
 const permit=el('public'), capture=el('capture'), save=el('save'), status=el('status'), review=el('reviewed'), zip=el('mirror');
+const entry=el('collection-entry');
 let selected=null, session=null, result=null, busy=false;
 const sync=()=>{
   capture.disabled=busy||!selected||!permit.checked;
   permit.disabled=busy||!selected;
   review.disabled=busy||!result||!permit.checked;
-  save.disabled=zip.disabled=review.disabled||!review.checked;
+  save.disabled=zip.disabled=entry.disabled=review.disabled||!review.checked;
 };
 const discard=()=>{
   session?.clear();result=null;review.checked=false;
@@ -46,6 +47,12 @@ save.addEventListener('click',()=>{
   if(save.disabled)return;
   download(new Blob([JSON.stringify(result.packet,null,2)+'\n'],{type:'application/json;charset=utf-8'}),'zebra-public-capture.json');
   status.textContent='JSON download requested. Check the browser downloads.';
+});
+entry.addEventListener('click',()=>{
+  if(entry.disabled)return;
+  const envelope={schema_version:'zebra-reviewed-mirror-page/v1',capture:result.packet,discovered_links:result.links};
+  download(new Blob([JSON.stringify(envelope)+'\n'],{type:'application/json;charset=utf-8'}),'zebra-reviewed-mirror-page.json');
+  status.textContent='Collection file download requested. Check browser downloads.';
 });
 zip.addEventListener('click',()=>{
   if(zip.disabled)return;

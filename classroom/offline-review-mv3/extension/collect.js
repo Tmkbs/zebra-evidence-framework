@@ -45,6 +45,7 @@ export function previewCollection(rootUrl,entries){
     throw new Error('Mirror rejected content or link metadata.');
   return Object.freeze({
     preview:()=>structuredClone(input),
+    coverage:()=>structuredClone(output.manifest),
     export({approved=false}={}){
       if(approved!==true)throw new Error('Review and approve the complete collection first.');
       return buildMirror(input);
