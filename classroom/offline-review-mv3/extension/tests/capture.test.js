@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {checkSource,capturePage,captureActive,captureMirrorActive,readActiveTab,SCHEMA,LIMITS} from '../capture.js';
 
+import {createCaptureMirrorSession} from '../session.js';
+import {mirrorZip} from '../zip.js';
 const tech='https://techdocs.zebra.com/oeminfo/consume/';
 const forum='https://developer.zebra.com/content/serial-number-tc20';
 test('exact official paths, fragments not persisted',()=>{
@@ -87,7 +89,7 @@ test('title uses tab metadata or an already visible selected-article heading',()
  assert.throws(()=>run({title:'',values:[['h2','Hidden heading',undefined,true],['p','Article paragraph']]}),/title could not be identified/);
 });
 
-function extractFixture(specs, captureOptions) {
+function extractFixture(specs, captureOptions, injected={func:capturePage,args:[{url:tech,kind:'techdocs'},LIMITS,captureOptions]}) {
  const tags=(el,query)=>query.split(',').some(s=>s==='a[href]'?el.localName==='a'&&el.getAttribute('href')!==null:s===el.localName);
  const flatten=(e,onlyElements=false)=>e.nodes.flatMap(child=>
    child.nodeType===3?(onlyElements?[]:[child]):[child,...flatten(child,onlyElements)]);
@@ -110,8 +112,8 @@ function extractFixture(specs, captureOptions) {
    document:{title:'Archive example, synthetic',querySelector:()=>null,querySelectorAll:s=>s==='#mainContent .service-box'?[root]:[],
     createTreeWalker(el){const nodes=flatten(el);let n=0;return {nextNode:()=>nodes[n++]||null};}
    }};
- const serialize=new Function(...Object.keys(scope),'source','limits','opts','return ('+capturePage.toString()+')(source,limits,opts)');
- return serialize(...Object.values(scope),{url:tech,kind:'techdocs'},LIMITS,captureOptions);
+ const serialize=new Function(...Object.keys(scope),'source','limits','opts','return ('+injected.func.toString()+')(source,limits,opts)');
+ return serialize(...Object.values(scope),...injected.args);
 }
 
 test('standalone code and prose retain explicit visual breaks only',()=>{
@@ -204,4 +206,41 @@ test('reports whether the eligible article-link scan stopped at a bound',()=>{
  assert.equal(limited.link_discovery,'candidate_scan_limit');
  assert.equal(limited.discovered_links.length,0);
  assert.equal(limited.capture.truncated,false);
+});
+
+test('approved isolated DOM capture flows to offline ZIP and preserves only captured anchors',async()=>{
+ let executions=0;
+ const specs=[
+  ['h2',{id:'sample'},['Literal <markup> heading']],
+  ['p',{},[['a',{href:'#sample'},['Captured section']],['a',{href:'#absent'},['Missing section']],
+   ['a',{href:'/oeminfo/uncaptured/'},['Not supplied']]]],
+  ['p',{style:{display:'none'}},['Hidden evidence fixture']]
+ ];
+ const api={tabs:{query:async()=>[{id:7,url:tech+'#sample'}]},scripting:{executeScript:async request=>{
+  executions++;
+  assert.deepEqual(request.target,{tabId:7,frameIds:[0]});
+  assert.equal(request.world,'ISOLATED');
+  return [{frameId:0,result:extractFixture(specs,undefined,request)}];
+ }}};
+ const session=createCaptureMirrorSession(api,{roots:[tech]});
+ const expected=await session.selectActive();
+ await assert.rejects(session.capture({expected}),/Confirm/);
+ assert.equal(executions,0);
+ const {token,packet}=await session.capture({expected,approved:true});
+ assert.equal(executions,1);
+ assert.match(packet.blocks[0].text,/<markup>/);
+ assert.throws(()=>session.stage({token}),/Review/);
+ session.stage({token,approved:true});
+ const {files,manifest}=session.build({approved:true});
+ const html=files.get('pages/001.html');
+ assert.match(html,/id="sample"/);
+ assert.match(html,/href="001.html#sample"/);
+ assert.doesNotMatch(html,/href="001.html#absent"|Hidden evidence fixture|<markup>/);
+ assert.match(html,/&lt;markup&gt;/);
+ assert.equal(manifest.pages[0].omitted_links.missing_fragment,1);
+ assert.equal(manifest.missing[0].source_url,'https://techdocs.zebra.com/oeminfo/uncaptured/');
+ const zip=Buffer.from(await mirrorZip(files).arrayBuffer());
+ assert.equal(zip.readUInt32LE(0),0x04034b50);
+ assert.ok(zip.includes(Buffer.from(html)));
+ assert.ok(zip.includes(Buffer.from('manifest.json')));
 });
