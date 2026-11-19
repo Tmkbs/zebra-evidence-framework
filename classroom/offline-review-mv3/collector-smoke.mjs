@@ -6,7 +6,7 @@ function asFile(url,targets,title='Page'){
  const s=JSON.stringify({schema_version:'zebra-reviewed-mirror-page/v1',capture:{schema_version:'zebra-doc-capture/v1',
   source_url:url,source_kind:'techdocs',captured_at:'2026-11-19T12:00:00.000Z',title,truncated:false,
   blocks:[{kind:'paragraph',text:'<script>literal text only</script>'}]},
-  discovered_links:targets.map(target_url=>({target_url,label:'Review label'}))});
+  link_discovery:'retained_link_limit',discovered_links:targets.map(target_url=>({target_url,label:'Review label'}))});
  return new Blob([s]);
 }
 let read=0;
@@ -29,7 +29,7 @@ bindCollector(doc,{download:(_,blob)=>{deliver=blob;}});
 await elements.selection.trigger('submit');
 assert.equal(elements.export.disabled,true);
 const view=JSON.stringify([elements.coverage,elements.pages]);
-for(const literal of [missing,'Review title','Review label','<script>literal text only</script>'])assert.ok(view.includes(literal));
+for(const literal of [missing,'Review title','Review label','retaining 20 links','<script>literal text only</script>'])assert.ok(view.includes(literal));
 await elements.export.trigger('click');
 assert.equal(deliver,undefined);
 elements.approved.checked=true;

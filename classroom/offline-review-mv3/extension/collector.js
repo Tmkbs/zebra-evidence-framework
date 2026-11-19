@@ -1,5 +1,6 @@
 import {COLLECTION_LIMITS,previewCollection} from './collect.js';
 import {mirrorZip} from './zip.js';
+import {describeLinkDiscovery} from './engine.js';
 
 export async function loadCollection(root,files){
   const list=Array.from(files);
@@ -30,7 +31,7 @@ export function bindCollector(doc,{filesToCollection=loadCollection,makeZip=mirr
     coverage.replaceChildren(node('p',manifest.captured_pages+' page(s). '+manifest.completeness));
     for(const row of manifest.pages){
       const counts=Object.entries(row.omitted_links).filter(([,n])=>n).map(([kind,n])=>kind.replaceAll('_',' ')+': '+n);
-      coverage.append(node('p',row.source_url+' — '+(row.capture_truncated?'capture truncated; ':'')+(counts.join(', ')||'no recorded link omissions')));
+      coverage.append(node('p',row.source_url+' — '+(row.capture_truncated?'capture truncated; ':'')+(counts.join(', ')||'no recorded omissions among supplied links')+' — '+describeLinkDiscovery(row.link_discovery)));
     }
     if(manifest.missing.length){
       const list=node('ul');

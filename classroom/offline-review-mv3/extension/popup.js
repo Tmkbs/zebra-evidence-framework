@@ -1,6 +1,7 @@
 import {readActiveTab} from './capture.js';
 import {createCaptureMirrorSession} from './session.js';
 import {mirrorZip} from './zip.js';
+import {describeLinkDiscovery} from './engine.js';
 
 const el=id=>document.getElementById(id);
 const permit=el('public'), capture=el('capture'), save=el('save'), status=el('status'), review=el('reviewed'), zip=el('mirror');
@@ -36,7 +37,7 @@ capture.addEventListener('click',async()=>{
     el('blocks').replaceChildren(...result.packet.blocks.map(b=>item(b.kind.replaceAll('_',' ')+': '+b.text)));
     el('links').replaceChildren(...result.links.map(link=>item((link.label ?? link.target_url)+' | '+link.target_url)));
     el('links').hidden=!result.links.length;
-    el('linkCount').textContent=result.links.length+' same-origin link(s) found; linked pages are not fetched.';
+    el('linkCount').textContent=result.links.length+' same-origin link(s) found; linked pages are not fetched. '+describeLinkDiscovery(result.link_discovery);
     el('preview').hidden=false;el('preview').open=true;
     status.textContent=result.packet.truncated?'Capture was truncated. Inspect before export.':'Capture ready. Inspect before export.';
   } catch {
@@ -50,7 +51,7 @@ save.addEventListener('click',()=>{
 });
 entry.addEventListener('click',()=>{
   if(entry.disabled)return;
-  const envelope={schema_version:'zebra-reviewed-mirror-page/v1',capture:result.packet,discovered_links:result.links};
+  const envelope={schema_version:'zebra-reviewed-mirror-page/v1',capture:result.packet,discovered_links:result.links,...(result.link_discovery===undefined?{}:{link_discovery:result.link_discovery})};
   download(new Blob([JSON.stringify(envelope)+'\n'],{type:'application/json;charset=utf-8'}),'zebra-reviewed-mirror-page.json');
   status.textContent='Collection file download requested. Check browser downloads.';
 });

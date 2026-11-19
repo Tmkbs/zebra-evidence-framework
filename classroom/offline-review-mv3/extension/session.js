@@ -27,8 +27,8 @@ export function createCaptureMirrorSession(chromeApi, {roots, budget}={}) {
       const result=normalizeCapture(row.capture);
       if(generation!==epoch)throw new Error('Mirror session was cleared; capture discarded.');
       const token={};
-      preview={token,result,links:structuredClone(row.discovered_links)};
-      return {token,packet:structuredClone(result),links:structuredClone(preview.links)};
+      preview={token,result,links:structuredClone(row.discovered_links),link_discovery:row.link_discovery};
+      return {token,packet:structuredClone(result),links:structuredClone(preview.links),link_discovery:preview.link_discovery};
     } finally {
       busy=false;
     }
@@ -36,8 +36,8 @@ export function createCaptureMirrorSession(chromeApi, {roots, budget}={}) {
   function stage({approved=false, token}={}) {
     requireIdle();
     if(approved!==true||!preview||preview.token!==token)throw new Error('Review and approve this capture before staging.');
-    const {result,links}=preview;
-    const count=cache.stage({capture:result,discovered_links:links});
+    const {result,links,link_discovery}=preview;
+    const count=cache.stage({capture:result,discovered_links:links,...(link_discovery===undefined?{}:{link_discovery})});
     staged.add(result.source_url);
     preview=null;
     return count;

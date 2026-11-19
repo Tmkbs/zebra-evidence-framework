@@ -192,3 +192,16 @@ test('omits invisible branches and links but retains first summary and open deta
  ]]],{includeSameOriginLinks:true});
  assert.deepEqual(visible.discovered_links,[{target_url:'https://techdocs.zebra.com/oeminfo/visible-summary/',label:'Visible summary link'}]);
 });
+
+test('reports whether the eligible article-link scan stopped at a bound',()=>{
+ const p=['p',{},['Content']];
+ const a=i=>['p',{},[['a',{href:'/oeminfo/link'+i+'/'},['Link']]]];
+ const o={includeSameOriginLinks:true};
+ assert.equal(extractFixture([p,...Array.from({length:20},(_,i)=>a(i))],o).link_discovery,'filtered_scan_finished');
+ assert.equal(extractFixture([p,...Array.from({length:21},(_,i)=>a(i))],o).link_discovery,'retained_link_limit');
+ const skip=['a',{href:'/oeminfo/search/'},['Excluded']];
+ const limited=extractFixture([p,...Array.from({length:160},()=>skip),a(161)],o);
+ assert.equal(limited.link_discovery,'candidate_scan_limit');
+ assert.equal(limited.discovered_links.length,0);
+ assert.equal(limited.capture.truncated,false);
+});

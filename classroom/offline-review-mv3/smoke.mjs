@@ -13,7 +13,7 @@ const chrome={tabs:{query:async()=>[{id:42,url:root}]},scripting:{executeScript:
   assert.deepEqual(opts.target,{tabId:42,frameIds:[0]});
   assert.equal(opts.world,'ISOLATED');
   assert.equal(opts.args[2].includeSameOriginLinks,true);
-  return [{frameId:0,result:{capture,discovered_links:[{target_url:root+'#demo',label:'Same section'},{target_url:origin+'getversioninfo/',label:'Not captured'}]}}];
+  return [{frameId:0,result:{capture,link_discovery:'candidate_scan_limit',discovered_links:[{target_url:root+'#demo',label:'Same section'},{target_url:origin+'getversioninfo/',label:'Not captured'}]}}];
 }}};
 const session=createCaptureMirrorSession(chrome,{roots:[root]});
 const selected=await session.selectActive();
@@ -27,6 +27,8 @@ assert.throws(()=>session.stage({token}),/approve/);
 session.stage({token,approved:true});
 const {files,manifest}=session.build({approved:true});
 assert.equal(manifest.captured_pages,1);
+assert.equal(manifest.pages[0].link_discovery,'candidate_scan_limit');
+assert.match(files.get('pages/001.html'),/examining 160 candidates/);
 assert.equal(manifest.missing[0].source_url,origin+'getversioninfo/');
 assert.match(files.get('pages/001.html'),/href="001.html#demo"/);
 assert.match(files.get('site.css'),/p,li,blockquote,td,th\{white-space:pre-wrap/);

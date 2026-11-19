@@ -92,6 +92,17 @@ function article(blocks){
 }
 
 /** Volatile browser-side buffer; no grants or disk persistence. */
+const linkDiscoveryText=Object.freeze({
+  filtered_scan_finished:'Filtered article-link scan finished. It did not establish full link or asset coverage.',
+  retained_link_limit:'Link discovery stopped after retaining 20 links; additional article links may be omitted.',
+  candidate_scan_limit:'Link discovery stopped after examining 160 candidates; additional article links may be omitted.',
+  unknown:'No link discovery status supplied; link coverage is unknown.'
+});
+export function describeLinkDiscovery(status='unknown') {
+  if(typeof status!=='string'||!Object.hasOwn(linkDiscoveryText,status))throw new Error('Invalid link discovery status.');
+  return linkDiscoveryText[status];
+}
+
 export function createMirrorCache(config) {
   if(!keys(config,['allowed_origins','roots','budget'],['allowed_origins','roots'])||
      !Array.isArray(config.allowed_origins)||config.allowed_origins.length<1||config.allowed_origins.length>4||
@@ -112,12 +123,13 @@ export function createMirrorCache(config) {
   const saved=new Map();
   let cacheBytes=0;
   function stage(row) {
-    if(!keys(row,['capture','discovered_links'],['capture']))throw new Error('invalid cache record');
+    if(!keys(row,['capture','discovered_links','link_discovery'],['capture']))throw new Error('invalid cache record');
     const cap=normalizeCapture(row.capture);
     const source=reference(cap.source_url);
     if(!origins.has(source.origin)||saved.has(cap.source_url))throw new Error('unapproved or duplicate capture');
     const allowedLinks=new Map(), rejected={ invalid_url:0,cross_origin:0,link_budget:0 };
-    const links=row.discovered_links??[];
+    const links=row.discovered_links??[], link_discovery=Object.hasOwn(row,'link_discovery')?row.link_discovery:'unknown';
+    describeLinkDiscovery(link_discovery);
     if(!Array.isArray(links)||links.length>360)throw new Error('invalid discovered links');
     for(const l of links){
       if(!keys(l,['target_url','label'],['target_url']))throw new Error('invalid link record');
@@ -131,9 +143,9 @@ export function createMirrorCache(config) {
     const sorted=[...allowedLinks].sort(([a],[b])=>a===b?0:a<b?-1:1).map(([,v])=>v);
     rejected.link_budget=Math.max(0,sorted.length-budget.maxLinksPerPage);
     const edges=sorted.slice(0,budget.maxLinksPerPage);
-    const size=bytes(JSON.stringify({cap,edges,rejected}));
+    const size=bytes(JSON.stringify({cap,edges,rejected,link_discovery}));
     if(saved.size>=budget.maxPages||cacheBytes+size>budget.maxBytes)throw new Error('temporary mirror cache budget exceeded');
-    saved.set(cap.source_url,{cap,edges,rejected,size});
+    saved.set(cap.source_url,{cap,edges,rejected,link_discovery,size});
     cacheBytes+=size;
     return {count:saved.size,bytes:cacheBytes};
   }
@@ -175,10 +187,11 @@ export function createMirrorCache(config) {
         (p.cap.truncated?'<p class="note">Capture itself was truncated.</p>':'')+
         '<article>'+article(p.cap.blocks)+'</article>'+
         (linked?'<h2>Links within this mirror</h2><ul>'+linked+'</ul>':'')+
+        '<p class="note">'+escape(describeLinkDiscovery(p.link_discovery))+'</p>'+
         (n?'<p class="note">'+n+' discovered link(s) not mirrored; see coverage manifest.</p>':'')+
         '</main></body></html>');
       records.push({source_url:url,path:p.file,source_kind:p.cap.source_kind,captured_at:p.cap.captured_at,
-                    depth:p.depth,blocks:p.cap.blocks.length,capture_truncated:p.cap.truncated,omitted_links:omissions});
+                    depth:p.depth,blocks:p.cap.blocks.length,capture_truncated:p.cap.truncated,omitted_links:omissions,link_discovery:p.link_discovery});
     }
     const manifest={schema_version:OUTPUT,roots,allowed_origins:[...origins].sort(),budget,
       captured_pages:pages.size,unreachable_captures:saved.size-pages.size,temporary_cache_bytes:cacheBytes,

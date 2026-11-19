@@ -23,7 +23,8 @@ export function previewCollection(rootUrl,entries){
     const size=encoder.encode(serialized).length;
     if(size>COLLECTION_LIMITS.entryBytes||(bytes+=size)>COLLECTION_LIMITS.inputBytes)throw new Error('Capture file limit exceeded.');
     const item=JSON.parse(serialized);
-    if(!exact(item,['schema_version','capture','discovered_links'])||item.schema_version!==ENTRY||
+    const extended=exact(item,['schema_version','capture','discovered_links','link_discovery']);
+    if((!extended&&!exact(item,['schema_version','capture','discovered_links']))||item.schema_version!==ENTRY||
       !Array.isArray(item.discovered_links)||item.discovered_links.length>COLLECTION_LIMITS.links)throw new Error('Invalid capture entry envelope.');
     const capture=normalizeCapture(item.capture), url=publicURL(capture.source_url);
     if(new URL(url.url).origin!==origin||url.kind!==root.kind||urls.has(url.url))throw new Error('Duplicate or out-of-scope capture.');
@@ -35,7 +36,7 @@ export function previewCollection(rootUrl,entries){
       if(new URL(target.url).origin!==origin||target.kind!==root.kind)throw new Error('Out-of-scope discovered link.');
       return labeled?{target_url:link.target_url,label:link.label}:{target_url:link.target_url};
     });
-    return {capture,discovered_links};
+    return {capture,discovered_links,...(extended?{link_discovery:item.link_discovery}:{})};
   });
   if(!urls.has(root.url))throw new Error('Select the root page capture.');
   const input={schema_version:'zebra-mirror-input/v1',allowed_origins:[origin],roots:[root.url],pages};

@@ -155,9 +155,11 @@ export function capturePage(source, limits, options) {
   // captured URL as base, not a potentially overriding HTML <base> element.
   const discovered_links=[], linked=new Set();
   const sensitivePath=/^(?:login|logout|log-in|sign-in|signin|register|signup|account|user|users|admin|internal|private|download|oauth|sso|search|ticket|support-portal)(?:$|[-_.])/i;
-  let examinedLinks=0;
+  let examinedLinks=0, link_discovery='filtered_scan_finished';
   for(const a of root.querySelectorAll('a[href]')){
-    if(++examinedLinks>160||discovered_links.length>=20)break;
+    if(discovered_links.length>=20){link_discovery='retained_link_limit';break;}
+    if(examinedLinks>=160){link_discovery='candidate_scan_limit';break;}
+    ++examinedLinks;
     if(!visible(a)||a.getAttribute('download')!==null)continue;
     const raw=a.getAttribute('href');
     if(!raw||raw.length>1800||raw.startsWith('//')||/[?%\\\u0000-\u0020\u007f]/u.test(raw))continue;
@@ -176,7 +178,7 @@ export function capturePage(source, limits, options) {
     linked.add(u.href);
     discovered_links.push(label?{target_url:u.href,label}:{target_url:u.href});
   }
-  return {capture,discovered_links};
+  return {capture,discovered_links,link_discovery};
 }
 
 export async function readActiveTab(chromeApi) {
@@ -204,6 +206,8 @@ export async function captureMirrorActive(chromeApi, expected) {
       packet.source_kind!==source.kind||!Array.isArray(packet.blocks)||!packet.blocks.length||
       !Array.isArray(result.discovered_links)||result.discovered_links.length>20)
     throw new Error('Mirror capture did not finish on the selected page.');
+  if(result.link_discovery!==undefined&&!['filtered_scan_finished','retained_link_limit','candidate_scan_limit'].includes(result.link_discovery))
+    throw new Error('Invalid mirror link discovery status.');
   const origin=new URL(source.url).origin;
   for(const link of result.discovered_links){
     if(typeof link?.target_url!=='string')throw new Error('Malformed mirror link.');

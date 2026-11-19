@@ -41,3 +41,16 @@ test('round trips the optional label emitted for image-only or icon links',()=>{
  assert.throws(()=>previewCollection(root,[JSON.stringify({...entry,discovered_links:[{target_url:child,label:null}]}),packet(child)]),/Invalid discovered/);
  assert.throws(()=>previewCollection(root,[JSON.stringify({...entry,discovered_links:[{target_url:child,extra:'unexpected'}]}),packet(child)]),/Invalid discovered/);
 });
+
+test('carries capture discovery limits separately from offline omissions, accepts legacy unknown',()=>{
+ const entry=JSON.parse(packet(root,[child]));
+ entry.link_discovery='retained_link_limit';
+ const session=previewCollection(root,[JSON.stringify(entry),packet(child)]);
+ assert.equal(session.coverage().pages[0].link_discovery,'retained_link_limit');
+ assert.equal(session.coverage().pages[1].link_discovery,'unknown');
+ assert.match(session.export({approved:true}).files.get('pages/001.html'),/additional article links may be omitted/);
+ for(const invalid of ['complete',null,['retained_link_limit']]){
+   entry.link_discovery=invalid;
+   assert.throws(()=>previewCollection(root,[JSON.stringify(entry),packet(child)]),/Invalid link discovery/);
+ }
+});
