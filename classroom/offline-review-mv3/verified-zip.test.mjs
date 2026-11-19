@@ -48,3 +48,16 @@ test('download is off until local verification and cancelled selections cannot r
  assert.equal(sha(Buffer.from(await download.arrayBuffer())),archive_hash);
  assert.equal(els.save.disabled,true);
 });
+
+test('pinned pair receipt is displayed only when case, edition and capture agree',async()=>{
+ const source_pair={schema:'zebra-local-case-source-pair-binding/v1',case_id:receipt.binding.case_id,
+   run_id:receipt.binding.run_id,techdocs_url:receipt.binding.source_url,forum_url:'https://developer.zebra.com/forum/25083',
+   techdocs_capture_sha256:receipt.binding.capture_sha256,forum_capture_sha256:'e'.repeat(64),
+   pair_pin_sha256:'f'.repeat(64),grant_sha256:'1'.repeat(64),publication:'NOT_AUTHORIZED',reviewer_authenticated:false};
+ const r={...receipt,forum_pairing:'EXACT_LOCAL_PAIR_PIN_MATCHED',source_pair};
+ assert.equal((await verifyLocalZip(files(r))).pairedForum,source_pair.forum_url);
+ assert.equal((await verifyLocalZip(files())).pairedForum,null);
+ for(const diff of [{case_id:'OTHER'},{techdocs_capture_sha256:'2'.repeat(64)},
+    {forum_url:'https://techdocs.zebra.com/emdk-for-android/7-3/samples/barcode/'},{reviewer_authenticated:true}])
+  await assert.rejects(verifyLocalZip(files({...r,source_pair:{...source_pair,...diff}})));
+});

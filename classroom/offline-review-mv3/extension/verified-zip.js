@@ -24,10 +24,21 @@ export async function verifyLocalZip({receiptFile,zipFile,expectedReceiptSha256}
     b.archive_path.split('#')[1]!==b.target_anchor)fail();
  const src=checkSource(b.source_url);
  if(src.kind!=='techdocs'||src.url!==b.source_url||new URL(src.url).pathname.split('/')[2]!==b.source_version)fail();
+ const pair=r.source_pair;
+ let pairedForum=null;
+ if(r.forum_pairing==='EXACT_LOCAL_PAIR_PIN_MATCHED'){
+  if(!pair||pair.schema!=='zebra-local-case-source-pair-binding/v1'||pair.case_id!==b.case_id||
+     pair.run_id!==b.run_id||pair.techdocs_url!==src.url||pair.techdocs_capture_sha256!==b.capture_sha256||
+     !valid(pair.forum_capture_sha256,SHA)||!valid(pair.pair_pin_sha256,SHA)||!valid(pair.grant_sha256,SHA)||
+     pair.publication!=='NOT_AUTHORIZED'||pair.reviewer_authenticated!==false)fail();
+  const forum=checkSource(pair.forum_url);
+  if(forum.kind!=='forum'||forum.url!==pair.forum_url)fail();
+  pairedForum=forum.url;
+ }else if(pair!==undefined||(r.forum_pairing!==undefined&&r.forum_pairing!=='UNVERIFIED_COMPANION_NOT_BOUND_TO_CASE'))fail();
  const zipBytes=await zipFile.arrayBuffer();
  if(zipBytes.byteLength!==zipFile.size||await digest(zipBytes)!==r.archive_hash)fail();
  return Object.freeze({caseId:b.case_id,runId:b.run_id,edition:b.source_version,sourceUrl:src.url,archivePath:b.archive_path,
-   archiveSha256:r.archive_hash,blob:new Blob([zipBytes],{type:'application/zip'})});
+   archiveSha256:r.archive_hash,pairedForum,blob:new Blob([zipBytes],{type:'application/zip'})});
 }
 
 export function bindVerifiedZip(doc,{verify=verifyLocalZip,save=saveLocal}={}){
@@ -50,7 +61,7 @@ export function bindVerifiedZip(doc,{verify=verifyLocalZip,save=saveLocal}={}){
    state=result;
    summary.textContent=[result.caseId,result.runId,'Edition '+result.edition,result.sourceUrl,
     'Receipt-reported archive location: '+result.archivePath,'ZIP SHA-256: '+result.archiveSha256].join('\n');
-   status.textContent='Exact ZIP bytes match the pinned receipt. The accompanying forum capture is not bound to the reviewed case. Structure and reviewer identity were not checked.';
+   status.textContent='Exact ZIP bytes match the pinned receipt. '+(result.pairedForum?'The receipt reports a pinned forum pair: '+result.pairedForum+'. ':'The accompanying forum capture is not bound to the reviewed case. ')+'Archive structure and reviewer identity were not checked.';
    button.disabled=false;
   }catch{if(round===epoch)invalidate('Verification failed. Check the independent receipt pin and the two local files.');}
  });

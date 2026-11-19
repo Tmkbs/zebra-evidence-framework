@@ -37,5 +37,24 @@ test('one selected-input command assembles actual reviewed ZIP and refuses inval
   assert.equal(report.forum_pairing,'UNVERIFIED_COMPANION_NOT_BOUND_TO_CASE');
   assert.equal(report.binding.publication,'NOT_AUTHORIZED');assert.equal(report.browser_extension_install,'NOT_RUN');
   assert.equal(run(sha(grant)).status,1);assert.deepEqual(readFileSync(out),bytes);
+  const paired=path.join(dir,'paired.zip');
+  const pair=JSON.stringify({schema:'zebra-local-case-source-pair/v1',scope:'LOCAL_INERT_ARCHIVE_ONLY',
+   case_id:identity.case_id,run_id:identity.run_id,grant_sha256:sha(grant),forum_url:forum.source_url,
+   forum_capture_sha256:captureDigest(forum),techdocs_url:source_url,techdocs_capture_sha256:captureDigest(capture)});
+  writeFileSync(path.join(selected,'pair.json'),pair);
+  const pairedRun=(pin)=>spawnSync(process.execPath,[here,'--paired-local',selected,sha(grant),paired,pin],{encoding:'utf8',timeout:5000});
+  assert.equal(pairedRun('0'.repeat(64)).status,1);
+  writeFileSync(path.join(selected,'forum.json'),JSON.stringify(wrap({...forum,source_url:'https://developer.zebra.com/forum/25084'})));
+  assert.equal(pairedRun(sha(pair)).status,1);assert.equal(existsSync(paired),false);
+  writeFileSync(path.join(selected,'forum.json'),JSON.stringify(wrap({...forum,blocks:[{kind:'paragraph',text:'Unapproved altered body.'}]})));
+  assert.equal(pairedRun(sha(pair)).status,1);assert.equal(existsSync(paired),false);
+  writeFileSync(path.join(selected,'forum.json'),JSON.stringify(wrap(forum)));
+  const resultPaired=pairedRun(sha(pair));assert.equal(resultPaired.status,0,resultPaired.stderr);
+  const pReport=JSON.parse(resultPaired.stdout);
+  assert.equal(pReport.forum_pairing,'EXACT_LOCAL_PAIR_PIN_MATCHED');
+  assert.equal(pReport.source_pair.forum_capture_sha256,captureDigest(forum));
+  assert.equal(pReport.source_pair.reviewer_authenticated,false);
+  assert.equal(pReport.archive_hash,sha(readFileSync(paired)));
+
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
