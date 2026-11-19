@@ -120,6 +120,24 @@ const omissionLabels=Object.freeze({
  invalid_url:'Invalid target URL',cross_origin:'Cross-origin target',link_budget:'Link budget',
  depth_budget:'Depth budget',not_supplied:'Target not supplied',missing_fragment:'Section anchor not captured'
 });
+function coverageReadiness({roots,pages,missing,unreachable_captures}) {
+  const rendered=new Set(pages.map(p=>p.source_url));
+  const roots_not_rendered=roots.filter(url=>!rendered.has(url));
+  const text_truncated=pages.filter(p=>p.capture_truncated).length;
+  const link_scan_incomplete=pages.filter(p=>p.link_discovery!=='filtered_scan_finished').length;
+  const omitted_targets=pages.some(p=>Object.values(p.omitted_links).some(count=>count>0));
+  const known_partial=roots_not_rendered.length>0||unreachable_captures>0||text_truncated>0||missing.length>0||omitted_targets||
+    pages.some(p=>['retained_link_limit','candidate_scan_limit'].includes(p.link_discovery));
+  return {
+    status:known_partial?'KNOWN_PARTIAL_CAPTURE':'STRUCTURED_SNAPSHOT_ONLY',
+    requested_root_routes:{count:roots.length,rendered:roots.length-roots_not_rendered.length,not_rendered:roots_not_rendered},
+    linked_routes_rendered:pages.length-(roots.length-roots_not_rendered.length),
+    text:{truncated_pages:text_truncated},
+    link_discovery:{unknown_or_limited_pages:link_scan_incomplete},
+    assets:{status:'NOT_CAPTURED',excluded:['source images','source stylesheets','attachments','source scripts']},
+    independent_source_fidelity_verified:false,full_site_coverage_verified:false
+  };
+}
 function renderCoverage(manifest,pages) {
   const items=manifest.pages.map(row=>{
     const title=pages.get(row.source_url).cap.title;
@@ -129,8 +147,15 @@ function renderCoverage(manifest,pages) {
       '<td>'+escape(row.captured_at)+'<br>'+row.blocks+' block(s) · '+(row.capture_truncated?'Capture truncated':'No reported text truncation')+'</td>'+
       '<td>'+escape(describeLinkDiscovery(row.link_discovery))+(reasons?'<ul>'+reasons+'</ul>':'<p>No omitted targets among reported links.</p>')+'</td></tr>';
   }).join('');
+  const readiness=manifest.coverage_readiness, roots=readiness.requested_root_routes;
+  const known=readiness.status==='KNOWN_PARTIAL_CAPTURE';
   return '<section aria-labelledby="archive-coverage"><h2 id="archive-coverage">Archive coverage</h2>'+
-    '<p>'+manifest.captured_pages+' page(s) rendered · '+manifest.missing.length+' requested target(s) not supplied · '+
+    '<p><strong>'+(known?'Known partial capture.':'Structured snapshot only.')+'</strong> '+
+    roots.rendered+' of '+roots.count+' requested root routes rendered; '+readiness.linked_routes_rendered+' linked route(s) rendered.</p>'+
+    '<p>'+readiness.text.truncated_pages+' page(s) reported text truncation; '+readiness.link_discovery.unknown_or_limited_pages+
+    ' page(s) reported unknown or budget-limited link discovery. Source images, stylesheets, attachments, and scripts were not captured. '+
+    'Source fidelity and full-site coverage were not independently verified.</p>'+
+    '<p>'+manifest.captured_pages+' page(s) rendered · '+manifest.missing.length+' target(s) not supplied · '+
     manifest.unreachable_captures+' supplied snapshot(s) not reachable within the configured graph.</p>'+
     '<p>Counts describe this offline archive, not the original site. A capture is not a diagnosis, revision, or model result. '+
     '<a href="manifest.json">Machine-readable coverage manifest</a></p>'+
@@ -138,7 +163,7 @@ function renderCoverage(manifest,pages) {
     manifest.budget.maxLinksPerPage+' accepted links per page, '+manifest.budget.maxBytes+' bytes in the temporary cache.</p>'+
     (items?'<table><caption>Rendered snapshots and known limits</caption><thead><tr><th scope="col">Snapshot</th><th scope="col">Captured text</th><th scope="col">Link scan and omissions</th></tr></thead><tbody>'+items+'</tbody></table>':
       '<p>No rendered snapshots. Supply the exact root capture to start.</p>')+
-    (manifest.missing.length?'<h3>Requested targets not supplied</h3><ul>'+manifest.missing.map(row=>
+    (manifest.missing.length?'<h3>Targets not supplied (requested roots or discovered links)</h3><ul>'+manifest.missing.map(row=>
       '<li><code>'+escape(row.source_url)+'</code></li>').join('')+'</ul>':'')+'</section>';
 }
 
@@ -237,6 +262,7 @@ export function createMirrorCache(config) {
       captured_pages:pages.size,unreachable_captures:saved.size-pages.size,temporary_cache_bytes:cacheBytes,
       pages:records,missing,
       completeness:'Supplied structured text only. Scripts, images, assets, private pages, external links and unsupplied routes are not mirrored.'};
+    manifest.coverage_readiness=coverageReadiness(manifest);
     files.set('index.html',head('Offline Zebra evidence mirror','site.css')+
       '<main><h1>Offline Zebra evidence mirror</h1><p class="note">'+escape(manifest.completeness)+'</p>'+
       renderCoverage(manifest,pages)+'</main></body></html>');

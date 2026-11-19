@@ -52,7 +52,7 @@ test('index explains archive coverage using manifest facts without turning missi
  a.link_discovery='retained_link_limit';
  const result=build([a,second,row(orphan,'Not reachable',[[null,'Unreachable heading']])]);
  const index=result.files.get('index.html');
- assert.match(index,/2 page\(s\) rendered · 1 requested target\(s\) not supplied · 1 supplied snapshot\(s\) not reachable/);
+ assert.match(index,/2 page\(s\) rendered · 1 target\(s\) not supplied · 1 supplied snapshot\(s\) not reachable/);
  assert.match(index,/href="pages\/001.html">Root &lt;b&gt;/);
  assert.match(index,/Capture truncated/);
  assert.match(index,/retaining 20 links/);
@@ -74,4 +74,28 @@ test('empty archive reports the missing root rather than implying successful cov
  assert.match(index,/No rendered snapshots/);
  assert.ok(index.includes('<code>'+root+'</code>'));
  assert.doesNotMatch(index,/href="pages\//);
+});
+
+test('archive readiness separates explicit roots, bounded links, text and excluded assets',()=>{
+ const a=row(root,'Synthetic root', [['overview','Overview']], [child+'#setup']);
+ a.capture.truncated=true;
+ a.link_discovery='candidate_scan_limit';
+ const view=build([a,second]);
+ const q=view.manifest.coverage_readiness;
+ assert.equal(q.status,'KNOWN_PARTIAL_CAPTURE');
+ assert.deepEqual(q.requested_root_routes,{count:1,rendered:1,not_rendered:[]});
+ assert.equal(q.linked_routes_rendered,1);
+ assert.equal(q.text.truncated_pages,1);
+ assert.equal(q.link_discovery.unknown_or_limited_pages,2);
+ assert.equal(q.assets.status,'NOT_CAPTURED');
+ assert.equal(q.independent_source_fidelity_verified,false);
+ assert.equal(q.full_site_coverage_verified,false);
+ assert.match(view.files.get('index.html'),/Known partial capture/);
+ assert.match(view.files.get('index.html'),/1 of 1 requested root routes rendered; 1 linked route/);
+ assert.match(view.files.get('index.html'),/Source images, stylesheets, attachments, and scripts were not captured/);
+ const clean=build([row(root,'Synthetic root',[[null,'No omissions']])]).manifest.coverage_readiness;
+ assert.equal(clean.status,'STRUCTURED_SNAPSHOT_ONLY');
+ assert.equal(clean.full_site_coverage_verified,false);
+ assert.equal(clean.link_discovery.unknown_or_limited_pages,1);
+ assert.deepEqual(build([]).manifest.coverage_readiness.requested_root_routes,{count:1,rendered:0,not_rendered:[root]});
 });
