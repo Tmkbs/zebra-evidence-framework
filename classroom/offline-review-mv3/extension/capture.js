@@ -59,6 +59,8 @@ export function capturePage(source, limits, options) {
         /(?:^|\s)(?:password|api[_ -]?key|secret[_ -]?key|access[_ -]?token|client[_ -]?secret)\s*[:=]\s*['"]?[A-Za-z0-9+/_.-]{16,}/i.test(value) ||
         (source.kind==='forum' && /(?:^|[^A-Za-z0-9+/])[A-Za-z0-9+/]{64,}={0,2}(?=$|[^A-Za-z0-9+/])/.test(value));
   const blocks=[];
+  const tableOptIn=source.kind==='techdocs'&&options?.includeTableCellMap===true;
+  const rows=[];let omittedRows=0;
   let size=0, truncated=false, examined=0, remainingTextNodes=18000;
   const presentation=new WeakMap();
   const visible=(el)=>{
@@ -128,7 +130,11 @@ export function capturePage(source, limits, options) {
     if(tag!=='pre'&&el.parentElement?.closest('pre'))continue;
     if(tag!=='tr'&&el.parentElement?.closest('td,th'))continue; // cells own their semantics
     if(tag==='tr'&&el.cells.length>40)truncated=true;
-    const value=tag==='tr'?Array.prototype.slice.call(el.cells,0,40).filter(visible).map(e=>plain(e,'cell')).join(' | '):plain(el,tag==='pre'?'code':'prose');
+    const rowCells=tag==='tr'?Array.prototype.slice.call(el.cells,0,40).filter(visible):null;
+    const beforeTextBudget=remainingTextNodes;
+    const wasTruncated=truncated;
+    const cellTexts=rowCells?.map(e=>plain(e,'cell'));
+    const value=cellTexts?cellTexts.join(' | '):plain(el,tag==='pre'?'code':'prose');
     if (!value.trim()) continue;
     if (restricted(value))throw new Error('Potential credentials or opaque identifiers detected; nothing was captured.');
     if (blocks.length>=limits.blocks || size>=limits.totalBytes){truncated=true;break;}
@@ -139,6 +145,23 @@ export function capturePage(source, limits, options) {
     const block={kind,text:next};
     if(kind==='heading')block.level=Number(tag[1]);
     if(el.id && /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/.test(el.id))block.anchor=el.id;
+    if(tableOptIn&&rowCells){
+      const complete=!wasTruncated&&!truncated&&value===next&&beforeTextBudget>0&&remainingTextNodes>0&&
+        rowCells.length===el.cells.length&&rowCells.length>0&&rowCells.length<=12&&rows.length<32&&
+        rowCells.every((c,i)=>c.parentElement===el&&(c.localName==='td'||c.localName==='th')&&
+          [null,'1'].includes(c.getAttribute('rowspan'))&&[null,'1'].includes(c.getAttribute('colspan'))&&
+          c.querySelectorAll('table').length===0&&cellTexts[i].trim().length>0);
+      if(complete){
+        let start=0;
+        const cells=rowCells.map((c,column_index)=>{
+          const end=start+cellTexts[column_index].length;
+          const range={column_index,cell_kind:c.localName,start_utf16:start,end_utf16:end};
+          start=end+3;
+          return range;
+        });
+        rows.push({block_index:blocks.length,cells});
+      }else ++omittedRows;
+    }
     blocks.push(block);size+=encoder.encode(next).byteLength;
   }
   if(!blocks.length) throw new Error('No supported public text blocks were found.');
@@ -150,7 +173,8 @@ export function capturePage(source, limits, options) {
   const boundedTitle=clip(title,limits.titleBytes);
   if(boundedTitle!==title)truncated=true;
   const capture={schema_version:'zebra-doc-capture/v1',source_url:source.url,captured_at:new Date().toISOString(),title:boundedTitle,source_kind:source.kind,blocks,truncated};
-  if(options?.includeSameOriginLinks!==true)return capture;
+  const table_cell_map={schema_version:'zebra-table-cell-map/v1',rows,omitted_rows:omittedRows,capture_truncated:capture.truncated};
+  if(options?.includeSameOriginLinks!==true)return tableOptIn?{capture,table_cell_map}:capture;
   // Opt-in only: discover visible candidates without visiting them. Use the
   // captured URL as base, not a potentially overriding HTML <base> element.
   const discovered_links=[], linked=new Set();
@@ -178,7 +202,7 @@ export function capturePage(source, limits, options) {
     linked.add(u.href);
     discovered_links.push(label?{target_url:u.href,label}:{target_url:u.href});
   }
-  return {capture,discovered_links,link_discovery};
+  return {capture,discovered_links,link_discovery,...(tableOptIn?{table_cell_map}:{})};
 }
 
 export async function readActiveTab(chromeApi) {
@@ -218,4 +242,43 @@ export async function captureMirrorActive(chromeApi, expected) {
       throw new Error('Invalid mirror link.');
   }
   return result;
+}
+
+/** Explicit opt-in in the currently approved public TechDocs tab; no popup behavior changes. */
+export async function captureTableActive(chromeApi, expected, {approved=false}={}) {
+ if(approved!==true)throw new Error('Explicit local table capture approval is required.');
+ const {tabId,source}=await readActiveTab(chromeApi);
+ if(source.kind!=='techdocs'||expected?.tabId!==tabId||expected.source?.url!==source.url)
+   throw new Error('The selected public TechDocs page changed before capture.');
+ const [r]=await chromeApi.scripting.executeScript({target:{tabId,frameIds:[0]},world:'ISOLATED',
+   func:capturePage,args:[source,LIMITS,{includeTableCellMap:true}]});
+ const out=r?.result, cap=out?.capture, map=out?.table_cell_map;
+ const invalid=()=>{throw new Error('Invalid local table-cell capture.');};
+ const exact=(x, keys)=>x&&typeof x==='object'&&!Array.isArray(x)&&Object.keys(x).length===keys.length&&keys.every(k=>Object.hasOwn(x,k));
+ if(r?.frameId!==0||!exact(out,['capture','table_cell_map'])||
+    !exact(cap,['schema_version','source_url','captured_at','title','source_kind','blocks','truncated'])||
+    !exact(map,['schema_version','rows','omitted_rows','capture_truncated'])||
+    cap?.schema_version!==SCHEMA||cap.source_url!==source.url||cap.source_kind!=='techdocs'||
+    !Array.isArray(cap.blocks)||!cap.blocks.length||cap.blocks.length>LIMITS.blocks||typeof cap.truncated!=='boolean'||
+    map?.schema_version!=='zebra-table-cell-map/v1'||!Array.isArray(map.rows)||map.rows.length>32||
+    !Number.isInteger(map.omitted_rows)||map.omitted_rows<0||map.omitted_rows>cap.blocks.length||map.capture_truncated!==cap.truncated)invalid();
+ if(cap.blocks.some(b=>!exact(b,['kind','text',...(Object.hasOwn(b??{},'anchor')?['anchor']:[]),...(Object.hasOwn(b??{},'level')?['level']:[])]))||
+    map.rows.length+map.omitted_rows!==cap.blocks.filter(b=>b.kind==='table_row').length)invalid();
+ let last=-1;
+ for(const row of map.rows) {
+  const index=row?.block_index, b=cap.blocks[index];
+  if(!exact(row,['block_index','cells'])||!Number.isInteger(index)||index<=last||b?.kind!=='table_row'||typeof b.text!=='string'||
+     !Array.isArray(row.cells)||!row.cells.length||row.cells.length>12)invalid();
+  last=index;let start=0,end=0;
+  for(const [i,c] of row.cells.entries()){
+   if(!exact(c,['column_index','cell_kind','start_utf16','end_utf16'])||c.column_index!==i||!['td','th'].includes(c.cell_kind)||c.start_utf16!==start||
+      !Number.isInteger(c.end_utf16)||c.end_utf16<=start||c.end_utf16>b.text.length)invalid();
+   end=c.end_utf16;
+   const text=b.text.slice(start,end);
+   if(!text.trim()||/\p{Surrogate}/u.test(text)||(i+1<row.cells.length&&b.text.slice(end,end+3)!==' | '))invalid();
+   start=end+3;
+  }
+  if(end!==b.text.length)invalid();
+ }
+ return out;
 }

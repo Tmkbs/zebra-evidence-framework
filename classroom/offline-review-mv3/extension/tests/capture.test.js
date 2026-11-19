@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {checkSource,capturePage,captureActive,captureMirrorActive,readActiveTab,SCHEMA,LIMITS} from '../capture.js';
+import {checkSource,capturePage,captureActive,captureTableActive,captureMirrorActive,readActiveTab,SCHEMA,LIMITS} from '../capture.js';
 
 import {createCaptureMirrorSession} from '../session.js';
 import {mirrorZip} from '../zip.js';
@@ -265,4 +265,46 @@ test('numeric developer forum paths are exact and remain same-origin when discov
  const result=extractFixture(fixture,options,{func:capturePage,args:[checkSource(numeric),LIMITS,options]});
  assert.deepEqual(result.discovered_links,[{target_url:'https://developer.zebra.com/forum/3/',label:'Accepted'}]);
  assert.equal(result.capture.source_url,numeric);
+});
+
+test('opt-in cell boundaries preserve literal separators and Unicode UTF-16 offsets without changing capture v1',()=>{
+ const specs=[['h2',{id:'syntax'},['Syntax']],['table',{},[['tr',{},[['th',{},['字😀 | Example']],['td',{},[['p',{},['Second']],['p',{},['Line']]]]]]]]];
+ const base=extractFixture(specs,undefined);
+ const mapped=extractFixture(specs,{includeTableCellMap:true});
+ const {captured_at:ignore1,...plain}=base,{captured_at:ignore2,...plus}=mapped.capture;
+ assert.deepEqual(plus,plain);
+ assert.equal(Object.hasOwn(base,'table_cell_map'),false);
+ assert.equal(mapped.table_cell_map.schema_version,'zebra-table-cell-map/v1');
+ const [row]=mapped.table_cell_map.rows;
+ assert.equal(row.block_index,1);
+ assert.deepEqual(row.cells.map(c=>mapped.capture.blocks[row.block_index].text.slice(c.start_utf16,c.end_utf16)),['字😀 | Example','Second\nLine']);
+ assert.deepEqual(row.cells.map(c=>c.cell_kind),['th','td']);
+ assert.equal(mapped.table_cell_map.omitted_rows,0);
+});
+test('table sidecar omits unsupported geometry without suggesting a cell identity',()=>{
+ const span=[['table',{},[['tr',{},[['td',{colspan:'2'},['Across']],['td',{},['Other']]]]]]];
+ const mapped=extractFixture(span,{includeTableCellMap:true,includeSameOriginLinks:true});
+ assert.deepEqual(mapped.table_cell_map.rows,[]);
+ assert.equal(mapped.table_cell_map.omitted_rows,1);
+ assert.equal(mapped.capture.blocks[0].text,'Across | Other');
+});
+test('table adapter requires explicit approval and exact top-frame result',async()=>{
+ const specs=[['table',{},[['tr',{},[['td',{},['One']],['td',{},['Two']]]]]]];
+ let calls=0,mode='valid';
+ const api={tabs:{query:async()=>[{id:5,url:tech}]},scripting:{executeScript:async req=>{
+  calls++;
+  assert.deepEqual(req.target,{tabId:5,frameIds:[0]});assert.equal(req.world,'ISOLATED');
+  const result=extractFixture(specs,req.args[2],req);
+  if(mode==='boundary')result.table_cell_map.rows[0].cells[1].start_utf16--;
+  if(mode==='extra_wrapper')result.extra='not packed';
+  if(mode==='extra_map')result.table_cell_map.extra='not packed';
+  if(mode==='extra_cell')result.table_cell_map.rows[0].cells[0].extra='not packed';
+  if(mode==='extra_block')result.capture.blocks[0].extra='not packed';
+  if(mode==='coverage')result.table_cell_map.omitted_rows++;
+  return [{frameId:mode==='frame'?1:0,result}];
+ }}};
+ const expected=await readActiveTab(api);
+ await assert.rejects(captureTableActive(api,expected),/approval/);assert.equal(calls,0);
+ assert.equal((await captureTableActive(api,expected,{approved:true})).table_cell_map.rows.length,1);
+ for(const bad of ['boundary','frame','extra_wrapper','extra_map','extra_cell','extra_block','coverage']){mode=bad;await assert.rejects(captureTableActive(api,expected,{approved:true}),/Invalid/);}
 });
