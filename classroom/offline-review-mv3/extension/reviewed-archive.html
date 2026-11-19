@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; base-uri 'none'; connect-src 'none'; form-action 'none'; object-src 'none'">
+<title>Build a locally reviewed revision archive</title>
+<script type="module" src="./reviewed-archive-page.mjs"></script>
+<main>
+<h1>Build a locally reviewed revision archive</h1>
+<p>Select the two captured pages, reviewer files, and the two SHA-256 pins from your separate review record. The files stay in this browser tab. This does not capture new pages, run a model, or publish changes.</p>
+<form id="reviewed">
+<p><label>Forum capture <input name="forum" type="file" required></label></p>
+<p><label>TechDocs capture <input name="techdocs" type="file" required></label></p>
+<p><label>Review grant <input name="grant" type="file" required></label></p>
+<p><label>Review grant SHA-256 <input name="trustPin" pattern="[a-f0-9]{64}" maxlength="64" autocomplete="off" required></label></p>
+<p><label>Capture-pair declaration <input name="pairBytes" type="file" required></label></p>
+<p><label>Capture-pair SHA-256 <input name="pairPin" pattern="[a-f0-9]{64}" maxlength="64" autocomplete="off" required></label></p>
+<p><label>Original HTML <input name="baseline" type="file" required></label></p>
+<p><label>Reviewed working-copy HTML <input name="workingCopy" type="file" required></label></p>
+<p><label>Review receipt <input name="receipt" type="file" required></label></p>
+<p><button type="submit">Build ZIP</button></p>
+</form>
+<p id="status" role="status"></p>
+<p><a id="archive" download="zebra-local-reviewed-revision.zip" hidden>Download reviewed ZIP</a></p>
+</main>
+</html>

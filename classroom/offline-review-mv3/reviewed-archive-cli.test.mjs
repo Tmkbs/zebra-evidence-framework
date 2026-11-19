@@ -9,7 +9,7 @@ import {fileURLToPath} from 'node:url';
 import {captureDigest} from './approved-revision-archive.mjs';
 const sha=x=>createHash('sha256').update(x).digest('hex');
 const here=fileURLToPath(new URL('./reviewed-archive-cli.mjs',import.meta.url));
-test('one selected-input command assembles actual reviewed ZIP and refuses invalid pin/overwrite',()=>{
+test('one selected-input command assembles actual reviewed ZIP and refuses invalid pin/overwrite',async()=>{
  const dir=mkdtempSync(path.join(realpathSync(tmpdir()),'zebra-assemble-'));
  try {
   const selected=path.join(dir,'selected');mkdirSync(selected);
@@ -23,7 +23,7 @@ test('one selected-input command assembles actual reviewed ZIP and refuses inval
   const copy='<main><p id="step-3">Synthetic original source.</p><p id="proposal">Synthetic reviewed copy.</p></main>';
   const identity={case_id:'SYNTHETIC-01',run_id:'CAPTURE-'+'a'.repeat(24),source_url,source_anchor:'step-3',target_anchor:'proposal',
     source_version:'7-3',source_sha256:sha(baseline),paragraph_sha256:'1'.repeat(64),operation_sha256:'2'.repeat(64),
-    working_copy_sha256:sha(copy),capture_sha256:captureDigest(capture)};
+    working_copy_sha256:sha(copy),capture_sha256:await captureDigest(capture)};
   const receipt={...identity,schema:'zebra-bound-typed-copy/v1',publication:'NOT_AUTHORIZED',model_execution:'NOT_RUN',original_modified:false,write_performed:false};
   const grant=JSON.stringify({schema:'zebra-local-archive-overlay-grant/v1',scope:'LOCAL_INERT_ARCHIVE_ONLY',...identity,archive_text:'Synthetic reviewed paragraph'});
   for(const [name,v] of Object.entries({'forum.json':JSON.stringify(wrap(forum)),'techdocs.json':JSON.stringify(wrap(capture)),
@@ -40,7 +40,7 @@ test('one selected-input command assembles actual reviewed ZIP and refuses inval
   const paired=path.join(dir,'paired.zip');
   const pair=JSON.stringify({schema:'zebra-local-case-source-pair/v1',scope:'LOCAL_INERT_ARCHIVE_ONLY',
    case_id:identity.case_id,run_id:identity.run_id,grant_sha256:sha(grant),forum_url:forum.source_url,
-   forum_capture_sha256:captureDigest(forum),techdocs_url:source_url,techdocs_capture_sha256:captureDigest(capture)});
+   forum_capture_sha256:await captureDigest(forum),techdocs_url:source_url,techdocs_capture_sha256:await captureDigest(capture)});
   writeFileSync(path.join(selected,'pair.json'),pair);
   const pairedRun=(pin)=>spawnSync(process.execPath,[here,'--paired-local',selected,sha(grant),paired,pin],{encoding:'utf8',timeout:5000});
   assert.equal(pairedRun('0'.repeat(64)).status,1);
@@ -52,7 +52,7 @@ test('one selected-input command assembles actual reviewed ZIP and refuses inval
   const resultPaired=pairedRun(sha(pair));assert.equal(resultPaired.status,0,resultPaired.stderr);
   const pReport=JSON.parse(resultPaired.stdout);
   assert.equal(pReport.forum_pairing,'EXACT_LOCAL_PAIR_PIN_MATCHED');
-  assert.equal(pReport.source_pair.forum_capture_sha256,captureDigest(forum));
+  assert.equal(pReport.source_pair.forum_capture_sha256,await captureDigest(forum));
   assert.equal(pReport.source_pair.reviewer_authenticated,false);
   assert.equal(pReport.archive_hash,sha(readFileSync(paired)));
 
