@@ -76,6 +76,19 @@ export function normalizeCapture(raw) {
 const escape=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
 const head=(title,css)=>'<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'self\'; object-src \'none\'; base-uri \'none\'; form-action \'none\'"><title>'+escape(title)+'</title><link rel="stylesheet" href="'+css+'"></head><body>';
 const CSS='body{overflow-wrap:anywhere;font:16px/1.55 system-ui,sans-serif;max-width:70rem;margin:auto;padding:1rem;color:#132031}a{color:#00507a}p,li,blockquote,td,th{white-space:pre-wrap;overflow-wrap:anywhere}pre{overflow:auto;padding:.7rem;background:#f0f4f8}code{white-space:pre-wrap;overflow-wrap:anywhere}blockquote{border-left:3px solid #789;margin-left:0;padding-left:1rem}td,th{padding:.3rem;border:1px solid #84909a;overflow-wrap:anywhere}table{border-collapse:collapse;max-width:100%;display:block;overflow:auto}.note{background:#edf4f9;padding:.5rem}a:focus-visible{outline:3px solid #a84800}';
+const pageName=p=>p.file.slice('pages/'.length);
+function archiveNavigation(order,i) {
+  const adjacent=(p,dir,label)=>p?'<li><a rel="'+dir+'" href="'+pageName(p)+'">'+label+'<span> '+escape(p.cap.title)+'</span></a></li>':'';
+  return '<nav aria-label="Offline archive pages"><ul>'+
+    '<li><a href="../index.html">Mirror index</a></li><li><a href="../manifest.json">Coverage manifest</a></li>'+
+    adjacent(order[i-1],'prev','Previous snapshot:')+adjacent(order[i+1],'next','Next snapshot:')+
+    '</ul><p>Snapshot '+(i+1)+' of '+order.length+' · Archive order, not original site order</p></nav>';
+}
+function sectionNavigation(blocks) {
+  const headings=blocks.filter(b=>b.kind==='heading'&&b.anchor);
+  return headings.length?'<nav aria-label="Captured sections"><ul>'+headings.map(b=>
+    '<li><a href="#'+escape(b.anchor)+'">'+escape(b.text)+'</a></li>').join('')+'</ul></nav>':'';
+}
 const idAttr=b=>b.anchor?' id="'+escape(b.anchor)+'"':'';
 function article(blocks){
  let out='',group='';
@@ -166,7 +179,8 @@ export function createMirrorCache(config) {
     }
     const records=[];
     const files=new Map([['site.css',CSS]]);
-    for(const [url,p] of pages){
+    const orderedPages=[...pages.values()];
+    for(const [i,[url,p]] of [...pages.entries()].entries()){
       let linked='';
       const omissions={...p.rejected,depth_budget:0,not_supplied:0,missing_fragment:0};
       for(const e of p.edges){
@@ -178,14 +192,14 @@ export function createMirrorCache(config) {
         }
         const goodSection=!e.fragment||target.cap.blocks.some(b=>b.anchor===e.fragment);
         if(!goodSection){omissions.missing_fragment++;continue;}
-        linked+='<li><a href="'+target.file.slice('pages/'.length)+(e.fragment?'#'+escape(e.fragment):'')+'">'+escape(e.label)+'</a></li>';
+        linked+='<li><a href="'+pageName(target)+(e.fragment?'#'+escape(e.fragment):'')+'">'+escape(e.label)+'</a></li>';
       }
       const n=Object.values(omissions).reduce((a,b)=>a+b,0);
       files.set(p.file,head(p.cap.title,'../site.css')+
-        '<main><p><a href="../index.html">Mirror index</a></p><h1>'+escape(p.cap.title)+'</h1><p class="note">Offline structured text snapshot · Not an official publication.</p>'+
+        archiveNavigation(orderedPages,i)+'<main><h1>'+escape(p.cap.title)+'</h1><p class="note">Offline structured text snapshot · Not an official publication.</p>'+
         '<p>Source: <code>'+escape(url)+'</code><br>Captured: '+escape(p.cap.captured_at)+'</p>'+
         (p.cap.truncated?'<p class="note">Capture itself was truncated.</p>':'')+
-        '<article>'+article(p.cap.blocks)+'</article>'+
+        sectionNavigation(p.cap.blocks)+'<article>'+article(p.cap.blocks)+'</article>'+
         (linked?'<h2>Links within this mirror</h2><ul>'+linked+'</ul>':'')+
         '<p class="note">'+escape(describeLinkDiscovery(p.link_discovery))+'</p>'+
         (n?'<p class="note">'+n+' discovered link(s) not mirrored; see coverage manifest.</p>':'')+

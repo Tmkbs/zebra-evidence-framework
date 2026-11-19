@@ -22,3 +22,15 @@ Run `node collector-smoke.mjs` and `node --test intake-cli.test.cjs` for fixture
 To compare the selected official-document capture with the package manifest, append `--mirror-manifest <extracted-manifest.json>` to the approved intake command. This optional check compares the selected page's metadata only; it does not authenticate the ZIP, its HTML, or additional pages, and does not replace reviewing the source capture. A mismatch fails closed. The correlated result still requires review and does not run a model, edit a document, or publish anything.
 
 Link discovery reports when the collector reaches the 20 retained-link cap or its 160 candidate inspection cap. Otherwise it reports completion of the bounded, filtered article scan, not complete site, asset, or link coverage. Imported status is recorded by the capture, not independently authenticated. Older envelopes missing this status are accepted and shown as unknown. Older strict collector builds will not accept new envelopes containing the optional status; update the collector before importing them. Plain capture files used by the intake CLI are unchanged.
+
+### Check an extracted archive against reviewed captures
+
+The offline pages now include an index/coverage link, previous/next in archive order, and contents links only for captured section IDs. This is archive navigation, not a recreation of the source site's navigation.
+
+With the same renderer revision and Node on a host supporting O_NOFOLLOW and O_NONBLOCK (tested on Linux), extract the ZIP into a new, private directory. Keep that directory and its parents unchanged during the check. Run:
+
+```text
+node verify-offline.mjs --reviewed-local <extracted-directory> <exact-root-url> <collection.json> [...]
+```
+
+The verifier rebuilds the expected output from the reviewed inputs and compares the exact file set and contents, returning file hashes. It does not extract or validate the ZIP container, authenticate the browser source or approval, defend against concurrent directory swaps, or independently validate the renderer. It refuses to run where the required file-open guards are unavailable.
