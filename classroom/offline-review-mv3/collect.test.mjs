@@ -30,3 +30,14 @@ test('historical single-page capture packets and over-cap selections fail closed
  assert.throws(()=>previewCollection(root,[JSON.stringify(JSON.parse(packet(root)).capture)]),/envelope/);
  assert.throws(()=>previewCollection(root,Array(13).fill(packet(root))),/number/);
 });
+
+test('round trips the optional label emitted for image-only or icon links',()=>{
+ const entry=JSON.parse(packet(root,[child]));
+ delete entry.discovered_links[0].label;
+ const session=previewCollection(root,[JSON.stringify(entry),packet(child)]);
+ assert.deepEqual(session.preview().pages[0].discovered_links,[{target_url:child}]);
+ const html=session.export({approved:true}).files.get('pages/001.html');
+ assert.match(html,/href="002.html">https:\/\/techdocs\.zebra\.com\//);
+ assert.throws(()=>previewCollection(root,[JSON.stringify({...entry,discovered_links:[{target_url:child,label:null}]}),packet(child)]),/Invalid discovered/);
+ assert.throws(()=>previewCollection(root,[JSON.stringify({...entry,discovered_links:[{target_url:child,extra:'unexpected'}]}),packet(child)]),/Invalid discovered/);
+});

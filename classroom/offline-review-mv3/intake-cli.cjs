@@ -3,9 +3,10 @@ const fs=require('node:fs');
 const LIMIT=160_000;
 const deps=require('../capture-intake.cjs');
 const adapter=require('./reviewed-pair.cjs').createReviewedPairAdapter(deps);
+const {verifyMirrorManifest}=require('./verify-mirror-manifest.cjs');
 const HASH=/^[0-9a-f]{64}$/;
 const args=process.argv.slice(2);
-const USAGE='Use inspect <capture.json> <exact-public-url>, or intake --approve-local <forum.json> <forum-url> <reviewed-forum-sha256> <techdocs.json> <techdocs-url> <reviewed-techdocs-sha256> [case-id].';
+const USAGE='Use inspect <capture.json> <exact-public-url>, or intake --approve-local <forum.json> <forum-url> <reviewed-forum-sha256> <techdocs.json> <techdocs-url> <reviewed-techdocs-sha256> [case-id]; append --mirror-manifest <extracted-manifest.json> for metadata correlation.';
 class CliError extends Error {
  constructor(code,message){super(message);this.code=code;}
 }
@@ -32,10 +33,18 @@ function run() {
   return {schema:'zebra-local-capture-preview/v1',...adapter.inspect(packet,args[2]),blocks:packet.blocks,
    source_status:'PUBLIC_URL_NOT_INDEPENDENTLY_VERIFIED',model_execution_status:'NOT_RUN',approved_for_local_intake:false};
  }
+ let mirrorPath=null;
+ if(args[0]==='intake'&&args.length>=10&&args.at(-2)==='--mirror-manifest'){
+  mirrorPath=args.at(-1);args.splice(-2);
+ }
  if(args[0]!=='intake'||args[1]!=='--approve-local'||![8,9].includes(args.length)||
    !HASH.test(args[4])||!HASH.test(args[7]))throw new CliError('USAGE',USAGE);
  const entry=(path,source_url,sha256)=>({packet:load(path),review:{source_url,sha256,approved_for_local_intake:true}});
- return adapter.run({forum:entry(...args.slice(2,5)),techdocs:entry(...args.slice(5,8)),caseId:args[8]??null});
+ const forum=entry(...args.slice(2,5)),techdocs=entry(...args.slice(5,8));
+ const intake=adapter.run({forum,techdocs,caseId:args[8]??null});
+ if(mirrorPath===null)return intake;
+ const mirror=verifyMirrorManifest(load(mirrorPath),deps.validateCapture(techdocs.packet));
+ return {schema:'zebra-correlated-intake/v1',mirror,intake};
 }
 try{process.stdout.write(JSON.stringify(run(),null,2)+'\n');}
 catch(err){

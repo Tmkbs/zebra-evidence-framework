@@ -43,7 +43,7 @@ export function bindCollector(doc,{filesToCollection=loadCollection,makeZip=mirr
       for(const b of p.blocks)details.append(node('p',b.kind+(b.anchor?' — #'+b.anchor:'')),node('pre',b.text));
       if(row.discovered_links.length){
         const links=node('ul');
-        for(const link of row.discovered_links)links.append(node('li',link.label+' — '+link.target_url));
+        for(const link of row.discovered_links)links.append(node('li',(link.label===undefined?'No captured link label':link.label)+' — '+link.target_url));
         details.append(node('p','Discovered links (not fetched):'),links);
       }
       pages.append(details);

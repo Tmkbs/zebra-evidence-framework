@@ -29,10 +29,11 @@ export function previewCollection(rootUrl,entries){
     if(new URL(url.url).origin!==origin||url.kind!==root.kind||urls.has(url.url))throw new Error('Duplicate or out-of-scope capture.');
     urls.add(url.url);
     const discovered_links=item.discovered_links.map(link=>{
-      if(!exact(link,['target_url','label'])||typeof link.label!=='string')throw new Error('Invalid discovered link.');
+      const labeled=exact(link,['target_url','label']);
+      if((!labeled&&!exact(link,['target_url']))||(labeled&&typeof link.label!=='string'))throw new Error('Invalid discovered link.');
       const target=publicURL(link.target_url,{fragment:true});
       if(new URL(target.url).origin!==origin||target.kind!==root.kind)throw new Error('Out-of-scope discovered link.');
-      return {target_url:link.target_url,label:link.label};
+      return labeled?{target_url:link.target_url,label:link.label}:{target_url:link.target_url};
     });
     return {capture,discovered_links};
   });
