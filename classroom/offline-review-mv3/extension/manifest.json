@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Zebra TechDocs Evidence Capture",
+  "description": "Review a structured public Zebra article and save JSON or an offline snapshot ZIP locally.",
+  "version": "0.3.0",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Capture public Zebra evidence"
+  },
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; connect-src 'none'; frame-src 'none'; base-uri 'none'"
+  }
+}
