@@ -38,3 +38,37 @@ test('inspect then individually bind captures to one non-applicable actual frame
   const wrong=call('inspect',files[0],urls[1]);assert.equal(wrong.status,1);assert.equal(wrong.stdout,'');
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
+
+test('browser collection envelopes enter native intake without manually re-exporting plain capture JSON',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'zebra-collection-intake-'));
+ try{
+  const urls=['https://developer.zebra.com/content/sample-forum-question','https://techdocs.zebra.com/datawedge/15-0/guide/input/barcode/'];
+  const docs=[obj('forum',urls[0]),obj('techdocs',urls[1])];
+  const entry=(capture)=>({schema_version:'zebra-reviewed-mirror-page/v1',capture,
+   discovered_links:[{target_url:capture.source_url,label:'Archive-only test metadata'}],link_discovery:'filtered_scan_finished'});
+  const files=docs.map((doc,i)=>{const f=join(dir,i+'.json');writeFileSync(f,JSON.stringify(entry(doc)));return f;});
+  const bindings=files.flatMap((f,i)=>{
+   const r=call('inspect',f,urls[i]);assert.equal(r.status,0,r.stderr);
+   assert.doesNotMatch(r.stdout,/Archive-only test metadata/);
+   const p=JSON.parse(r.stdout);assert.equal(p.approved_for_local_intake,false);
+   return [f,urls[i],p.sha256];
+  });
+  writeFileSync(files[0],JSON.stringify(docs[0])+' '.repeat(170_000));
+  assert.equal(JSON.parse(call('inspect',files[0],urls[0]).stderr).error.code,'CAPTURE_LIMIT');
+  writeFileSync(files[0],JSON.stringify(entry(docs[0]))+' '.repeat(170_000));
+  assert.equal(call('inspect',files[0],urls[0]).status,0);
+  writeFileSync(files[0],JSON.stringify(entry(docs[0]))+' '.repeat(370_000));
+  assert.equal(JSON.parse(call('inspect',files[0],urls[0]).stderr).error.code,'CAPTURE_LIMIT');
+  writeFileSync(files[0],JSON.stringify(entry(docs[0])));
+  const actual=call('intake','--approve-local',...bindings);assert.equal(actual.status,0,actual.stderr);
+  const expected=require('../capture-intake.cjs').intake({forum:docs[0],techdocs:docs[1]});
+  assert.deepEqual(JSON.parse(actual.stdout),expected);
+  assert.equal(call('intake',...bindings).status,1);
+  writeFileSync(files[1],JSON.stringify({...entry(docs[1]),approved_for_local_intake:true}));
+  assert.equal(JSON.parse(call('inspect',files[1],urls[1]).stderr).error.code,'COLLECTION_ENVELOPE');
+  docs[0].blocks[0].text+='Changed';
+  writeFileSync(files[0],JSON.stringify(entry(docs[0])));
+  const modified=call('intake','--approve-local',...bindings);
+  assert.equal(modified.status,1);assert.equal(modified.stdout,'');
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});
