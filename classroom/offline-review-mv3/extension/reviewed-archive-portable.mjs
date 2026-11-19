@@ -42,3 +42,5 @@ export async function assembleSelectedArchive({forum,techdocs,grant,trustPin,rec
   ...(pair?{source_pair:pair}:{}),
   browser_extension_install:'NOT_RUN',model:'NOT_RUN',publication:'NOT_AUTHORIZED'}};
 }
+
+export const archiveCheckReceiptText=report=>JSON.stringify(report,null,2)+'\n';

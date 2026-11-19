@@ -7,6 +7,8 @@ import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {captureDigest} from './approved-revision-archive.mjs';
+import {archiveCheckReceiptText} from './extension/reviewed-archive-portable.mjs';
+import {verifyLocalZip} from './extension/verified-zip.js';
 const sha=x=>createHash('sha256').update(x).digest('hex');
 const here=fileURLToPath(new URL('./reviewed-archive-cli.mjs',import.meta.url));
 test('one selected-input command assembles actual reviewed ZIP and refuses invalid pin/overwrite',async()=>{
@@ -54,7 +56,17 @@ test('one selected-input command assembles actual reviewed ZIP and refuses inval
   assert.equal(pReport.forum_pairing,'EXACT_LOCAL_PAIR_PIN_MATCHED');
   assert.equal(pReport.source_pair.forum_capture_sha256,await captureDigest(forum));
   assert.equal(pReport.source_pair.reviewer_authenticated,false);
-  assert.equal(pReport.archive_hash,sha(readFileSync(paired)));
+  const pairedBytes=readFileSync(paired);
+  assert.equal(pReport.archive_hash,sha(pairedBytes));
+  const receiptText=archiveCheckReceiptText(pReport);
+  assert.equal(receiptText,resultPaired.stdout);
+  const verifierInput={receiptFile:new Blob([receiptText]),zipFile:new Blob([pairedBytes]),expectedReceiptSha256:sha(receiptText)};
+  const verified=await verifyLocalZip(verifierInput);
+  assert.equal(verified.caseId,identity.case_id);
+  assert.equal(verified.runId,identity.run_id);
+  assert.equal(verified.pairedForum,forum.source_url);
+  await assert.rejects(verifyLocalZip({...verifierInput,expectedReceiptSha256:'0'.repeat(64)}));
+  await assert.rejects(verifyLocalZip({...verifierInput,zipFile:new Blob([pairedBytes,'changed'])}));
 
  }finally{rmSync(dir,{recursive:true,force:true});}
 });

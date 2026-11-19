@@ -8,7 +8,7 @@ const hash = v=>createHash('sha256').update(v).digest('hex');
 const data=v=>Buffer.from(JSON.stringify(v));
 (async()=>{
  const {captureDigest}=await import('./approved-revision-archive.mjs');
- const {assembleSelectedArchive}=await import('./reviewed-archive-portable.mjs');
+ const {archiveCheckReceiptText,assembleSelectedArchive}=await import('./reviewed-archive-portable.mjs');
  const doc={schema_version:'zebra-doc-capture/v1',source_url:'https://techdocs.zebra.com/emdk-for-android/7-3/samples/barcode/',
   source_kind:'techdocs',captured_at:'2026-11-19T00:00:00.000Z',title:'Synthetic Doc',
   blocks:[{kind:'paragraph',text:'Synthetic original text.',anchor:'para-1'}],truncated:false};
@@ -59,7 +59,8 @@ const data=v=>Buffer.from(JSON.stringify(v));
   const submit=()=>page.getByRole('button',{name:'Build ZIP'}).click();
   const waitFail=()=>page.getByText('ZIP was not generated.',{exact:false}).waitFor();
   const archive=page.getByRole('link',{name:'Download reviewed ZIP'});
-  submitted=true;await submit(); await waitFail();assert.equal(await archive.count(),0);
+  const receiptLink=page.getByRole('link',{name:'Download ZIP check receipt'});
+  submitted=true;await submit(); await waitFail();assert.equal(await archive.count(),0);assert.equal(await receiptLink.count(),0);
   await page.locator('[name=pairPin]').fill(pairPin);
   await submit();
   await archive.waitFor();
@@ -67,10 +68,12 @@ const data=v=>Buffer.from(JSON.stringify(v));
   const [download]=await Promise.all([page.waitForEvent('download'),archive.click()]);
   const downloaded=fs.readFileSync(await download.path());
   assert.deepEqual(downloaded,Buffer.from(expected.buffer));
+  const [receiptDownload]=await Promise.all([page.waitForEvent('download'),receiptLink.click()]);
+  assert.equal(fs.readFileSync(await receiptDownload.path(),'utf8'),archiveCheckReceiptText(expected.report));
   if(process.env.ZEBRA_BROWSER_SMOKE_ZIP)fs.writeFileSync(process.env.ZEBRA_BROWSER_SMOKE_ZIP,downloaded,{mode:0o600});
   await set('forum',wrap({...question,blocks:[{kind:'paragraph',text:'Changed synthetic question.'}]}));
-  assert.equal(await archive.count(),0);
-  await submit(); await waitFail();assert.equal(await archive.count(),0);
+  assert.equal(await archive.count(),0);assert.equal(await receiptLink.count(),0);
+  await submit(); await waitFail();assert.equal(await archive.count(),0);assert.equal(await receiptLink.count(),0);
   assert.deepEqual(outside,[]);assert.deepEqual(errors,[]);assert.deepEqual(late,[]);
   console.log(JSON.stringify({browser:browser.version(),sha256:hash(downloaded),members:expected.report.member_count,equal_to_shared_runtime:true,
    wrong_pair_rejected:true,changed_forum_rejected:true,download_invalidated_on_edit:true,post_submit_requests:0,extension_installed:false,sources:'synthetic capture fixtures'},null,2));

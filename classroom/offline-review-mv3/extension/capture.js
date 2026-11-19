@@ -30,7 +30,9 @@ export function capturePage(source, limits, options) {
   const excluded='script,style,template,noscript,form,input,textarea,select,button,nav,aside,header,footer,iframe,object,embed,[hidden],[inert],[aria-hidden="true"],[contenteditable]:not([contenteditable="false"]),.comment,.comments,.user-info,.author,.node__meta,.profile,.toolbar,.forum-topic__meta,.forum-topic__attachments,.forum-topic__comments-list,.forum-topic__replies-header';
   let root;
   if (source.kind === 'forum') {
-    const selector=['article.node--type-forum main.forum-topic__content .forum-topic__body','article.forum-topic-page .forum-topic__body','main article.node--type-forum .field--name-body','main article.node--type-forum .node__content','main .node-forum .field-name-body','main .node--type-forum .field--name-body','[role="main"] article.node--type-forum .field--name-body'];
+    // A generic forum node content wrapper may include replies and account details.
+    // Require a positively identified body, even if an unsupported layout is omitted.
+    const selector=['article.node--type-forum main.forum-topic__content .forum-topic__body','article.forum-topic-page .forum-topic__body','main article.node--type-forum .field--name-body','main .node-forum .field-name-body','main .node--type-forum .field--name-body','[role="main"] article.node--type-forum .field--name-body'];
     for (const s of selector) {
       const matches=[...document.querySelectorAll(s)].filter(el=>!el.closest(excluded));
       if (matches.length===1) {root=matches[0];break;}

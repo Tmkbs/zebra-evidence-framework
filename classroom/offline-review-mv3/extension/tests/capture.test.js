@@ -89,7 +89,7 @@ test('title uses tab metadata or an already visible selected-article heading',()
  assert.throws(()=>run({title:'',values:[['h2','Hidden heading',undefined,true],['p','Article paragraph']]}),/title could not be identified/);
 });
 
-function extractFixture(specs, captureOptions, injected={func:capturePage,args:[{url:tech,kind:'techdocs'},LIMITS,captureOptions]}) {
+function extractFixture(specs, captureOptions, injected={func:capturePage,args:[{url:tech,kind:'techdocs'},LIMITS,captureOptions]}, fixtureSelector) {
  const tags=(el,query)=>query.split(',').some(s=>s==='a[href]'?el.localName==='a'&&el.getAttribute('href')!==null:s===el.localName);
  const flatten=(e,onlyElements=false)=>e.nodes.flatMap(child=>
    child.nodeType===3?(onlyElements?[]:[child]):[child,...flatten(child,onlyElements)]);
@@ -109,7 +109,7 @@ function extractFixture(specs, captureOptions, injected={func:capturePage,args:[
  const win={};win.top=win.self=win;
  const scope={URL,location:{href:injected.args[0].url},window:win,NodeFilter:{SHOW_TEXT:4,SHOW_ELEMENT:1},TextEncoder,
    getComputedStyle:el=>el.style||{display:'block',visibility:'visible'},
-   document:{title:'Archive example, synthetic',querySelector:()=>null,querySelectorAll:s=>[injected.args[0].kind==='forum'?'article.node--type-forum main.forum-topic__content .forum-topic__body':'#mainContent .service-box'].includes(s)?[root]:[],
+   document:{title:'Archive example, synthetic',querySelector:()=>null,querySelectorAll:s=>[fixtureSelector??(injected.args[0].kind==='forum'?'article.node--type-forum main.forum-topic__content .forum-topic__body':'#mainContent .service-box')].includes(s)?[root]:[],
     createTreeWalker(el){const nodes=flatten(el);let n=0;return {nextNode:()=>nodes[n++]||null};}
    }};
  const serialize=new Function(...Object.keys(scope),'source','limits','opts','return ('+injected.func.toString()+')(source,limits,opts)');
@@ -307,4 +307,17 @@ test('table adapter requires explicit approval and exact top-frame result',async
  await assert.rejects(captureTableActive(api,expected),/approval/);assert.equal(calls,0);
  assert.equal((await captureTableActive(api,expected,{approved:true})).table_cell_map.rows.length,1);
  for(const bad of ['boundary','frame','extra_wrapper','extra_map','extra_cell','extra_block','coverage']){mode=bad;await assert.rejects(captureTableActive(api,expected,{approved:true}),/Invalid/);}
+});
+
+test('forum capture requires a positive topic-body marker rather than a generic mixed node wrapper',()=>{
+ const route=checkSource('https://developer.zebra.com/forum/1234');
+ const isolated={func:capturePage,args:[route,LIMITS]};
+ const fixtures=[['p',{},['Synthetic text.']]];
+ const modern='article.node--type-forum main.forum-topic__content .forum-topic__body';
+ const legacy='main article.node--type-forum .field--name-body';
+ for(const selector of [modern,legacy]){
+   const result=extractFixture(fixtures,undefined,isolated,selector);
+   assert.equal(result.blocks[0].text,'Synthetic text.');
+ }
+ assert.throws(()=>extractFixture(fixtures,undefined,isolated,'main article.node--type-forum .node__content'),/No identifiable public article body/);
 });
