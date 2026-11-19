@@ -91,3 +91,32 @@ test('scoped v2 locator inserts only inside the exact digest-pinned list item wi
  const b=encode({...unscoped,schema:'zebra-local-archive-overlay-grant/v1'});
  assert.throws(()=>buildApprovedRevisionArchive({...checked(),grantBytes:b,trustedGrantSha256:sha(b)}),/independent local review pin/);
 });
+
+test('v3 independent local pin inserts before the only exact paragraph in the selected section',async()=>{
+ const para={kind:'paragraph',text:'Synthetic source text.'};
+ const cap={...capture,truncated:true,blocks:[
+  {kind:'heading',level:2,anchor:'section',text:'Selected section'},
+  {kind:'paragraph',text:'Not selected.'},
+  para,
+  {kind:'heading',level:2,anchor:'later',text:'Later section'},
+  para
+ ]};
+ const capInput={...input,pages:[{capture:cap}]};
+ const capReceipt={...receipt,source_anchor:'section',capture_sha256:captureDigest(cap)};
+ const locator={section_anchor:'section',block_kind:'paragraph',section_block_index:1,block_sha256:capturedListItemDigest(para)};
+ const capGrant={...grant,schema:'zebra-local-archive-overlay-grant/v3',source_anchor:capReceipt.source_anchor,
+  capture_sha256:capReceipt.capture_sha256,locator};
+ const pack=(g=capGrant)=>{const bytes=encode(g);return {...args,input:capInput,receipt:capReceipt,grantBytes:bytes,trustedGrantSha256:sha(bytes)};};
+ const approved=await zipApprovedRevisionArchive(pack());
+ const page=approved.files.get('pages/001.html');
+ assert.match(page,/<p id="revision-proposal">[^]*?<\/p><p>Synthetic source text\.<\/p>/);
+ assert.equal(page.match(/id="revision-proposal"/g)?.length,1);
+ assert.equal(approved.manifest.local_revision_overlay.captured_paragraph_before_locator.native_capture_anchor,null);
+ assert.equal(approved.manifest.pages[0].capture_truncated,true);
+ for(const bad of [{...locator,section_block_index:3},{...locator,block_sha256:'0'.repeat(64)},{...locator,block_kind:'list_item'}])
+  assert.throws(()=>buildApprovedRevisionArchive(pack({...capGrant,locator:bad})));
+ assert.throws(()=>buildApprovedRevisionArchive({...pack(),trustedGrantSha256:'0'.repeat(64)}));
+ const dup={...cap,blocks:[...cap.blocks.slice(0,3),para,...cap.blocks.slice(3)]};
+ const d=captureDigest(dup),dg={...capGrant,capture_sha256:d};
+ assert.throws(()=>buildApprovedRevisionArchive({...pack(dg),input:{...input,pages:[{capture:dup}]},receipt:{...capReceipt,capture_sha256:d}}));
+});
