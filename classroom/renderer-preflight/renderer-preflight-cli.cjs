@@ -2,9 +2,14 @@
 const fs=require('node:fs'),path=require('node:path');
 const {createRendererPreflight}=require('./renderer-preflight.cjs');
 const utf=new TextDecoder('utf-8',{fatal:true});
+function guardedReadFlags({O_RDONLY,O_NOFOLLOW,O_NONBLOCK}) {
+ const [noFollow,nonBlock]=[O_NOFOLLOW,O_NONBLOCK];
+ if(![noFollow,nonBlock].every(n=>Number.isInteger(n)&&n>0&&n<=0x7fffffff)||
+    (noFollow&nonBlock)!==0)throw Error('Unsupported file checks');
+ return O_RDONLY|noFollow|nonBlock;
+}
 function localFile(filename,limit) {
- if(typeof fs.constants.O_NOFOLLOW!=='number'||typeof fs.constants.O_NONBLOCK!=='number')throw Error('Unsupported file checks');
- const fd=fs.openSync(filename,fs.constants.O_RDONLY|fs.constants.O_NOFOLLOW|fs.constants.O_NONBLOCK);
+ const fd=fs.openSync(filename,guardedReadFlags(fs.constants));
  try {
   const st=fs.fstatSync(fd);
   if(!st.isFile()||st.size>limit)throw Error('Invalid input size or type');
@@ -44,4 +49,4 @@ if(require.main===module){
   process.exitCode=1;
  }
 }
-module.exports={main};
+module.exports={main,guardedReadFlags};

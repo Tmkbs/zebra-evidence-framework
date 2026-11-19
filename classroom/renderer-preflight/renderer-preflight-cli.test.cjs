@@ -68,3 +68,14 @@ test('portable subprocess exercises the CLI with an explicitly synthetic trusted
  fs.appendFileSync(paths[2],'drift');
  const rejected=call();assert.equal(rejected.status,1);assert.equal(JSON.parse(rejected.stdout).result,'LOCAL_COPY_RENDERER_REJECTS_BINDINGS');
 }));
+
+test('guarded read mask requires two distinct positive integer protections',()=>{
+ const {guardedReadFlags}=require('./renderer-preflight-cli.cjs');
+ const valid={O_RDONLY:0,O_NOFOLLOW:4,O_NONBLOCK:8};
+ assert.equal(guardedReadFlags(valid),12);
+ for(const key of ['O_NOFOLLOW','O_NONBLOCK']){
+  for(const value of [undefined,0,-1,NaN,Infinity,4.5,'4',0x80000000])
+   assert.throws(()=>guardedReadFlags({...valid,[key]:value}),/Unsupported file checks/);
+ }
+ assert.throws(()=>guardedReadFlags({...valid,O_NOFOLLOW:8}),/Unsupported file checks/);
+});
