@@ -15,7 +15,7 @@ export function checkSource(raw) {
   const rawPath = parsed[2];
   if (path !== rawPath || /\/\//.test(path) || path.split('/').some(s => SENSITIVE.test(s))) throw new Error('This page is out of scope.');
   if (u.hostname === 'techdocs.zebra.com' && /^\/[a-z][a-z0-9-]+\/(?:[A-Za-z0-9_.-]+\/)*[A-Za-z0-9_.-]*$/.test(path) && !/\.(?!html$)[a-z]{2,}$/i.test(path)) return {url:u.origin+path,kind:'techdocs'};
-  if (u.hostname === 'developer.zebra.com' && /^\/content\/[a-z0-9][a-z0-9-]{1,170}\/?$/.test(path)) return {url:u.origin+path,kind:'forum'};
+  if (u.hostname === 'developer.zebra.com' && /^\/(?:content\/[a-z0-9][a-z0-9-]{1,170}|forum\/[1-9][0-9]{0,11})\/?$/.test(path)) return {url:u.origin+path,kind:'forum'};
   throw new Error('Use a public TechDocs article or a Zebra Developer forum topic.');
 }
 
@@ -170,7 +170,7 @@ export function capturePage(source, limits, options) {
     if(/\/\//.test(u.pathname)||u.pathname.split('/').some(s=>sensitivePath.test(s)))continue;
     if(source.kind==='techdocs'){
       if(!/^\/[a-z][a-z0-9-]+\/(?:[A-Za-z0-9_.-]+\/)*[A-Za-z0-9_.-]*$/.test(u.pathname)||/\.(?!html$)[a-z]{2,}$/i.test(u.pathname))continue;
-    }else if(!/^\/content\/[a-z0-9][a-z0-9-]{1,170}\/?$/.test(u.pathname))continue;
+    }else if(!/^\/(?:content\/[a-z0-9][a-z0-9-]{1,170}|forum\/[1-9][0-9]{0,11})\/?$/.test(u.pathname))continue;
     if(u.hash&&!/^#[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/.test(u.hash))continue;
     if(u.href.length>1800||linked.has(u.href)||(u.href===source.url&&!u.hash))continue;
     const label=clip(plain(a,'link').trim().replace(/\s+/g,' '),300);

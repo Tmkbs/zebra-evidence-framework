@@ -107,9 +107,9 @@ function extractFixture(specs, captureOptions, injected={func:capturePage,args:[
  }
  const root=construct(['div',{},specs],null);
  const win={};win.top=win.self=win;
- const scope={URL,location:{href:tech},window:win,NodeFilter:{SHOW_TEXT:4,SHOW_ELEMENT:1},TextEncoder,
+ const scope={URL,location:{href:injected.args[0].url},window:win,NodeFilter:{SHOW_TEXT:4,SHOW_ELEMENT:1},TextEncoder,
    getComputedStyle:el=>el.style||{display:'block',visibility:'visible'},
-   document:{title:'Archive example, synthetic',querySelector:()=>null,querySelectorAll:s=>s==='#mainContent .service-box'?[root]:[],
+   document:{title:'Archive example, synthetic',querySelector:()=>null,querySelectorAll:s=>[injected.args[0].kind==='forum'?'article.node--type-forum main.forum-topic__content .forum-topic__body':'#mainContent .service-box'].includes(s)?[root]:[],
     createTreeWalker(el){const nodes=flatten(el);let n=0;return {nextNode:()=>nodes[n++]||null};}
    }};
  const serialize=new Function(...Object.keys(scope),'source','limits','opts','return ('+injected.func.toString()+')(source,limits,opts)');
@@ -243,4 +243,26 @@ test('approved isolated DOM capture flows to offline ZIP and preserves only capt
  assert.equal(zip.readUInt32LE(0),0x04034b50);
  assert.ok(zip.includes(Buffer.from(html)));
  assert.ok(zip.includes(Buffer.from('manifest.json')));
+});
+
+
+test('numeric developer forum paths are exact and remain same-origin when discovered',()=>{
+ const numeric='https://developer.zebra.com/forum/123456789012';
+ for(const url of [numeric,numeric+'/','https://developer.zebra.com/forum/1']){
+  assert.deepEqual(checkSource(url+'#topic'),{url,kind:'forum'});
+ }
+ for(const route of ['/forum/0','/forum/01','/forum/1234567890123','/forum/'+encodeURIComponent('１２３'),
+                    '/forum/123/password','/forum/123?x=1','/forum/123//','/forum/topic']) {
+  assert.throws(()=>checkSource('https://developer.zebra.com'+route));
+ }
+ const options={includeSameOriginLinks:true};
+ const fixture=[['p',{},[
+  ['a',{href:'/forum/3/'},['Accepted']],
+  ['a',{href:'/forum/03'},['Excluded']],
+  ['a',{href:'/forum/123/other'},['Excluded']],
+  ['a',{href:'https://techdocs.zebra.com/forum/3'},['Excluded']]
+ ]]];
+ const result=extractFixture(fixture,options,{func:capturePage,args:[checkSource(numeric),LIMITS,options]});
+ assert.deepEqual(result.discovered_links,[{target_url:'https://developer.zebra.com/forum/3/',label:'Accepted'}]);
+ assert.equal(result.capture.source_url,numeric);
 });

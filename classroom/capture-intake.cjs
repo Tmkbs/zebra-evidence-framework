@@ -10,7 +10,7 @@ const LIMIT={file:384*1024, title:512, block:3500, body:48*1024, blocks:120};
 const BLOCK=new Set(['heading','paragraph','list_item','code','table_row','quote']);
 const CASE=/^[A-Za-z][A-Za-z0-9_.-]{0,79}$/;
 const ANCHOR=/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/;
-const FORUM=/^\/content\/[a-z0-9][a-z0-9-]{1,170}\/?$/;
+const FORUM=/^\/(?:content\/[a-z0-9][a-z0-9-]{1,170}|forum\/[1-9][0-9]{0,11})\/?$/;
 const DOC_PATH=/^\/[a-z][a-z0-9-]+\/(?:[A-Za-z0-9_.-]+\/)*[A-Za-z0-9_.-]*$/;
 const RESTRICTED=/^(?:login|logout|log-in|sign-in|signin|register|signup|account|user|users|admin|internal|private|download|oauth|sso|search|ticket|support-portal)(?:$|[-_.])/i;
 class IntakeError extends Error {

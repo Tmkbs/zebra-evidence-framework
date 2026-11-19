@@ -72,3 +72,29 @@ test('browser collection envelopes enter native intake without manually re-expor
   assert.equal(modified.status,1);assert.equal(modified.stdout,'');
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
+
+
+test('native intake retains exact optional slash on numeric public forum captures',()=>{
+ const deps=require('../capture-intake.cjs');
+ const docs='https://techdocs.zebra.com/datawedge/15-0/guide/input/barcode/';
+ const numeric='https://developer.zebra.com/forum/123456789012';
+ const dir=mkdtempSync(join(tmpdir(),'zebra-numeric-forum-'));
+ try {
+  const t=join(dir,'docs.json'), f=join(dir,'forum.json');
+  writeFileSync(t,JSON.stringify(obj('techdocs',docs)));
+  const doc=JSON.parse(call('inspect',t,docs).stdout);
+  for(const url of [numeric,numeric+'/']){
+   writeFileSync(f,JSON.stringify(obj('forum',url)));
+   const p=call('inspect',f,url);assert.equal(p.status,0,p.stderr);
+   const reviewed=JSON.parse(p.stdout);
+   const accepted=call('intake','--approve-local',f,url,reviewed.sha256,t,docs,doc.sha256);
+   assert.equal(accepted.status,0,accepted.stderr);
+   const row=JSON.parse(accepted.stdout);
+   assert.equal(row.evidence[0].public_url,url);
+   assert.equal(row.stage,'CAPTURE_REVIEW_REQUIRED');
+   assert.equal(row.downstream_adapter.apply_allowed,false);
+  }
+  for(const route of ['/forum/0','/forum/01','/forum/1234567890123','/forum/123/replies','/forum/123?x=1','/forum/topic'])
+   assert.throws(()=>deps.validateCapture(obj('forum','https://developer.zebra.com'+route)));
+ } finally {rmSync(dir,{recursive:true,force:true});}
+});
