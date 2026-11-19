@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {buildMirror} from './extension/engine.js';
-import {buildApprovedRevisionArchive,captureDigest,zipApprovedRevisionArchive} from './approved-revision-archive.mjs';
+import {buildApprovedRevisionArchive,captureDigest,capturedListItemDigest,zipApprovedRevisionArchive} from './approved-revision-archive.mjs';
 const sha=x=>createHash('sha256').update(x).digest('hex');
 const url='https://techdocs.zebra.com/emdk-for-android/7-3/samples/barcode/';
 const baselineBytes=Buffer.from('<main><p id="step-3">Synthetic original source.</p></main>');
@@ -54,4 +54,40 @@ test('requires pinned authority, receipt bindings, source identity, bytes and ex
   // Even a separately pinned synthetic local grant cannot place a nonexistent/duplicate target or wrong edition.
   assert.throws(()=>buildApprovedRevisionArchive({...args,grantBytes:bytes,trustedGrantSha256:sha(bytes),receipt:{...receipt,...edit}}),/independent local review pin/);
  }
+});
+
+test('scoped v2 locator inserts only inside the exact digest-pinned list item with no native anchor',async()=>{
+ const list={kind:'list_item',text:'Repeated  text\nwith <brackets>.'};
+ const cap={...capture,truncated:true,blocks:[
+  {kind:'heading',level:2,anchor:'using-sample',text:'Using the sample'},
+  {kind:'paragraph',text:'Before the steps.'},
+  list,list,
+  {kind:'heading',level:2,anchor:'another-section',text:'Another section'},
+  list
+ ]};
+ const capInput={...input,pages:[{capture:cap}]};
+ const capReceipt={...receipt,capture_sha256:captureDigest(cap),source_anchor:'using-sample'};
+ const locator={section_anchor:'using-sample',block_kind:'list_item',section_block_index:2,
+  block_sha256:sha('Repeated text with <brackets>.')};
+ assert.equal(locator.block_sha256,capturedListItemDigest(list));
+ const capGrant={...grant,schema:'zebra-local-archive-overlay-grant/v2',source_anchor:capReceipt.source_anchor,
+  capture_sha256:capReceipt.capture_sha256,locator};
+ const checked=(replacements={})=>{
+  const b=encode({...capGrant,...replacements});
+  return {...args,input:capInput,receipt:capReceipt,grantBytes:b,trustedGrantSha256:sha(b)};
+ };
+ const generated=await zipApprovedRevisionArchive(checked());
+ const page=generated.files.get('pages/001.html');
+ assert.match(page,/<li>Repeated  text\nwith &lt;brackets&gt;\.<\/li>\n<li>Repeated  text\nwith &lt;brackets&gt;\.<p id="revision-proposal"/);
+ assert.equal((page.match(/id="revision-proposal"/g)||[]).length,1);
+ assert.deepEqual(generated.manifest.local_revision_overlay.captured_list_locator,{...locator,native_capture_anchor:null});
+ assert.equal(generated.manifest.pages[0].capture_truncated,true);
+ assert.equal(capInput.pages[0].capture.blocks[3].anchor,undefined);
+ assert.match(generated.files.get('index.html'),/href="pages\/001.html#revision-proposal"/);
+ for(const edit of [{section_block_index:4},{section_block_index:0},{block_sha256:'e'.repeat(64)},{section_anchor:'another-section'}]){
+  assert.throws(()=>buildApprovedRevisionArchive(checked({locator:{...locator,...edit}})),/independent local review pin/);
+ }
+ const {locator:removed,...unscoped}=capGrant;
+ const b=encode({...unscoped,schema:'zebra-local-archive-overlay-grant/v1'});
+ assert.throws(()=>buildApprovedRevisionArchive({...checked(),grantBytes:b,trustedGrantSha256:sha(b)}),/independent local review pin/);
 });

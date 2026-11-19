@@ -25,12 +25,43 @@ function digestMatches(bytes,digest,limit){
   timingSafeEqual(Buffer.from(hash(bytes),'hex'),Buffer.from(digest,'hex'));
 }
 
+// This is a locator digest, not a replacement for the exact native capture digest.
+export const capturedListItemDigest=block=>hash(block.text.replace(/[\t\n\f\r ]+/g,' ').replace(/^ +| +$/g,''));
+
+function findListItem(cap,locator,sectionAnchor){
+ if(!exact(locator,['section_anchor','block_kind','section_block_index','block_sha256'])||
+    locator.section_anchor!==sectionAnchor||locator.block_kind!=='list_item'||
+    !Number.isInteger(locator.section_block_index)||locator.section_block_index<0||locator.section_block_index>=cap.blocks.length||
+    !matches(locator.block_sha256,SHA))fail();
+ const section=cap.blocks.findIndex(b=>b.kind==='heading'&&b.anchor===sectionAnchor);
+ if(section<0)fail();
+ const end=cap.blocks.findIndex((b,i)=>i>section&&b.kind==='heading'&&b.level<=cap.blocks[section].level);
+ const at=section+1+locator.section_block_index;
+ const block=cap.blocks[at];
+ if(!block||(end!==-1&&at>=end)||block.kind!=='list_item'||capturedListItemDigest(block)!==locator.block_sha256)fail();
+ return {block,index:cap.blocks.slice(0,at).filter(b=>b.kind==='list_item').length,
+   total:cap.blocks.filter(b=>b.kind==='list_item').length};
+}
+function insertInGeneratedListItem(page,found,addition){
+ const open='<article>',start=page.indexOf(open),stop=page.indexOf('</article>',start);
+ if(start<0||stop<0||page.indexOf(open,start+1)!==-1)fail();
+ const contentStart=start+open.length;
+ const html=page.slice(contentStart,stop);
+ const items=[...html.matchAll(/<li(?: id="[A-Za-z0-9_.:-]+")?>[^<]*<\/li>/g)];
+ const item=items[found.index], expected='<li'+(found.block.anchor?' id="'+esc(found.block.anchor)+'"':'')+'>'+
+   esc(found.block.text)+'</li>';
+ if(items.length!==found.total||!item||item[0]!==expected)fail();
+ const beforeEnd=contentStart+item.index+item[0].length-'</li>'.length;
+ return page.slice(0,beforeEnd)+addition+page.slice(beforeEnd);
+}
+
 export function buildApprovedRevisionArchive({input,grantBytes,trustedGrantSha256,receipt,baselineBytes,workingCopyBytes}={}){
  if(!digestMatches(grantBytes,trustedGrantSha256,16_384))fail();
  let grant;
  try{grant=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(grantBytes));}catch{fail();}
- if(!exact(grant,['schema','scope',...fields,'capture_sha256','archive_text'])||
-    grant.schema!=='zebra-local-archive-overlay-grant/v1'||grant.scope!=='LOCAL_INERT_ARCHIVE_ONLY')fail();
+ const scoped=grant?.schema==='zebra-local-archive-overlay-grant/v2';
+ if(!exact(grant,['schema','scope',...fields,'capture_sha256','archive_text',...(scoped?['locator']:[])])||
+    (!scoped&&grant.schema!=='zebra-local-archive-overlay-grant/v1')||grant.scope!=='LOCAL_INERT_ARCHIVE_ONLY')fail();
  if(receipt?.schema!=='zebra-bound-typed-copy/v1'||receipt.publication!=='NOT_AUTHORIZED'||receipt.capture_sha256!==grant.capture_sha256||
     receipt.original_modified!==false||receipt.write_performed!==false||receipt.model_execution!=='NOT_RUN'||
     fields.some(k=>!Object.hasOwn(receipt,k)||receipt[k]!==grant[k]))fail();
@@ -46,8 +77,9 @@ export function buildApprovedRevisionArchive({input,grantBytes,trustedGrantSha25
  if(matchesPage?.length!==1)fail();
  const cap=normalizeCapture(matchesPage[0].capture);
  if(cap.source_kind!==route.kind||captureDigest(cap)!==grant.capture_sha256||
-    cap.blocks.filter(b=>b.kind==='paragraph'&&b.anchor===grant.source_anchor).length!==1||
     cap.blocks.some(b=>b.anchor===grant.target_anchor))fail();
+ const located=scoped?findListItem(cap,grant.locator,grant.source_anchor):null;
+ if(!scoped&&cap.blocks.filter(b=>b.kind==='paragraph'&&b.anchor===grant.source_anchor).length!==1)fail();
  const text=grant.archive_text;
  if(!matches(text,/^[^\u0000-\u001f\u007f-\u009f\p{Surrogate}]+$/u)||Buffer.byteLength(text)>1600)fail();
  // Reapply engine text policy independently; the original captured record remains unchanged.
@@ -55,12 +87,16 @@ export function buildApprovedRevisionArchive({input,grantBytes,trustedGrantSha25
  const {files,manifest}=buildMirror(input);
  const target=manifest.pages.find(row=>row.source_url===route.url);
  if(!target||!/^pages\/\d{3}\.html$/.test(target.path))fail();
- const page=files.get(target.path), anchor='<p id="'+esc(grant.source_anchor)+'">';
- const position=page?.indexOf(anchor)??-1;
- const end=page?.indexOf('</p>',position)??-1;
- if(position<0||end<0||page.indexOf(anchor,position+1)!==-1)fail();
+ const page=files.get(target.path);
+ if(typeof page!=='string')fail();
  const insertion='<p id="'+esc(grant.target_anchor)+'"><strong>Locally reviewed paragraph excerpt (added):</strong> '+esc(text)+'</p>';
- files.set(target.path,page.slice(0,end+4)+insertion+page.slice(end+4));
+ if(located)files.set(target.path,insertInGeneratedListItem(page,located,insertion));
+ else{
+  const anchor='<p id="'+esc(grant.source_anchor)+'">';
+  const position=page.indexOf(anchor), end=page.indexOf('</p>',position);
+  if(position<0||end<0||page.indexOf(anchor,position+1)!==-1)fail();
+  files.set(target.path,page.slice(0,end+4)+insertion+page.slice(end+4));
+ }
  const index=files.get('index.html'), close='</main></body></html>';
  if(!index?.endsWith(close))fail();
  const deep=target.path+'#'+grant.target_anchor;
@@ -69,6 +105,7 @@ export function buildApprovedRevisionArchive({input,grantBytes,trustedGrantSha25
  manifest.local_revision_overlay={schema:'zebra-archive-revision-overlay/v1',case_id:grant.case_id,run_id:grant.run_id,
   source_url:route.url,source_version:edition,capture_sha256:grant.capture_sha256,working_copy_sha256:grant.working_copy_sha256,
   source_anchor:grant.source_anchor,target_anchor:grant.target_anchor,archive_path:deep,rendered_working_copy_embedded:false,
+  ...(located?{captured_list_locator:{...grant.locator,native_capture_anchor:located.block.anchor??null}}:{}),
   reviewer_authenticated:false,publication:'NOT_AUTHORIZED'};
  files.set('manifest.json',JSON.stringify(manifest,null,2)+'\n');
  if([...files.values()].reduce((total,x)=>total+Buffer.byteLength(x),0)>25_000_000)fail();
