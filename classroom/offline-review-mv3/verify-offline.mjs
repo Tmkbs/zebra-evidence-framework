@@ -1,3 +1,5 @@
+import {isDeepStrictEqual} from 'node:util';
+import captureIntake from '../capture-intake.cjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
@@ -35,7 +37,22 @@ function list(dir,expected) {
  } finally {parent.closeSync();}
  if(seen.size!==expected.size)fail();
 }
-export function verifyOffline({root,entryFiles,outputDir,approved=false}) {
+function bindRun(record,collection) {
+ const source=record?.capture_binding?.structured_sources;
+ if(record?.schema!=='zebra-doc-capture-intake/v1'||!source||typeof record?.case?.id!=='string')fail();
+ const expected=captureIntake.intake({forum:source.forum,techdocs:source.techdocs,caseId:record.case.id});
+ if(!isDeepStrictEqual(expected,record))fail();
+ const pair=expected.capture_binding.captures.find(c=>c.kind==='techdocs');
+ const pages=collection.pages.filter(p=>p.capture.source_url===pair.url);
+ if(pages.length!==1)fail();
+ const cap=captureIntake.validateCapture(pages[0].capture);
+ if(hash(JSON.stringify(cap))!==pair.sha256)fail();
+ return {schema:'zebra-offline-intake-link/v1',status:'TECHDOCS_CAPTURE_DIGEST_MATCH',
+  case_id:expected.case.id,run_id:expected.run_id,source_url:pair.url,capture_sha256:pair.sha256,
+  source_version_from_url:expected.document_snapshot.source_version_from_url,
+  intake_stage:expected.stage,model_execution:'NOT_RUN',apply_allowed:false};
+}
+export function verifyOffline({root,entryFiles,outputDir,approved=false,intakePath=null}) {
  if(approved!==true||!Array.isArray(entryFiles)||entryFiles.length<1||entryFiles.length>COLLECTION_LIMITS.pages)
   throw new Error('Supply only an explicitly reviewed local collection.');
  const decoder=new TextDecoder('utf-8',{fatal:true});
@@ -45,7 +62,9 @@ export function verifyOffline({root,entryFiles,outputDir,approved=false}) {
   total+=bytes.length;
   return decoder.decode(bytes);
  });
- const {files,manifest}=previewCollection(root,entries).export({approved:true});
+ const collection=previewCollection(root,entries);
+ const {files,manifest}=collection.export({approved:true});
+ const link=intakePath===null?null:bindRun(JSON.parse(decoder.decode(read(intakePath,1_000_000))),collection.preview());
  const top=new Set(), articles=new Set();
  for(const name of files.keys()){
   if(/^pages\/\d{3}\.html$/u.test(name))articles.add(name.slice(6));
@@ -64,15 +83,17 @@ export function verifyOffline({root,entryFiles,outputDir,approved=false}) {
  }
  return {schema:'zebra-offline-artifact-verification/v1',status:'BYTE_MATCH_TO_REVIEWED_LOCAL_COLLECTION',
   root:manifest.roots[0],file_count:verified.length,files:verified,
-  browser_origin_authenticated:false,zip_container_validated:false,model_execution:'NOT_RUN'};
+  browser_origin_authenticated:false,zip_container_validated:false,model_execution:'NOT_RUN',...(link?{intake_link:link}:{})};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  try{
   const [flag,outputDir,root,...entryFiles]=process.argv.slice(2);
   if(flag!=='--reviewed-local'||!outputDir||!root)throw new Error('Usage.');
-  process.stdout.write(JSON.stringify(verifyOffline({root,entryFiles,outputDir,approved:true}),null,2)+'\n');
+  let intakePath=null;
+  if(entryFiles.length>=3&&entryFiles.at(-2)==='--intake-record')intakePath=entryFiles.splice(-2)[1];
+  process.stdout.write(JSON.stringify(verifyOffline({root,entryFiles,outputDir,approved:true,intakePath}),null,2)+'\n');
  }catch{
-  process.stderr.write('Offline verification failed. Supply --reviewed-local <extracted-directory> <exact-root-url> <collection.json> [...] and check the exact exported files.\n');
+  process.stderr.write('Offline verification failed. Supply --reviewed-local <extracted-directory> <exact-root-url> <collection.json> [...] [--intake-record intake.json] and check the exact exported files.\n');
   process.exitCode=1;
  }
 }

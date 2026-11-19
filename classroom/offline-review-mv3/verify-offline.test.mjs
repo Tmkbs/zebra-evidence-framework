@@ -41,3 +41,29 @@ test('real renderer parity and CLI detect changes and do not certify provenance'
   assert.throws(()=>verifyOffline(args));
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
+test('optional exact canonical intake binds case/run/version to offline bytes and rejects drift',async()=>{
+ const {default: framework}=await import('../capture-intake.cjs');
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'zebra-intake-link-'));
+ try {
+  const capture={schema_version:'zebra-doc-capture/v1',source_kind:'techdocs',source_url:root,
+   captured_at:'2026-11-19T12:00:00.000Z',title:'Fixture',truncated:false,blocks:[{kind:'paragraph',text:'Fixture content'}]};
+  const forum={...capture,source_kind:'forum',source_url:'https://developer.zebra.com/content/sample-forum-question'};
+  const entry=JSON.stringify({schema_version:'zebra-reviewed-mirror-page/v1',capture,discovered_links:[]});
+  const entryfile=path.join(dir,'entry.json'), intakePath=path.join(dir,'intake.json'), outputDir=path.join(dir,'output');
+  fs.writeFileSync(entryfile,entry);fs.mkdirSync(path.join(outputDir,'pages'),{recursive:true});
+  for(const [name,text] of previewCollection(root,[entry]).export({approved:true}).files)fs.writeFileSync(path.join(outputDir,name),text);
+  const args={root,entryFiles:[entryfile],outputDir,approved:true,intakePath};
+  const selected=framework.intake({forum,techdocs:capture,caseId:'DOC-LOCAL-01'});
+  fs.writeFileSync(intakePath,JSON.stringify(selected));
+  const actual=verifyOffline(args).intake_link;
+  assert.equal(actual.case_id,'DOC-LOCAL-01');assert.equal(actual.run_id,selected.run_id);
+  assert.equal(actual.source_version_from_url,'15-0');assert.equal(actual.apply_allowed,false);
+  const cli=spawnSync(process.execPath,[fileURLToPath(new URL('./verify-offline.mjs',import.meta.url)),
+   '--reviewed-local',outputDir,root,entryfile,'--intake-record',intakePath],{timeout:5000,encoding:'utf8'});
+  assert.equal(cli.status,0,cli.stderr);assert.deepEqual(JSON.parse(cli.stdout).intake_link,actual);
+  fs.writeFileSync(intakePath,JSON.stringify({...selected,run_id:'modified'}));
+  assert.throws(()=>verifyOffline(args));
+  fs.writeFileSync(intakePath,JSON.stringify(framework.intake({forum,techdocs:{...capture,title:'Different capture'},caseId:'DOC-LOCAL-01'})));
+  assert.throws(()=>verifyOffline(args));
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});

@@ -34,3 +34,5 @@ node verify-offline.mjs --reviewed-local <extracted-directory> <exact-root-url> 
 ```
 
 The verifier rebuilds the expected output from the reviewed inputs and compares the exact file set and contents, returning file hashes. It does not extract or validate the ZIP container, authenticate the browser source or approval, defend against concurrent directory swaps, or independently validate the renderer. It refuses to run where the required file-open guards are unavailable.
+
+To verify the reviewed document capture against a framework case, append `--intake-record <intake.json>` to the archive verifier. Supply the raw JSON from `intake-cli.cjs intake` **without** `--mirror-manifest`: the optional correlated wrapper is not accepted here. The verifier regenerates and compares the canonical intake record and matches the document URL and capture digest to the reviewed collection before reporting case, run, and document edition. It remains a local check; no model runs, revision application, or publication occur.
