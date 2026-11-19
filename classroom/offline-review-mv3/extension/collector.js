@@ -1,4 +1,5 @@
 import {COLLECTION_LIMITS,previewCollection} from './collect.js';
+import {coverageCsv} from './coverage-csv.js';
 import {mirrorZip} from './zip.js';
 import {describeLinkDiscovery} from './engine.js';
 
@@ -15,7 +16,7 @@ export async function loadCollection(root,files){
 
 export function bindCollector(doc,{filesToCollection=loadCollection,makeZip=mirrorZip,download=downloadLocal}={}){
   const el=id=>doc.getElementById(id);
-  const root=el('root'),files=el('files'),review=el('review'),coverage=el('coverage'),pages=el('pages'),approved=el('approved'), save=el('export'),status=el('status');
+  const root=el('root'),files=el('files'),review=el('review'),coverage=el('coverage'),pages=el('pages'),approved=el('approved'), save=el('export'),csv=el('export-csv'),status=el('status');
   let staged=null, epoch=0;
   function node(tag,value){
     const n=doc.createElement(tag);
@@ -23,7 +24,7 @@ export function bindCollector(doc,{filesToCollection=loadCollection,makeZip=mirr
     return n;
   }
   function invalidate(message=''){
-    ++epoch; staged=null; approved.checked=false; save.disabled=true;
+    ++epoch; staged=null; approved.checked=false; save.disabled=csv.disabled=true;
     review.hidden=true; pages.replaceChildren(); coverage.replaceChildren(); status.textContent=message;
   }
   function show(session){
@@ -64,7 +65,15 @@ export function bindCollector(doc,{filesToCollection=loadCollection,makeZip=mirr
       if(pending===epoch)invalidate('Could not load the selection. Check file size, format, official root URL, and same-origin links.');
     }
   });
-  approved.addEventListener('change',()=>{save.disabled=!staged||!approved.checked;});
+  approved.addEventListener('change',()=>{save.disabled=csv.disabled=!staged||!approved.checked;});
+  csv.addEventListener('click',()=>{
+    if(csv.disabled||!staged||!approved.checked)return;
+    try {
+      const report=coverageCsv(staged.coverage());
+      download(doc,new Blob([report],{type:'text/csv;charset=utf-8'}),'zebra-offline-coverage.csv');
+      status.textContent='CSV download requested. Check browser downloads.';
+    } catch {invalidate('Could not build or request the coverage CSV. Reload your selection and try again.');}
+  });
   save.addEventListener('click',()=>{
     if(save.disabled||!staged||!approved.checked)return;
     try {
@@ -75,9 +84,9 @@ export function bindCollector(doc,{filesToCollection=loadCollection,makeZip=mirr
   });
 }
 
-function downloadLocal(doc,blob){
+function downloadLocal(doc,blob,filename='zebra-public-offline-collection.zip'){
   const url=URL.createObjectURL(blob),link=doc.createElement('a');
-  link.href=url;link.download='zebra-public-offline-collection.zip';doc.body.append(link);
+  link.href=url;link.download=filename;doc.body.append(link);
   try{link.click();}finally{link.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);}
 }
 if(typeof document!=='undefined')bindCollector(document);

@@ -20,20 +20,28 @@ function element(){
   async trigger(event){return handlers.get(event)?.({preventDefault(){}});}
  };
 }
-const elements=Object.fromEntries(['root','files','review','coverage','pages','approved','export','status','selection','clear'].map(x=>[x,element()]));
+const elements=Object.fromEntries(['root','files','review','coverage','pages','approved','export','export-csv','status','selection','clear'].map(x=>[x,element()]));
 elements.root.value=root;
 elements.files.files=[asFile(child,[]),asFile(root,[child,missing],'Review title')];
-let deliver;
+let deliver, filename;
 const doc={getElementById:id=>elements[id],createElement:element};
-bindCollector(doc,{download:(_,blob)=>{deliver=blob;}});
+bindCollector(doc,{download:(_,blob,name)=>{deliver=blob;filename=name;}});
 await elements.selection.trigger('submit');
 assert.equal(elements.export.disabled,true);
 const view=JSON.stringify([elements.coverage,elements.pages]);
 for(const literal of [missing,'Review title','Review label','retaining 20 links','<script>literal text only</script>'])assert.ok(view.includes(literal));
 await elements.export.trigger('click');
+await elements['export-csv'].trigger('click');
 assert.equal(deliver,undefined);
 elements.approved.checked=true;
 await elements.approved.trigger('change');
+await elements['export-csv'].trigger('click');
+assert.equal(deliver.type,'text/csv;charset=utf-8');
+assert.equal(filename,'zebra-offline-coverage.csv');
+const csv=await deliver.text();
+assert.ok(csv.includes('"rendered_capture"')&&csv.includes('"missing_target"')&&csv.includes(missing));
+assert.doesNotMatch(csv,/literal text only|Review title|Review label/);
+assert.equal(elements.approved.checked,true);
 await elements.export.trigger('click');
 assert.equal(deliver.type,'application/zip');
 assert.equal(elements.pages.children.length,0);
