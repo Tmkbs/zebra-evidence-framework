@@ -38,9 +38,10 @@ test('preview cannot authorize a different page or iframe',async()=>{
  api.scripting.executeScript=async()=>[{frameId:1,result:{schema_version:SCHEMA,source_url:tech}}];
  await assert.rejects(captureActive(api,preview),/did not finish/);
 });
-function run({url=tech,tag='techdocs',hidden=false,privatePage=false,values}={}) {
+function run({url=tech,tag='techdocs',hidden=false,hiddenAncestor=false,privatePage=false,title='Official article',values}={}) {
  const specs=values??[['h2','An Overview','overview'],['p','Source body'],['pre','line 1\n    line 2'],['blockquote','Not a reply'],['p','hidden text',undefined,true]];
- const root={localName:'div',parentElement:null,closest:()=>null,matches:()=>false,querySelectorAll:()=>[]};
+ const wrapper={localName:'section',parentElement:null,matches:()=>false};
+ const root={localName:'div',parentElement:wrapper,closest:()=>null,matches:()=>false,querySelectorAll:()=>[]};
  const nodes=specs.map(([localName,data,id,isHidden])=>{
    const element={localName,id,parentElement:root,matches:()=>isHidden||false,closest:()=>null};
    element.text={parentElement:element,data};
@@ -48,8 +49,8 @@ function run({url=tech,tag='techdocs',hidden=false,privatePage=false,values}={})
  });
  root.querySelectorAll=()=>nodes;
  const g={URL, location:{href:url},window:{},NodeFilter:{SHOW_TEXT:4},TextEncoder,
-   getComputedStyle:()=>({display:'block',visibility:hidden?'hidden':'visible'}),
-   document:{title:'Official article',querySelector:s=>s.includes('input[type')&&privatePage?{}:null,
+   getComputedStyle:e=>({display:hiddenAncestor&&e===wrapper?'none':'block',visibility:hidden?'hidden':'visible'}),
+   document:{title,querySelector:s=>s.includes('input[type')&&privatePage?{}:s.includes('h1')?{innerText:'Hidden out-of-article heading'}:null,
     querySelectorAll:s=>/(?:#mainContent \.service-box|article\.node--type-forum main\.forum-topic__content)/.test(s)?[root]:[],
     createTreeWalker:e=>{let done=false;return {nextNode(){if(done)return null;done=true;return e.text;}};}
    }};
@@ -74,4 +75,14 @@ test('restricted context and obvious credential-like content fail closed',()=>{
  assert.throws(()=>run({hidden:true}),/supported public text/);
  assert.throws(()=>run({values:[['p','api_key = x'.padEnd(42,'a')]]}),/Potential credentials/);
  assert.throws(()=>run({url:forum,tag:'forum',values:[['p','Opaque candidate: '+'X'.repeat(70)]]}),/Potential credentials/);
+});
+
+test('display none on an ancestor above the selected article blocks extraction',()=>{
+ assert.throws(()=>run({hiddenAncestor:true}),/supported public text/);
+});
+
+test('title uses tab metadata or an already visible selected-article heading',()=>{
+ assert.equal(run().title,'Official article');
+ assert.equal(run({title:''}).title,'An Overview');
+ assert.throws(()=>run({title:'',values:[['h2','Hidden heading',undefined,true],['p','Article paragraph']]}),/title could not be identified/);
 });

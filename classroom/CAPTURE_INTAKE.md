@@ -4,9 +4,10 @@ Framework baseline: Tmkbs/zebra-evidence-framework main at
 `db29d41418ae877f8ce9ab44cc0347350bc7e676` (read-back via GitHub API).
 At that commit, the classroom application exports a
 `research-documentation-handoff/v0.4` case record and accepts TXT/Markdown and
-`documentation-revision/v1` drafts separately. This bridge emits a **capture-stage
-v0.4-shaped record** with a new `capture_binding` envelope. It intentionally does
-not fulfill the existing completed-review/approved-revision receiver contract:
+`documentation-revision/v1` drafts separately. This bridge emits a distinct **capture-stage
+`zebra-doc-capture-intake/v1` record** with a `capture_binding` envelope. It is
+not a v0.4 handoff or a documentation revision, and explicitly disallows both
+export to handoff and apply:
 `case.question`, exact paragraph, and proposal are not filled in. It must not be
 sent to an apply adapter until a distinct review flow has created a valid proposal.
 

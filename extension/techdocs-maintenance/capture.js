@@ -60,12 +60,17 @@ export function capturePage(source, limits) {
         (source.kind==='forum' && /(?:^|[^A-Za-z0-9+/])[A-Za-z0-9+/]{64,}={0,2}(?=$|[^A-Za-z0-9+/])/.test(value));
   const blocks=[];
   let size=0, truncated=false, examined=0, remainingTextNodes=18000;
+  const presentation=new WeakMap();
   const visible=(el)=>{
     for(let n=el; n; n=n.parentElement){
       if(n.matches(excluded))return false;
-      const style=getComputedStyle(n);
-      if(style.display==='none'||style.visibility==='hidden'||style.contentVisibility==='hidden')return false;
-      if(n===root)break;
+      let shown=presentation.get(n);
+      if(shown===undefined){
+        const style=getComputedStyle(n);
+        shown=style.display!=='none'&&style.visibility!=='hidden'&&style.contentVisibility!=='hidden';
+        presentation.set(n,shown);
+      }
+      if(!shown)return false;
     }
     return true;
   };
@@ -106,7 +111,9 @@ export function capturePage(source, limits) {
     blocks.push(block);size+=encoder.encode(next).byteLength;
   }
   if(!blocks.length) throw new Error('No supported public text blocks were found.');
-  const title=(document.querySelector('article.forum-topic-page h1,main h1,[role="main"] h1')?.innerText||document.title||'').trim().replace(/[\u0000-\u001f\u007f-\u009f]/g,' ');
+  // The browser tab's title is page metadata, not an arbitrary heading in hidden DOM.
+  // If it is empty, fall back only to an already visibility-checked article heading.
+  const title=(document.title?.trim()||blocks.find(b=>b.kind==='heading')?.text||'').trim().replace(/[\u0000-\u001f\u007f-\u009f]/g,' ');
   if(!title.trim())throw new Error('A document title could not be identified.');
   if(restricted(title))throw new Error('Potential credentials or opaque identifiers detected; nothing was captured.');
   const boundedTitle=clip(title,limits.titleBytes);

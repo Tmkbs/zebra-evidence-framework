@@ -5,7 +5,7 @@
 const fs=require('node:fs');
 const crypto=require('node:crypto');
 const VERSION='zebra-doc-capture/v1';
-const HANDOFF='research-documentation-handoff/v0.4';
+const INTAKE='zebra-doc-capture-intake/v1';
 const LIMIT={file:384*1024, title:512, block:3500, body:48*1024, blocks:120};
 const BLOCK=new Set(['heading','paragraph','list_item','code','table_row','quote']);
 const CASE=/^[A-Za-z][A-Za-z0-9_.-]{0,79}$/;
@@ -101,7 +101,7 @@ function intake({forum,techdocs,caseId=null}){
  if(!version)unknowns.push('No exact product-doc edition inferred from the source URL.');
  if(pinned.some(p=>p.truncated))unknowns.push('Capture truncated; verify the missing content before using it for any review.');
  return {
-  schema:HANDOFF,fictional_demo:false,record_kind:'PUBLIC_SOURCE_RESEARCH',document_source_kind:'browser_text_capture',
+  schema:INTAKE,stage:'CAPTURE_REVIEW_REQUIRED',fictional_demo:false,record_kind:'PUBLIC_SOURCE_RESEARCH',document_source_kind:'browser_text_capture',
   run_id:runId,
   case:{id,question:null,question_title:f.title,known_facts:[],unknowns,document_reference:docId,source_status:'PUBLIC_URL_NOT_INDEPENDENTLY_VERIFIED',case_url:f.source_url,public_report_url:null,model_execution_status:'NOT_RUN'},
   document_snapshot:{name:d.title,type:'browser_text_capture',extension:'.txt',original_text:body,character_count:body.length,selected_paragraph:null,exact_match_count:0,customer_source_verified:false,source_version_from_url:version},
@@ -113,7 +113,7 @@ function intake({forum,techdocs,caseId=null}){
   heldout_evaluation:{questions:[],notes:'',real_model_test_performed:false},optional_search_experiment:null,
   developer_preview:{status:'CAPTURE_REVIEW_REQUIRED',draft_answer:null,video_generated:false,customer_study_performed:false},
   release:{status:'NOT_AUTHORIZED',publication:false,real_device_validation:'NOT_RUN',customer_acceptance:'NOT_RUN'},
-  downstream_adapter:{schema:'documentation-revision/v1',mode:'capture_intake_before_revision',teammate_private_code_connected:false},
+  downstream_adapter:{schema:'documentation-revision/v1',mode:'capture_intake_before_revision',apply_allowed:false,export_to_handoff_allowed:false,teammate_private_code_connected:false},
   capture_binding:{schema:'zebra-capture-intake/v1',intake_status:'CAPTURE_REVIEW_REQUIRED',association:'USER_SELECTED_NOT_VERIFIED',captures:pinned,structured_sources:{forum:f,techdocs:d},network_calls:0,model_execution:'NOT_RUN'},
  };
 }

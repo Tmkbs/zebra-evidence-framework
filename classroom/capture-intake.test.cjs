@@ -17,7 +17,12 @@ test('deterministically binds pair, case, run and ordered content without claimi
  const f=fixture(),d=fixture('techdocs'),a=intake({forum:f,techdocs:d,caseId:'ZF-EXAMPLE'});
  const b=intake({forum:f,techdocs:{...d,blocks:d.blocks.map(x=>({text:x.text,...x}))},caseId:'ZF-EXAMPLE'});
  assert.deepEqual(a,b);
- assert.equal(a.schema,'research-documentation-handoff/v0.4');
+ assert.equal(a.schema,'zebra-doc-capture-intake/v1');
+ assert.notEqual(a.schema,'research-documentation-handoff/v0.4');
+ assert.notEqual(a.schema,'documentation-revision/v1');
+ assert.equal(a.downstream_adapter.apply_allowed,false);
+ assert.equal(a.downstream_adapter.export_to_handoff_allowed,false);
+ assert.equal(a.stage,'CAPTURE_REVIEW_REQUIRED');
  assert.equal(a.case.id,'ZF-EXAMPLE');
  assert.equal(a.case.question,null);
  assert.equal(a.document_snapshot.source_version_from_url,'13-0');
