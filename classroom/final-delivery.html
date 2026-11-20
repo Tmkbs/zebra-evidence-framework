@@ -286,7 +286,9 @@ async function runAI(){
    if(finding.quote_verified&&finding.quote){const q=textNode("p",String(finding.source||"Source")+": “"+String(finding.quote)+"”");q.className="preview small";list.append(q)}
   }
   el("ai-limit").textContent="Real model: "+String(data.model||"unknown")+
-   ". Retrieved excerpts: "+String((data.source_receipts||[]).length)+". No device test or publication authorization.";
+   ". Retrieved excerpts: "+String((data.source_receipts||[]).length)+
+   ". Run: "+String(data.run_id||"").slice(0,8)+". Input hash: "+String(data.review_input_sha256||"").slice(0,12)+
+   ". No device test or publication authorization.";
   el("ai-status").textContent="Live model response received. Inspect the linked documents before marking this case client-review ready.";
  }catch(err){if(seq===aiSequence){lastAI=null;el("ai-result").hidden=true;el("ai-status").textContent="AI review not completed: "+String(err.message).slice(0,240)}}
  finally{aiRunning=false;el("ai-run").disabled=!accessCode;el("ai-run").textContent="Run real AI review";}
