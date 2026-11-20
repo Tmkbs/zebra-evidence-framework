@@ -2,16 +2,16 @@
 
 ## Final delivery review (November 20)
 
-**[Open Final Delivery Review](final-delivery.html)** for the closing client handoff. This is a separate, single-purpose workflow that complements the team's already-published revised TechDocs pages:
+**[Open Final Delivery Review](final-delivery.html)** for the client handoff. The local campus runner now supports a real Qwen document review of *any* published TechDocs revision with a valid source pair:
 
-1. Download the team's **public** [case CSV](https://zebra-techdocs-practicum.vercel.app/document-reader/zebra-cases.csv); import it locally (no automatic fetching).
-2. Choose a case, open the original and proposed-revision links, and record what was actually inspected.
-3. Mark the disposition as evidence missing, version check needed, ready for client review, or out of scope. A ready-for-review label **never means client approval**.
-4. Export **zebra-final-review-handoff/v1** JSON including case identity, mapped public URLs, clarification, limitations, next owner action and explicit NOT VERIFIED flags.
+1. On the Northwestern-connected computer run `npm run campus`; open `http://127.0.0.1:3000/final-delivery.html`. The page automatically fetches only the team's **public** case CSV via the local backend. Manual public CSV upload remains available.
+2. Select a case. The page maps the 6-column SPR-style public table and additional CSV columns when present. It pre-fills an unverified proposed action and follow-up checks. If either public document URL is missing, open the team's case and paste the exact official TechDocs URL and published document-reader revision URL.
+3. Press **Run real AI review**. The backend retrieves only the approved public pages and submits excerpts to the configured campus Qwen API. It returns source hashes, model identity, quoted findings, limitations and next checks; no synthetic/model-cache response is substituted. Export the actual model-run JSON.
+4. Independently inspect the evidence, select a human review disposition and export `zebra-final-review-handoff/v1`. A ready-for-client-review label **never** means customer approval. When a real model result exists for that same case, it is attached to the handoff and marked as model-generated, not independently verified.
 
-The page never uploads the CSV, accepts only a public/approved case table, and does not ingest the private five-year SPR workbook. Missing columns are not fabricated. It does not fetch TechDocs, call a model, test a device, modify the team's site, or approve publication. The default classroom page now highlights its always-working local evidence checks; secure AI remains explicitly optional and requires a separate deployed backend.
+The GitHub Pages copy is static: it supports manual review/import, not campus model inference. No private five-year SPR workbook is fetched or sent. The review tool does not edit the teammate's site, test a scanner or publish official Zebra documentation.
 
-Run `npm test` to exercise the offline UI, final handoff parsing and no-approval invariants. The team's 57-case release is documented in the separate public repository; this framework deliberately does not hard-code that count as a live statistic.
+`npm test` runs zero-dependency mocked regression checks; `npm run campus:check` makes an **actual** campus model request on the connected computer.
 
 ---
 

@@ -7,19 +7,19 @@ The working UI and AI review server now run together using the campus Qwen Chat 
 ```bash
 git clone https://github.com/Tmkbs/zebra-evidence-framework.git
 cd zebra-evidence-framework
-git checkout final-delivery-review-handoff-20261120
 npm run campus:check
 npm run campus
 ```
 
-After PR #8 is merged, the checkout line is unnecessary. Requires Node 20+ and no external npm dependencies.
+Requires Node 20+ and no external npm dependencies. The source is the current `main` branch.
 
 - `npm run campus:check` sends **one harmless synthetic prompt** to the lab model and prints the actual response and token count (if supplied); failures are explicit.
-- `npm run campus` starts the full Zebra Evidence Review site at **http://127.0.0.1:3000/**, with an actual `/api/review` route routed to the campus model. The terminal prints the temporary review access code. Open **AI connection**, enter that code, and click **Run AI document review** on **SET_CONFIG 13.0** or **EHS 2.8**. The backend retrieves the exact paired public official and proposed pages; the model assesses their excerpts and returns source-linked findings. For a different case, choose the case and provide two approved public original/revised text files. Device testing and publication remain outside scope.
+- `npm run campus` starts the local site at **http://127.0.0.1:3000/**. For the new client handoff, open **http://127.0.0.1:3000/final-delivery.html**. It auto-loads the team's **public** published case CSV through the local server, with manual CSV import as a fallback. Select a case, verify the official TechDocs URL and the team's published revision URL (paste missing public links only when the CSV lacks them), then click **Run real AI review**. The local page obtains a same-origin session automatically; no API key or manual passcode is needed in this handoff page. The Qwen backend retrieves the paired public pages, compares evidence-supported sections and returns model results with source receipts. You can export both the actual AI review and the separate reviewer/client handoff JSON. Device testing and publication remain outside scope.
+- For the original five-case classroom UI, the optional passcode flow still works. Its offline evidence check continues to operate without any model connection.
 - If Harper changed the port from the November 10 example, use `AI_BASE_URL=http://c3dgx0.cs.northwestern.edu:8080/v1` (or the currently confirmed port) in your environment. The default is **8000**, matching Harper's latest Python example.
 - `http://127.0.0.1:3000/api/campus-status` verifies the model-list route separately; a successful status request does not claim a completed inference. `npm test` runs only offline/mocked checks; `npm run campus:check` is the explicit real inference check.
 
-**Safety:** The local listener binds only to `127.0.0.1`; no campus or provider credential is embedded in the public UI. Do not submit the five-year customer SPR file, private notes, or confidential Zebra material to any model without approval. The backend does not automatically adopt or publish edits.
+**Safety:** The local listener binds only to `127.0.0.1`; no campus or provider credential is embedded in the public UI. Automatically loaded case data comes only from the published public project CSV; it does not retrieve the confidential five-year customer SPR workbook. Do not submit private tickets, customer notes, or confidential Zebra material to any model without approval. AI suggestions never count as device testing or customer acceptance, and the backend does not publish edits.
 
 
 ## Real AI comparison added (November 16)

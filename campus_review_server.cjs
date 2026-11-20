@@ -13,6 +13,7 @@ const review=require("./api/review.js");
 
 const DEFAULT_API="http://c3dgx0.cs.northwestern.edu:8000/v1";
 const DEFAULT_MODEL="nvidia/Qwen3.8-Flash-Next-FP4-Local";
+const PUBLIC_CASE_CSV="https://zebra-techdocs-practicum.vercel.app/document-reader/zebra-cases.csv";
 const UI_ROOT=path.join(__dirname,"classroom");
 const PAGES=Object.freeze({
  "/":"index.html",
@@ -68,6 +69,22 @@ async function campusStatus(cfg,request=fetch){
   return{connected:false,model:cfg.model,error:"Cannot reach the model endpoint. Check Northwestern VPN/eduroam, current port, and active deployment."};
  }
 }
+async function publicCases(request=fetch){
+ const result=await request(PUBLIC_CASE_CSV,{method:"GET",redirect:"manual",headers:{Accept:"text/csv,text/plain"},signal:AbortSignal.timeout(12000)});
+ if(!result.ok)throw Error("Published case CSV unavailable (HTTP "+result.status+"). Use the manual public CSV import.");
+ const type=String(result.headers?.get("content-type")||"");
+ if(type&& !/text\/csv|text\/plain|application\/(?:csv|octet-stream)/i.test(type))throw Error("The published URL did not return a CSV file");
+ if(Number(result.headers?.get("content-length")||0)>700000)throw Error("Published CSV exceeds the review size limit");
+ const raw=await result.text();
+ if(Buffer.byteLength(raw,"utf8")>700000||!raw.includes("\n"))throw Error("Published case CSV empty or too large");
+ return{ok:true,csv:raw,source_url:PUBLIC_CASE_CSV};
+}
+function sameOriginRequest(req,cfg){
+ const origin=String(req.headers.origin||"");
+ const site=String(req.headers["sec-fetch-site"]||"");
+ return(!origin||origin==="http://127.0.0.1:"+cfg.port||origin==="http://localhost:"+cfg.port)
+  &&site!=="cross-site"&&site!=="same-site";
+}
 async function readBody(req,limit=160000){
  const parts=[];let total=0;
  for await(const b of req){total+=b.length;if(total>limit)throw Error("Request body exceeds 160 KB");parts.push(b)}
@@ -81,8 +98,20 @@ function buildServer(cfg,request=fetch){
   if(!allowHost(req,cfg.port))return json(res,403,{ok:false,error:"Open the site using its localhost address."});
   let route;
   try{route=new URL(req.url||"/","http://127.0.0.1:"+cfg.port).pathname}catch{return json(res,400,{ok:false,error:"Bad URL"})}
+  if(route==="/api/session"){
+   if(req.method!=="GET")return json(res,405,{ok:false,error:"GET required"});
+   if(!sameOriginRequest(req,cfg))return json(res,403,{ok:false,error:"Same-origin local review only"});
+   return json(res,200,{ok:true,local_session:true,model:cfg.model,review_access:cfg.passcode});
+  }
+  if(route==="/api/public-cases"){
+   if(req.method!=="GET")return json(res,405,{ok:false,error:"GET required"});
+   if(!sameOriginRequest(req,cfg))return json(res,403,{ok:false,error:"Same-origin local review only"});
+   try{return json(res,200,await publicCases(request))}
+   catch(e){return json(res,502,{ok:false,error:String(e.message).slice(0,260)})}
+  }
   if(route==="/api/campus-status"){
    if(req.method!=="GET")return json(res,405,{ok:false,error:"GET required"});
+   if(!sameOriginRequest(req,cfg))return json(res,403,{ok:false,error:"Same-origin local review only"});
    return json(res,200,await campusStatus(cfg,request));
   }
   if(route==="/api/review"){
@@ -107,7 +136,8 @@ function start(){
  const cfg=configure();
  const server=buildServer(cfg);
  server.listen(cfg.port,"127.0.0.1",()=>{
-  console.log("Zebra live-review page: http://127.0.0.1:"+cfg.port+"/");
+  console.log("Zebra final AI review: http://127.0.0.1:"+cfg.port+"/final-delivery.html");
+  console.log("Classroom evidence demo: http://127.0.0.1:"+cfg.port+"/");
   console.log("Campus status check: http://127.0.0.1:"+cfg.port+"/api/campus-status");
   console.log("Configured model: "+cfg.model);
   console.log("Session review access code (enter under AI connection): "+cfg.passcode);
@@ -116,4 +146,4 @@ function start(){
  return server;
 }
 if(require.main===module)start();
-module.exports={configure,allowHost,campusStatus,buildServer};
+module.exports={configure,allowHost,sameOriginRequest,publicCases,campusStatus,buildServer};
