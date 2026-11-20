@@ -416,3 +416,14 @@ test('real scoped serializer envelope reaches classroom intake despite a quoted 
  assert.equal(input.downstream_adapter.apply_allowed,false);
  assert.equal(input.release.publication,false);
 });
+
+test('Android RFID scoped route reaches duplicate-ID validation and supports a clean unique anchor',()=>{
+ const route='https://techdocs.zebra.com/dcs/rfid/android/2-0-5-292/guide/connection/';
+ const stale=[H('code2','Disconnect'),P('Source'),H('code2','Detecting Connection Loss and Reconnecting'),P('Loss section'),H('code2','Dispose'),P('Cleanup')];
+ assert.throws(()=>scoped(stale,route,'code2'),/unique visible native heading/);
+ const distinct=[H('code2','Disconnect'),P('Source'),H('loss','Detecting Connection Loss and Reconnecting'),P('Loss section'),H('dispose','Dispose'),P('Cleanup')];
+ const result=scoped(distinct,route,'loss');
+ assert.equal(result.section_scope.boundary,'next_heading');
+ assert.deepEqual(result.capture.blocks.map(b=>b.text),['Detecting Connection Loss and Reconnecting','Loss section']);
+ assert.throws(()=>scoped(distinct,route.replace('/android/','/maui-android/'),'loss'),/versioned public/);
+});

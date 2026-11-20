@@ -12,13 +12,13 @@ const block={kind:'paragraph',text:'Synthetic original settings paragraph.'};
 const forum={...common,source_url:'https://developer.zebra.com/forum/25083',source_kind:'forum',blocks:[{kind:'paragraph',text:'Synthetic question not from this URL.'}],truncated:false};
 const doc={...common,source_url:'https://techdocs.zebra.com/datawedge/6-6/guide/input/barcode/',source_kind:'techdocs',
  blocks:[{kind:'heading',text:'Reader Parameters',level:2,anchor:'readerparams'},block],truncated:true};
-export async function scenario(){
- const docEnvelope={capture:doc,section_scope:scope};
+export async function scenario(sourceUrl=doc.source_url,version="6-6"){
+ const docEnvelope={capture:{...doc,source_url:sourceUrl},section_scope:scope};
  const proof=intake({forum,techdocs:docEnvelope,caseId:'SYNTHETIC-CONTRACT'});
  const [q,d]=proof.capture_binding.captures;
  const baseline=utf.encode('<p>Synthetic original settings paragraph.</p>'), workingCopy=utf.encode('<p>Test proposal.</p><p>Synthetic original settings paragraph.</p>');
  const identity={case_id:proof.case.id,run_id:proof.run_id,source_url:d.url,source_anchor:'readerparams',target_anchor:'proposal',
- source_version:'6-6',source_sha256:await sha256(baseline),paragraph_sha256:'1'.repeat(64),
+ source_version:version,source_sha256:await sha256(baseline),paragraph_sha256:'1'.repeat(64),
  operation_sha256:'2'.repeat(64),working_copy_sha256:await sha256(workingCopy),capture_sha256:d.sha256};
  const grant=json({schema:'zebra-local-archive-overlay-grant/v3',scope:'LOCAL_INERT_ARCHIVE_ONLY',...identity,archive_text:'Test proposal.',
  locator:{section_anchor:'readerparams',block_kind:'paragraph',section_block_index:0,block_sha256:await sha256(block.text)}});
@@ -79,5 +79,22 @@ test('scope verifier rejects substituted anchors, malformed hierarchy receipt, r
   await assert.rejects(verifyLocalZip({receiptFile:new Blob([bytes]),zipFile:new Blob([buffer]),expectedReceiptSha256:oldPin}));
   if(modified.source_pair.scoped_capture?.section_scope.boundary!=='article_end')
    await assert.rejects(verifyLocalZip({receiptFile:new Blob([bytes]),zipFile:new Blob([buffer]),expectedReceiptSha256:await sha256(bytes)}));
+ }
+});
+
+test('exact Zebra nested RFID path retains version and reaches local archive without widening catch-all prefixes',async()=>{
+ const rfid='https://techdocs.zebra.com/dcs/rfid/android/2-0-5-292/tutorials/usbsupport/';
+ const {args}=await scenario(rfid,'2-0-5-292');
+ const d={capture:{...doc,source_url:rfid},section_scope:scope};
+ assert.equal(intake({forum,techdocs:d,caseId:'SYNTHETIC-CONTRACT'}).document_snapshot.source_version_from_url,'2-0-5-292');
+ const {report,buffer}=await assembleSelectedArchive(args);
+ const r=json(report);
+ await verifyLocalZip({receiptFile:new Blob([r]),zipFile:new Blob([buffer]),expectedReceiptSha256:await sha256(r)});
+ assert.equal(report.binding.source_version,'2-0-5-292');
+ assert.equal(report.binding.source_url,rfid);
+ for (const path of ['dcs/rfid/maui-android/2-0-5-292/', 'dcs/other/android/2-0-5-292/', 'dcs/rfid/android/latest/']) {
+  const source='https://techdocs.zebra.com/'+path+'guide/sample/';
+  assert.throws(()=>normalizeScopedArchiveInput(forum,{capture:{...doc,source_url:source},section_scope:scope}));
+  assert.throws(()=>intake({forum,techdocs:{capture:{...doc,source_url:source},section_scope:scope},caseId:'SYNTHETIC-CONTRACT'}));
  }
 });

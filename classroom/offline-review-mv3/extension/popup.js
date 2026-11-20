@@ -107,7 +107,7 @@ zip.addEventListener('click',()=>{
 (async()=>{
   try {
     selected=await readActiveTab(chrome);
-    sectionCapable=selected.source.kind==='techdocs'&&/^https:\/\/techdocs\.zebra\.com\/[a-z][a-z0-9-]*\/\d{1,4}(?:-\d{1,4}){1,4}\//.test(selected.source.url);
+    sectionCapable=selected.source.kind==='techdocs'&&/^https:\/\/techdocs\.zebra\.com\/(?:[a-z][a-z0-9-]*|dcs\/rfid\/android)\/\d{1,4}(?:-\d{1,4}){1,4}\//.test(selected.source.url);
     sectionPanel.hidden=!sectionCapable;
     session=createCaptureMirrorSession(chrome,{roots:[selected.source.url]});
     el('target').textContent=selected.source.url;

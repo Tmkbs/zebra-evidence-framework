@@ -1,6 +1,6 @@
 // Portable local-only adapter. It does not import working-copy HTML.
 import {boundedCopy,sha256 as hash,utf8Bytes} from './archive-bytes.mjs';
-import {checkSource} from './capture.js';
+import {checkSource,techDocsEdition} from './capture.js';
 import {buildMirror,normalizeCapture} from './engine.js';
 import {mirrorZip} from './zip.js';
 
@@ -107,7 +107,7 @@ export async function buildApprovedRevisionArchive({input,grantBytes,trustedGran
     !matches(grant.source_version,/^[0-9]{1,4}(?:-[0-9]{1,4}){1,4}$/)||
     !['source_sha256','paragraph_sha256','operation_sha256','working_copy_sha256','capture_sha256'].every(k=>matches(grant[k],SHA)))fail();
  if(!await digestMatches(baselineBytes,grant.source_sha256)||!await digestMatches(workingCopyBytes,grant.working_copy_sha256))fail();
- const route=checkSource(grant.source_url), edition=new URL(route.url).pathname.split('/')[2];
+ const route=checkSource(grant.source_url), edition=techDocsEdition(route.url);
  if(route.kind!=='techdocs'||route.url!==grant.source_url||edition!==grant.source_version)fail();
  if(!Array.isArray(input?.pages)||input.pages.length>75)fail();
  const matchesPage=input?.pages?.filter(p=>p?.capture?.source_url===route.url);

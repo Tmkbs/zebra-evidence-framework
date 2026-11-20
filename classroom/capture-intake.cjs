@@ -7,7 +7,7 @@ const crypto=require('node:crypto');
 const VERSION='zebra-doc-capture/v1';
 const INTAKE='zebra-doc-capture-intake/v1';
 const SECTION_SCOPE='zebra-section-scope/v1';
-const SCOPED_DOC=/^https:\/\/techdocs\.zebra\.com\/[a-z][a-z0-9-]*\/\d{1,4}(?:-\d{1,4}){1,4}\//;
+const SCOPED_DOC=/^https:\/\/techdocs\.zebra\.com\/(?:[a-z][a-z0-9-]*|dcs\/rfid\/android)\/\d{1,4}(?:-\d{1,4}){1,4}\//;
 const LIMIT={file:384*1024, title:512, block:3500, body:48*1024, blocks:120};
 const BLOCK=new Set(['heading','paragraph','list_item','code','table_row','quote']);
 const CASE=/^[A-Za-z][A-Za-z0-9_.-]{0,79}$/;
@@ -89,7 +89,9 @@ function validateInput(value){
  return {capture,sectionScope:{schema_version:SECTION_SCOPE,heading_anchor:scope.heading_anchor,boundary:scope.boundary,whole_article:false}};
 }
 function documentVersion(url){
- const version=new URL(url).pathname.split('/')[2]||'';
+ const parts=new URL(url).pathname.split('/');
+ const nested=parts[1]==='dcs'&&parts[2]==='rfid'&&parts[3]==='android';
+ const version=parts[nested ? 4 : 2]||'';
  return /^(?:v)?\d+(?:[.-]\d+)+$/.test(version)?version:null;
 }
 function loadCapture(file,{allowSection=false}={}){

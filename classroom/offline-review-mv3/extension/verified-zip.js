@@ -1,4 +1,4 @@
-import {checkSource} from './capture.js';
+import {checkSource,techDocsEdition} from './capture.js';
 
 const SHA=/^[0-9a-f]{64}$/u;
 const ID=/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/u;
@@ -25,7 +25,7 @@ export async function verifyLocalZip({receiptFile,zipFile,expectedReceiptSha256}
     !valid(b.archive_path,/^pages\/\d{3}\.html#[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/u)||
     b.archive_path.split('#')[1]!==b.target_anchor)fail();
  const src=checkSource(b.source_url);
- if(src.kind!=='techdocs'||src.url!==b.source_url||new URL(src.url).pathname.split('/')[2]!==b.source_version)fail();
+ if(src.kind!=='techdocs'||src.url!==b.source_url||techDocsEdition(src.url)!==b.source_version)fail();
  const pair=r.source_pair;
  let pairedForum=null, scopedCapture;
  if(r.forum_pairing==='EXACT_LOCAL_PAIR_PIN_MATCHED'){

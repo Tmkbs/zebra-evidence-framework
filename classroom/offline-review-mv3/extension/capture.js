@@ -19,6 +19,12 @@ export function checkSource(raw) {
   throw new Error('Use a public TechDocs article or a Zebra Developer forum topic.');
 }
 
+/** Edition for a validated TechDocs URL, including the documented nested Android RFID family. */
+export function techDocsEdition(url) {
+  const parts=new URL(url).pathname.split('/');
+  return parts[parts[1]==='dcs'&&parts[2]==='rfid'&&parts[3]==='android'?4:2]||null;
+}
+
 // Chrome serializes this function for isolated execution. No module globals, page writes or requests.
 export function capturePage(source, limits, options) {
   const current = new URL(location.href);
@@ -31,7 +37,7 @@ export function capturePage(source, limits, options) {
   const sectionAnchor=options?.sectionAnchor;
   const scoped=sectionAnchor!==undefined;
   const anchorPattern=/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/;
-  const versionedDoc=/^https:\/\/techdocs\.zebra\.com\/[a-z][a-z0-9-]*\/\d{1,4}(?:-\d{1,4}){1,4}\//;
+  const versionedDoc=/^https:\/\/techdocs\.zebra\.com\/(?:[a-z][a-z0-9-]*|dcs\/rfid\/android)\/\d{1,4}(?:-\d{1,4}){1,4}\//;
   if(scoped&&(source.kind!=='techdocs'||!versionedDoc.test(source.url)||
       typeof sectionAnchor!=='string'||!anchorPattern.test(sectionAnchor)||
       options.includeTableCellMap===true||options.includeSameOriginLinks===true))
@@ -335,7 +341,7 @@ export async function captureSectionActive(chromeApi, expected, {approved=false,
   if(approved!==true||typeof sectionAnchor!=='string'||!/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/.test(sectionAnchor)||
      expected?.sectionAnchor!==sectionAnchor)bad();
   const {tabId,source}=await readActiveTab(chromeApi);
-  if(source.kind!=='techdocs'||!/^https:\/\/techdocs\.zebra\.com\/[a-z][a-z0-9-]*\/\d{1,4}(?:-\d{1,4}){1,4}\//.test(source.url)||
+  if(source.kind!=='techdocs'||!/^https:\/\/techdocs\.zebra\.com\/(?:[a-z][a-z0-9-]*|dcs\/rfid\/android)\/\d{1,4}(?:-\d{1,4}){1,4}\//.test(source.url)||
      expected?.tabId!==tabId||expected.source?.url!==source.url)bad();
   const [r]=await chromeApi.scripting.executeScript({target:{tabId,frameIds:[0]},world:'ISOLATED',
     func:capturePage,args:[source,LIMITS,{sectionAnchor}]});

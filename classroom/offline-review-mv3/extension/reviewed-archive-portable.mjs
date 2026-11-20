@@ -31,7 +31,7 @@ export function normalizeScopedArchiveInput(forumValue,techdocsValue){
  if(!exact(techdocsValue,['capture','section_scope']))fail();
  const forum=packet(forumValue), techdocs=packet(techdocsValue.capture), scope=techdocsValue.section_scope;
  if(forum.source_kind!=='forum'||techdocs.source_kind!=='techdocs'||!techdocs.truncated||
-    !/^https:\/\/techdocs\.zebra\.com\/[a-z][a-z0-9-]*\/\d{1,4}(?:-\d{1,4}){1,4}\//.test(techdocs.source_url)||
+    !/^https:\/\/techdocs\.zebra\.com\/(?:[a-z][a-z0-9-]*|dcs\/rfid\/android)\/\d{1,4}(?:-\d{1,4}){1,4}\//.test(techdocs.source_url)||
     !exact(scope,['schema_version','heading_anchor','boundary','whole_article'])||
     scope.schema_version!=='zebra-section-scope/v1'||scope.whole_article!==false||
     typeof scope.heading_anchor!=='string'||!/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/.test(scope.heading_anchor)||
