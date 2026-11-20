@@ -160,7 +160,10 @@ async function handler(req,res){
  }catch(e){return error(res,422,"document_unavailable",String(e.message).slice(0,330))}
  try{
   const ai=await callAI(question,original,proposal),review=normalizeModel(ai.result,original,proposal);
-  return reply(res,200,{ok:true,mode:"live_ai_document_comparison",case_id:caseId,model:ai.model,source_receipts:receipts,review,ran_at:new Date().toISOString(),device_tested:false,publication_approved:false,note:"Model assessment of retrieved document excerpts; no live device validation or approved publication."});
+  return reply(res,200,{ok:true,mode:"live_ai_document_comparison",case_id:caseId,model:ai.model,source_receipts:receipts,review,ran_at:new Date().toISOString(),
+   run_id:crypto.randomUUID(),review_input_sha256:digest(JSON.stringify({question,original,proposal})),
+   prompt_sha256:digest(JSON.stringify(messages(question,original,proposal))),
+   device_tested:false,publication_approved:false,note:"Model assessment of retrieved document excerpts; no live device validation or approved publication."});
  }catch(e){return error(res,502,"model_error",String(e.message).slice(0,340))}
 }
 module.exports=handler;
