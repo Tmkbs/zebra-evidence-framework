@@ -399,3 +399,20 @@ test('headings owned by a table cell cannot masquerade as native section boundar
  assert.ok(!result.capture.blocks.some(b=>b.text==='Outside section'||b.anchor==='peer'));
  for(const id of ['cell-heading','quote-heading'])assert.throws(()=>scoped(fixture,dw66,id),/unique visible native heading/);
 });
+
+test('real scoped serializer envelope reaches classroom intake despite a quoted peer-rank heading',async()=>{
+ const {intake}=await import('../../../capture-intake.cjs');
+ const forum={schema_version:SCHEMA,source_url:'https://developer.zebra.com/content/example-fixture',
+  source_kind:'forum',captured_at:'2026-11-19T04:00:00.000Z',title:'Fixture question',
+  blocks:[{kind:'paragraph',text:'Which option applies to the scope?'}],truncated:false};
+ const result=scoped([H('readerparams','Reader Parameters'),
+  ['blockquote',{},[H('quote-heading','Quoted heading'),P('Still in this quote')]],P('Retained prose'),
+  H('peer','Next real heading'),P('Out of scope')]);
+ assert.ok(result.capture.blocks.some(b=>b.kind==='heading'&&b.anchor==='quote-heading'&&b.level===2));
+ assert.ok(!result.capture.blocks.some(b=>b.anchor==='peer'));
+ const input=intake({forum,techdocs:JSON.parse(JSON.stringify(result))});
+ assert.equal(input.capture_binding.captures[1].section_scope.boundary,'next_heading');
+ assert.equal(input.stage,'CAPTURE_REVIEW_REQUIRED');
+ assert.equal(input.downstream_adapter.apply_allowed,false);
+ assert.equal(input.release.publication,false);
+});

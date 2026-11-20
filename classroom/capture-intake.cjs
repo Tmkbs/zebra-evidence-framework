@@ -6,6 +6,8 @@ const fs=require('node:fs');
 const crypto=require('node:crypto');
 const VERSION='zebra-doc-capture/v1';
 const INTAKE='zebra-doc-capture-intake/v1';
+const SECTION_SCOPE='zebra-section-scope/v1';
+const SCOPED_DOC=/^https:\/\/techdocs\.zebra\.com\/[a-z][a-z0-9-]*\/\d{1,4}(?:-\d{1,4}){1,4}\//;
 const LIMIT={file:384*1024, title:512, block:3500, body:48*1024, blocks:120};
 const BLOCK=new Set(['heading','paragraph','list_item','code','table_row','quote']);
 const CASE=/^[A-Za-z][A-Za-z0-9_.-]{0,79}$/;
@@ -68,11 +70,29 @@ function validateCapture(value){
  });
  return {schema_version:VERSION,source_url:url,captured_at:stamp,title:value.title,source_kind:value.source_kind,blocks,truncated:value.truncated};
 }
+function validateInput(value){
+ if(!object(value)||(!Object.hasOwn(value,'capture')&&!Object.hasOwn(value,'section_scope')))
+  return {capture:validateCapture(value),sectionScope:null};
+ if(!shape(value,['capture','section_scope']))deny('CAPTURE_SECTION','Invalid section capture envelope.');
+ const capture=validateCapture(value.capture);
+ const scope=value.section_scope;
+ if(capture.source_kind!=='techdocs'||!SCOPED_DOC.test(capture.source_url)||!capture.truncated||
+    !shape(scope,['schema_version','heading_anchor','boundary','whole_article'])||
+    scope.schema_version!==SECTION_SCOPE||scope.whole_article!==false||
+    typeof scope.heading_anchor!=='string'||!ANCHOR.test(scope.heading_anchor)||
+    !['next_heading','article_end','capture_limit'].includes(scope.boundary))
+   deny('CAPTURE_SECTION','Expected a partial section of a versioned public TechDocs article.');
+ const first=capture.blocks[0];
+ if(capture.blocks.length<2||first.kind!=='heading'||first.anchor!==scope.heading_anchor||
+    !first.level||capture.blocks.slice(1).some(b=>b.anchor===scope.heading_anchor))
+   deny('CAPTURE_SECTION','Section blocks do not match the unique starting heading or section boundary.');
+ return {capture,sectionScope:{schema_version:SECTION_SCOPE,heading_anchor:scope.heading_anchor,boundary:scope.boundary,whole_article:false}};
+}
 function documentVersion(url){
  const version=new URL(url).pathname.split('/')[2]||'';
  return /^(?:v)?\d+(?:[.-]\d+)+$/.test(version)?version:null;
 }
-function loadCapture(file){
+function loadCapture(file,{allowSection=false}={}){
  try{
   const bytes=fs.statSync(file);
   if(!bytes.isFile()||bytes.size>LIMIT.file) deny('CAPTURE_LIMIT','Only a bounded local capture file is accepted.');
@@ -80,32 +100,43 @@ function loadCapture(file){
   if(raw.length>LIMIT.file) deny('CAPTURE_LIMIT','Only a bounded local capture file is accepted.');
   let parsed;
   try{parsed=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(raw));}catch{deny('CAPTURE_JSON','Invalid UTF-8 or JSON capture.');}
-  return validateCapture(parsed);
+  const checked=validateInput(parsed);
+  if(checked.sectionScope&&!allowSection)deny('CAPTURE_SECTION','Section captures are accepted only as TechDocs inputs.');
+  return checked.sectionScope?{capture:checked.capture,section_scope:checked.sectionScope}:checked.capture;
  }catch(e){
   if(e instanceof IntakeError)throw e;
   deny('CAPTURE_IO','Local capture could not be opened.');
  }
 }
 function intake({forum,techdocs,caseId=null}){
- const captures=[validateCapture(forum),validateCapture(techdocs)];
+ const fInput=validateInput(forum),dInput=validateInput(techdocs);
+ if(fInput.sectionScope)deny('CAPTURE_SECTION','Section captures are accepted only as TechDocs inputs.');
+ const sectionScope=dInput.sectionScope;
+ const captures=[fInput.capture,dInput.capture];
  if(captures[0].source_kind!=='forum'||captures[1].source_kind!=='techdocs') deny('CAPTURE_PAIR','Select one forum capture followed by one TechDocs capture.');
  if(caseId!==null&&(typeof caseId!=='string'||!CASE.test(caseId))) deny('CASE_ID','Invalid project case ID.');
  const [f,d]=captures;
  const id=caseId||'CAP-'+sha(f.source_url).slice(0,18);
  const docId='DOC-'+sha(d.source_url).slice(0,18);
  const pinned=captures.map(c=>({kind:c.source_kind,url:c.source_url,captured_at:c.captured_at,sha256:sha(JSON.stringify(c)),block_count:c.blocks.length,truncated:c.truncated}));
- const runId='CAPTURE-'+sha(JSON.stringify([id,...pinned.map(r=>r.sha256)])).slice(0,24);
+ if(sectionScope){
+  pinned[1].section_scope=sectionScope;
+  // The capture digest stays compatible with consumers of flat capture v1.
+  pinned[1].section_envelope_sha256=sha(JSON.stringify({capture:d,section_scope:sectionScope}));
+ }
+ const runId='CAPTURE-'+sha(JSON.stringify([id,...pinned.map(r=>r.section_envelope_sha256??r.sha256)])).slice(0,24);
  const body=d.blocks.map(b=>b.text).join('\n\n');
  const version=documentVersion(d.source_url);
  const unknowns=['Verify forum author question versus replies and determine the exact question scope.','Confirm source fidelity, installed product and software versions, and whether the selected documentation applies.','Review public redistribution and model-use scope; this intake does not authorize either.'];
  if(!version)unknowns.push('No exact product-doc edition inferred from the source URL.');
- if(pinned.some(p=>p.truncated))unknowns.push('Capture truncated; verify the missing content before using it for any review.');
+ if(sectionScope)unknowns.push('Only the selected TechDocs section was captured; surrounding sections, media and original article fidelity remain unverified.');
+ if(pinned.some(p=>p.truncated&&!p.section_scope)||sectionScope?.boundary==='capture_limit')unknowns.push('Capture truncated; verify the missing content before using it for any review.');
  return {
   schema:INTAKE,stage:'CAPTURE_REVIEW_REQUIRED',fictional_demo:false,record_kind:'PUBLIC_SOURCE_RESEARCH',document_source_kind:'browser_text_capture',
   run_id:runId,
   case:{id,question:null,question_title:f.title,known_facts:[],unknowns,document_reference:docId,source_status:'PUBLIC_URL_NOT_INDEPENDENTLY_VERIFIED',case_url:f.source_url,public_report_url:null,model_execution_status:'NOT_RUN'},
   document_snapshot:{name:d.title,type:'browser_text_capture',extension:'.txt',original_text:body,character_count:body.length,selected_paragraph:null,exact_match_count:0,customer_source_verified:false,source_version_from_url:version},
-  evidence:[{id:'CAPTURE-FORUM',source_label:f.title,claim:null,scope_limit:'Captured title and visible blocks; author versus replies not yet reviewed.',public_url:f.source_url},{id:'CAPTURE-TECHDOCS',source_label:d.title,claim:null,scope_limit:'Structured browser text, not a verified article mirror or installed product version.',public_url:d.source_url}],
+  evidence:[{id:'CAPTURE-FORUM',source_label:f.title,claim:null,scope_limit:'Captured title and visible blocks; author versus replies not yet reviewed.',public_url:f.source_url},{id:'CAPTURE-TECHDOCS',source_label:d.title,claim:null,scope_limit:sectionScope?'Partial text from a named section, not a verified article mirror or installed product version.':'Structured browser text, not a verified article mirror or installed product version.',public_url:d.source_url}],
   evidence_assessment:[],unknowns,next_checks:['Check capture content and product version before evidence adjudication.','Select an exact original paragraph only after source review.'],
   recorded_answers:[{id:'A',source:'NOT_RUN',output:'',human_scores:{},transfer_receipt:null},{id:'B',source:'NOT_RUN',output:'',human_scores:{},transfer_receipt:null}],
   reviewer_choice:null,failure_diagnosis:{status:'NOT_REVIEWED',category:null,notes:'',confirmed_root_cause:false},
@@ -119,7 +150,7 @@ function intake({forum,techdocs,caseId=null}){
 }
 function cli(args){
  if(args.length!==2&&args.length!==3)deny('USAGE','Usage: node classroom/capture-intake.cjs forum.json techdocs.json [case-id]');
- return intake({forum:loadCapture(args[0]),techdocs:loadCapture(args[1]),caseId:args[2]??null});
+ return intake({forum:loadCapture(args[0]),techdocs:loadCapture(args[1],{allowSection:true}),caseId:args[2]??null});
 }
 module.exports={intake,loadCapture,validateCapture,IntakeError};
 if(require.main===module){
