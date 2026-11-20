@@ -12,6 +12,9 @@ const document={getElementById:id=>elements.get(id),createElement:tag=>({tag,tex
 const sandbox={document,URL,Blob,setTimeout, navigator:{clipboard:{writeText:async()=>{}}},module:{exports:{}}};
 vm.runInNewContext(script,sandbox,{timeout:5000});
 const api=sandbox.module.exports;
+assert.equal(elements.get("case-count").textContent,"2","two sourced fallback cases must render without public CSV");
+assert.ok(elements.get("official-url").value.startsWith("https://techdocs.zebra.com/"));
+assert.ok(elements.get("revision-url").value.includes("/document-reader/"));
 const csv='case id,title,question,version,source url,revision url\n'+
 'ZF-1,"Scanning, revised","Can it scan?",13.0,https://developer.zebra.com/content/a-example,https://zebra-techdocs-practicum.vercel.app/document-reader/ehs28-revised.html\n';
 const parsed=api.parseCSV(csv);
