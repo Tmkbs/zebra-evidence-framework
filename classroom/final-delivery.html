@@ -131,7 +131,7 @@ function mapColumns(headers){return {
  question:column(headers,[/^question$/,/^problem(\s|_|-)?statement$/,/^summary$/,/^description$/,/issue.*(description|summary)/,/^issue$/,/root cause breakdown.*missing content/]),
  version:column(headers,[/^doc(ument)?[\s_-]?version$/,/^version$/,/product.*version/]),
  forum:column(headers,[/forum.*(link|url)/,/original.*forum.*(link|url)/,/developer.*(link|url)/]),
- official:column(headers,[/official.*techdocs.*(url|link)/,/original.*techdocs.*(url|link)/,/^techdocs.*(url|link)/,/target techdocs.*(url|link)/,/^official.*source.*(url|link)/]),
+ official:column(headers,[/official.*techdocs.*(url|link)/,/original.*techdocs.*(url|link)/,/^techdocs.*(url|link)/,/target techdocs.*(url|link)/,/^target techdocs page\s*\/\s*section$/,/^official.*source.*(url|link)/]),
  proposal:column(headers,[/(revision|revised|proposal|review).*(link|url)/,/proposed.*doc.*(url|link)/,/^edited.*techdocs.*(url|link)/]),
  product:column(headers,[/^product$/,/^product[\s_-]?name$/,/^feature\s*\/\s*component$/]),
  category:column(headers,[/^documentation root cause category$/,/^root cause category$/]),
@@ -304,7 +304,7 @@ el("ai-export").addEventListener("click",()=>{if(lastAI){const p={case:{id:lastA
 el("build").addEventListener("click",build);el("reset").addEventListener("click",clearReview);
 el("export").addEventListener("click",()=>{if(lastPacket){exportJSON(lastPacket);el("export-status").textContent="Local handoff JSON downloaded."}});
 el("copy").addEventListener("click",async()=>{if(!lastPacket)return;try{await navigator.clipboard.writeText(summary(lastPacket));el("export-status").textContent="Summary copied."}catch{el("export-status").textContent="Clipboard unavailable. Select the summary text above."}});
-if(typeof module!=="undefined"&&module.exports)module.exports={safeURL,parseCSV,mapColumns,normalize,buildPacket,approvedPair};
+if(typeof module!=="undefined"&&module.exports)module.exports={safeURL,parseCSV,mapColumns,normalize,importText,buildPacket,approvedPair};
 if(typeof window!=="undefined")localInit();
 </script>
 </body></html>
