@@ -10,6 +10,8 @@ TRUST='zebra-trusted-local-operation/v1'
 BEFORE='zebra-paragraph-before/v1'
 ANCHOR=r'[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}'
 SHA=r'[a-f0-9]{64}'
+# Keep the added RFID route within the same public-path policy as extension/capture.js.
+SENSITIVE_PATH=re.compile(r'^(?:login|logout|log-in|sign-in|signin|register|signup|account|user|users|admin|internal|private|download|oauth|sso|search|ticket|support-portal)(?:$|[-_.])',re.I)
 FIELDS={'case_id':r'[A-Za-z0-9_-]{1,100}','run_id':r'CAPTURE-[a-f0-9]{24}',
         'source_version':r'[0-9]{1,4}(?:-[0-9]{1,4}){1,4}',
         'source_sha256':SHA,'paragraph_sha256':SHA}
@@ -41,7 +43,13 @@ def parse(raw,cap):
 def check_link(url,edition):
     if not check(url,r'https://techdocs\.zebra\.com/[A-Za-z0-9_./-]+'):reject()
     p=urlsplit(url); parts=p.path[1:].removesuffix('/').split('/')
-    if (p.scheme,p.netloc)!=('https','techdocs.zebra.com') or len(parts)<3 or parts[1]!=edition or any(s in ('','.','..') for s in parts):reject()
+    # Match the existing flat routes, plus the one named nested RFID Android family.
+    version_index=3 if parts[:3]==['dcs','rfid','android'] else 1
+    if ((p.scheme,p.netloc)!=('https','techdocs.zebra.com') or len(parts)<version_index+2 or
+        parts[version_index]!=edition or not check(edition,FIELDS['source_version']) or
+        any(s in ('','.','..') for s in parts)):reject()
+    if version_index==3 and (any(SENSITIVE_PATH.match(s) for s in parts) or
+        re.search(r'\.(?!html$)[a-z]{2,}$',p.path,re.I)):reject()
 def authorize_local_operation(*,operation_bytes,trust_bytes,operator_trust_sha256,baseline_bytes):
     """The caller must supply the trust SHA from a separate review channel, not the capture."""
     if type(trust_bytes) is not bytes or len(trust_bytes)>16_384 or not equal(digest(trust_bytes),operator_trust_sha256):reject()
