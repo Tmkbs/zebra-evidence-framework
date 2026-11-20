@@ -120,13 +120,14 @@ select{border:1px solid #cadbdd;border-radius:9px;background:white;color:#1d4654
 <div><div class="kicker">One-click research review</div><h1>One case. One check. A clear result.</h1><p>Start with a public Zebra developer case or a teammate's published documentation proposal. The framework automatically organizes source limits, missing information and a safer research-note draft.</p></div>
 <div class="flow" aria-label="Three step workflow"><b>1 Select</b><small>→</small><b>2 Run checks</b><small>→</small><b>3 Read results</b></div>
 </section>
+<p class="hint" style="margin:0 0 17px"><strong>Final delivery:</strong> review the team\u2019s published revision cases and export a client handoff in <a href="./final-delivery.html">Final Delivery Review</a>. This requires no model server.</p>
 <section class="card" aria-labelledby="case-title">
 <div class="stage-head"><span class="stage-num">01</span><h2 id="case-title">Choose a case</h2><span class="sub">No setup needed</span></div>
 <div class="select-row">
 <div><label class="field-label" for="case-select">Public case or documentation proposal</label><select id="case-select" aria-label="Choose a case"></select></div>
 <div class="run-actions">
-<button class="btn primary" id="ai-run" type="button">Run AI document review →</button>
-<button class="btn" id="run" type="button">Offline checks</button>
+<button class="btn" id="ai-run" type="button">Run AI document review (requires backend)</button>
+<button class="btn primary" id="run" type="button">Run evidence check →</button>
 </div>
 </div>
 <div class="case-preview"><span class="label" id="case-type">PUBLIC PROPOSAL</span><h3 id="case-question"></h3><p id="case-context"></p><div class="case-links" id="case-links"></div></div>
@@ -169,7 +170,7 @@ select{border:1px solid #cadbdd;border-radius:9px;background:white;color:#1d4654
 <label for="csv-file">Optional local case-table CSV (public data only)</label><input class="file" id="csv-file" type="file" accept=".csv,text/csv">
 <p id="csv-status" role="status">Files stay in your browser. Unrecognized columns are marked as missing instead of being guessed.</p>
 </details>
-<footer class="footer"><span>Evidence-first, human-controlled publication · Public educational prototype</span><span><a href="./evidence-framework-sandbox.html">Advanced research tools</a> · <a href="./course.html">Evolution lab</a> · <a href="https://github.com/Tmkbs/zebra-evidence-framework" target="_blank" rel="noopener noreferrer">Source code</a></span></footer>
+<footer class="footer"><span>Evidence-first, human-controlled publication · Public educational prototype</span><span><a href="./final-delivery.html">Final delivery handoff</a> · <a href="./evidence-framework-sandbox.html">Advanced research tools</a> · <a href="./course.html">Evolution lab</a> · <a href="https://github.com/Tmkbs/zebra-evidence-framework" target="_blank" rel="noopener noreferrer">Source code</a></span></footer>
 </main>
 <script>
 "use strict";
@@ -393,7 +394,7 @@ async function runAI(){
  }catch(e){
   setAIStatus(String(e.message||e).slice(0,400),"error");
   el("ai-connect").open=true;
- }finally{aiRunning=false;el("ai-run").disabled=false;el("ai-run").textContent="Run AI document review →";}
+ }finally{aiRunning=false;el("ai-run").disabled=false;el("ai-run").textContent="Run AI document review (requires backend)";}
 }
 function exportAI(){
  if(!lastAI)return;
