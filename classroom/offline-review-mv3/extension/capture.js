@@ -28,6 +28,14 @@ export function capturePage(source, limits, options) {
       /(?:sign in|log in|access denied|authentication required|page not found|404)(?:\s*[|:–-]|$)/i.test(document.title))
     throw new Error('This page looks restricted or unavailable. Nothing was captured.');
   const excluded='script,style,template,noscript,form,input,textarea,select,button,nav,aside,header,footer,iframe,object,embed,[hidden],[inert],[aria-hidden="true"],[contenteditable]:not([contenteditable="false"]),.comment,.comments,.user-info,.author,.node__meta,.profile,.toolbar,.forum-topic__meta,.forum-topic__attachments,.forum-topic__comments-list,.forum-topic__replies-header';
+  const sectionAnchor=options?.sectionAnchor;
+  const scoped=sectionAnchor!==undefined;
+  const anchorPattern=/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/;
+  const versionedDoc=/^https:\/\/techdocs\.zebra\.com\/[a-z][a-z0-9-]*\/\d{1,4}(?:-\d{1,4}){1,4}\//;
+  if(scoped&&(source.kind!=='techdocs'||!versionedDoc.test(source.url)||
+      typeof sectionAnchor!=='string'||!anchorPattern.test(sectionAnchor)||
+      options.includeTableCellMap===true||options.includeSameOriginLinks===true))
+    throw new Error('Choose one named section on a supported versioned public TechDocs page.');
   let root;
   if (source.kind === 'forum') {
     // A generic forum node content wrapper may include replies and account details.
@@ -38,6 +46,13 @@ export function capturePage(source, limits, options) {
       if (matches.length===1) {root=matches[0];break;}
       if (matches.length>1) throw new Error('The original forum post could not be identified uniquely.');
     }
+  } else if(scoped&&source.url==='https://techdocs.zebra.com/stagenow/3-1/csp/ui/') {
+    // This legacy template has no current TechDocs main/article selector.
+    // A generic Bootstrap column is not an approved article root.
+    const matches=[...document.querySelectorAll('section#services')];
+    if(matches.length!==1||matches[0].closest(excluded))
+      throw new Error('The legacy documentation article could not be identified uniquely.');
+    root=matches[0];
   } else {
     for (const s of ['#mainContent .service-box','#mainContent','main article','main .article','main .doc-content','main #content','main #markdown-content','main','[role="main"]']) {
       const matches=[...document.querySelectorAll(s)].filter(el=>!el.closest(excluded));
@@ -81,6 +96,19 @@ export function capturePage(source, limits, options) {
     }
     return true;
   };
+  const headingRank=el=>/^h[1-6]$/.test(el.localName)?Number(el.localName[1]):0;
+  // These descendants belong to the enclosing text block and cannot define a section.
+  // Otherwise that block could already include text after a reported boundary.
+  const isSectionHeading=el=>headingRank(el)>0&&!el.parentElement?.closest('pre,td,th,li,blockquote,p')&&visible(el);
+  let heading=null, inSection=!scoped, boundary='article_end';
+  if(scoped){
+    // Search only for an actual ID, not visible label or a synthetic anchor.
+    // Count hidden and out-of-root copies too so a fragment cannot be ambiguous.
+    const ids=document.querySelectorAll('[id="'+sectionAnchor+'"]');
+    if(ids.length!==1||!root.contains(ids[0])||!isSectionHeading(ids[0]))
+      throw new Error('The approved section has no unique visible native heading.');
+    heading=ids[0];
+  }
   const cellBreaks='address,div,section,p,li,pre,blockquote,dl,dt,dd,h1,h2,h3,h4,h5,h6';
   // Traverse text and explicit breaks together in DOM order. Preserve whitespace
   // in standalone code; prose source wrapping is not a rendered line break.
@@ -127,6 +155,13 @@ export function capturePage(source, limits, options) {
   };
   for (const el of root.querySelectorAll(allowed)) {
     if(++examined>6000 || remainingTextNodes<=0) {truncated=true;break;}
+    if(!inSection){
+      if(el!==heading)continue;
+      inSection=true;
+    }else if(scoped&&el!==heading&&headingRank(el)<=headingRank(heading)&&isSectionHeading(el)){
+      boundary='next_heading';
+      break;
+    }
     if(!visible(el))continue;
     const tag=el.localName;
     if(tag!=='pre'&&el.parentElement?.closest('pre'))continue;
@@ -174,7 +209,13 @@ export function capturePage(source, limits, options) {
   if(restricted(title))throw new Error('Potential credentials or opaque identifiers detected; nothing was captured.');
   const boundedTitle=clip(title,limits.titleBytes);
   if(boundedTitle!==title)truncated=true;
-  const capture={schema_version:'zebra-doc-capture/v1',source_url:source.url,captured_at:new Date().toISOString(),title:boundedTitle,source_kind:source.kind,blocks,truncated};
+  const capture={schema_version:'zebra-doc-capture/v1',source_url:source.url,captured_at:new Date().toISOString(),title:boundedTitle,source_kind:source.kind,blocks,truncated:scoped||truncated};
+  if(scoped){
+    if(blocks[0]?.kind!=='heading'||blocks[0].anchor!==sectionAnchor||blocks.length<2)
+      throw new Error('The approved section or its body was not retained.');
+    return {capture,section_scope:{schema_version:'zebra-section-scope/v1',heading_anchor:sectionAnchor,
+      boundary:truncated?'capture_limit':boundary,whole_article:false}};
+  }
   const table_cell_map={schema_version:'zebra-table-cell-map/v1',rows,omitted_rows:omittedRows,capture_truncated:capture.truncated};
   if(options?.includeSameOriginLinks!==true)return tableOptIn?{capture,table_cell_map}:capture;
   // Opt-in only: discover visible candidates without visiting them. Use the
@@ -283,4 +324,28 @@ export async function captureTableActive(chromeApi, expected, {approved=false}={
   if(end!==b.text.length)invalid();
  }
  return out;
+}
+
+
+/** Explicit exact-page native-heading capture; no network, extra permissions or popup integration. */
+export async function captureSectionActive(chromeApi, expected, {approved=false, sectionAnchor}={}) {
+  const bad=()=>{throw new Error('The selected documentation section could not be captured.');};
+  if(approved!==true||typeof sectionAnchor!=='string'||!/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/.test(sectionAnchor)||
+     expected?.sectionAnchor!==sectionAnchor)bad();
+  const {tabId,source}=await readActiveTab(chromeApi);
+  if(source.kind!=='techdocs'||!/^https:\/\/techdocs\.zebra\.com\/[a-z][a-z0-9-]*\/\d{1,4}(?:-\d{1,4}){1,4}\//.test(source.url)||
+     expected?.tabId!==tabId||expected.source?.url!==source.url)bad();
+  const [r]=await chromeApi.scripting.executeScript({target:{tabId,frameIds:[0]},world:'ISOLATED',
+    func:capturePage,args:[source,LIMITS,{sectionAnchor}]});
+  const out=r?.result, cap=out?.capture, scope=out?.section_scope;
+  const exact=(x,keys)=>x&&typeof x==='object'&&!Array.isArray(x)&&Object.keys(x).length===keys.length&&keys.every(k=>Object.hasOwn(x,k));
+  if(r?.frameId!==0||!exact(out,['capture','section_scope'])||
+     !exact(cap,['schema_version','source_url','captured_at','title','source_kind','blocks','truncated'])||
+     !exact(scope,['schema_version','heading_anchor','boundary','whole_article'])||
+     cap.schema_version!==SCHEMA||cap.source_url!==source.url||cap.source_kind!=='techdocs'||cap.truncated!==true||
+     !Array.isArray(cap.blocks)||cap.blocks.length<2||cap.blocks.length>LIMITS.blocks||
+     cap.blocks[0]?.kind!=='heading'||cap.blocks[0]?.anchor!==sectionAnchor||
+     scope.schema_version!=='zebra-section-scope/v1'||scope.heading_anchor!==sectionAnchor||scope.whole_article!==false||
+     !['capture_limit','article_end','next_heading'].includes(scope.boundary))bad();
+  return out;
 }

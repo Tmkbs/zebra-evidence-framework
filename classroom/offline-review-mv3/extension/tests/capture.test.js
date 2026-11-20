@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {checkSource,capturePage,captureActive,captureTableActive,captureMirrorActive,readActiveTab,SCHEMA,LIMITS} from '../capture.js';
+import {checkSource,capturePage,captureActive,captureTableActive,captureMirrorActive,captureSectionActive,readActiveTab,SCHEMA,LIMITS} from '../capture.js';
 
 import {createCaptureMirrorSession} from '../session.js';
 import {mirrorZip} from '../zip.js';
@@ -107,9 +107,15 @@ function extractFixture(specs, captureOptions, injected={func:capturePage,args:[
  }
  const root=construct(['div',{},specs],null);
  const win={};win.top=win.self=win;
+ root.contains=e=>flatten(root,true).includes(e);
  const scope={URL,location:{href:injected.args[0].url},window:win,NodeFilter:{SHOW_TEXT:4,SHOW_ELEMENT:1},TextEncoder,
    getComputedStyle:el=>el.style||{display:'block',visibility:'visible'},
-   document:{title:'Archive example, synthetic',querySelector:()=>null,querySelectorAll:s=>[fixtureSelector??(injected.args[0].kind==='forum'?'article.node--type-forum main.forum-topic__content .forum-topic__body':'#mainContent .service-box')].includes(s)?[root]:[],
+   document:{title:'Archive example, synthetic',querySelector:()=>null,querySelectorAll:s=>{
+      const id=s.match(/^\[id="([^"]+)"\]$/)?.[1];
+      if(id)return flatten(root,true).filter(el=>el.id===id);
+      return s===fixtureSelector&&fixtureSelector==='section#services' ? [root]
+        : s===(fixtureSelector??(injected.args[0].kind==='forum'?'article.node--type-forum main.forum-topic__content .forum-topic__body':'#mainContent .service-box'))?[root]:[];
+    },
     createTreeWalker(el){const nodes=flatten(el);let n=0;return {nextNode:()=>nodes[n++]||null};}
    }};
  const serialize=new Function(...Object.keys(scope),'source','limits','opts','return ('+injected.func.toString()+')(source,limits,opts)');
@@ -320,4 +326,76 @@ test('forum capture requires a positive topic-body marker rather than a generic 
    assert.equal(result.blocks[0].text,'Synthetic text.');
  }
  assert.throws(()=>extractFixture(fixtures,undefined,isolated,'main article.node--type-forum .node__content'),/No identifiable public article body/);
+});
+
+const dw66='https://techdocs.zebra.com/datawedge/6-6/guide/input/barcode/';
+const sn31='https://techdocs.zebra.com/stagenow/3-1/csp/ui/';
+const H=(id,title='Same heading label',tag='h2')=>[tag,{id},[title]];
+const P=text=>['p',{},[text]];
+const scoped=(specs,url=dw66,anchor='readerparams',rootSelector)=>extractFixture(specs,undefined,
+ {func:capturePage,args:[{url,kind:'techdocs'},LIMITS,{sectionAnchor:anchor}]},rootSelector);
+test('explicit native heading scope can reach beyond full-article cap without reading prior text',()=>{
+ const earlier=Array.from({length:391},()=>P('Earlier baseline block'));
+ const fixture=[...earlier,H('readerparams','Reader Parameters'),P('LCD Mode example'),
+   H('nested','Subheading','h3'),P('Nested section still belongs'),
+   H('peer','Next section'),P('Private-looking suffix api_key = '+'a'.repeat(30))];
+ const full=extractFixture(fixture,undefined,{func:capturePage,args:[{url:dw66,kind:'techdocs'},LIMITS]});
+ assert.equal(full.blocks.length,120);
+ assert.ok(!full.blocks.some(b=>b.anchor==='readerparams'));
+ const result=scoped(fixture);
+ assert.deepEqual(result.capture.blocks.map(b=>b.text),['Reader Parameters','LCD Mode example','Subheading','Nested section still belongs']);
+ assert.equal(result.capture.truncated,true);
+ assert.deepEqual(result.section_scope,{schema_version:'zebra-section-scope/v1',heading_anchor:'readerparams',boundary:'next_heading',whole_article:false});
+ assert.equal(scoped([P('api_key = '+'a'.repeat(30)),H('readerparams'),P('Visible text')]).capture.blocks.length,2);
+});
+test('legacy StageNow root is exact-route opt-in and first duplicate label is selected by native ID',()=>{
+ const first='set-default-input-method', second='set-default-input-method-1';
+ const fixture=[H(first),P('Action control'),H(second),P('Choice control')];
+ assert.throws(()=>extractFixture(fixture,undefined,{func:capturePage,args:[{url:sn31,kind:'techdocs'},LIMITS]},'section#services'),/No identifiable/);
+ assert.deepEqual(scoped(fixture,sn31,first,'section#services').capture.blocks.map(b=>b.text),['Same heading label','Action control']);
+ assert.throws(()=>scoped(fixture,sn31,first,'.col-sm-9'),/legacy documentation/);
+ assert.throws(()=>scoped(fixture,sn31.replace('3-1','3-2'),first,'section#services'),/No identifiable/);
+});
+test('missing, duplicate, hidden, non-heading and empty selected scopes are denied',()=>{
+ for(const fixture of [[H('wrong'),P('Body')],[H('readerparams'),P('Body'),H('readerparams')],
+   [H('readerparams'),P('Body'),['div',{id:'readerparams',style:{display:'none'}},[]]],
+   [['h2',{id:'readerparams',style:{display:'none'}},['Hidden']],P('Body')],
+   [['p',{id:'readerparams'},['Not a heading']],P('Body')],[H('readerparams'),H('peer'),P('Body')]]){
+    assert.throws(()=>scoped(fixture),/native heading|not retained/);
+ }
+ assert.throws(()=>scoped([H('readerparams'),P('Body')],tech),/versioned public/);
+ assert.equal(scoped([H('readerparams'),...Array.from({length:140},()=>P('Body'))]).section_scope.boundary,'capture_limit');
+});
+test('section adapter requires exact explicit page, heading and safe result',async()=>{
+ const expected={tabId:31, source:checkSource(dw66),sectionAnchor:'readerparams'};
+ const options={approved:true,sectionAnchor:'readerparams'};
+ let calls=0;
+ const api={tabs:{query:async()=>[{id:31,url:dw66}]},scripting:{executeScript:async request=>{
+    ++calls;
+    assert.deepEqual(request.target,{tabId:31,frameIds:[0]});
+    assert.equal(request.world,'ISOLATED');
+    assert.deepEqual(request.args,[expected.source,LIMITS,{sectionAnchor:'readerparams'}]);
+    return [{frameId:0,result:scoped([H('readerparams'),P('Body')])}];
+ }}};
+ await assert.rejects(captureSectionActive(api,expected,{}));
+ await assert.rejects(captureSectionActive(api,expected,{...options,sectionAnchor:'peer'}));
+ await assert.rejects(captureSectionActive(api,{...expected,tabId:32},options));
+ assert.equal(calls,0);
+ assert.equal((await captureSectionActive(api,expected,options)).section_scope.boundary,'article_end');
+ assert.equal(calls,1);
+ const packet=scoped([H('readerparams'),P('Body')]);
+ api.scripting.executeScript=async()=>[{frameId:0,result:{...packet,capture:{...packet.capture,truncated:false}}}];
+ await assert.rejects(captureSectionActive(api,expected,options));
+});
+
+test('headings owned by a table cell cannot masquerade as native section boundaries',()=>{
+ const table=['table',{},[['tbody',{},[['tr',{},[['td',{},[H('cell-heading','Cell label'),P('Still in this cell')]]]]]]]];
+ const quote=['blockquote',{},[H('quote-heading','Quoted heading'),P('Still in this quote')]];
+ const fixture=[H('readerparams','Reader Parameters'),table,quote,P('Article body after nested headings'),H('peer'),P('Outside section')];
+ const result=scoped(fixture);
+ assert.equal(result.section_scope.boundary,'next_heading');
+ assert.ok(result.capture.blocks.some(b=>b.kind==='table_row'&&b.text.includes('Still in this cell')));
+ assert.ok(result.capture.blocks.some(b=>b.text==='Article body after nested headings'));
+ assert.ok(!result.capture.blocks.some(b=>b.text==='Outside section'||b.anchor==='peer'));
+ for(const id of ['cell-heading','quote-heading'])assert.throws(()=>scoped(fixture,dw66,id),/unique visible native heading/);
 });
