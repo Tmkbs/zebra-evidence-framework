@@ -40,7 +40,7 @@ footer{margin-top:26px;color:#6b8288;font-size:12px;border-top:1px solid #d5e1e3
 <label for="case-file">Public case CSV (loads automatically when the local runner is available)</label>
 <input class="file" id="case-file" type="file" accept=".csv,text/csv">
 <p class="small muted">The local runner may fetch only the team’s published public CSV; manual import remains available. No private customer SPR spreadsheet, no automatic model submission.</p>
-<div id="import-status" class="status" role="status">No case file imported. You can still preview the handoff format below.</div>
+<div id="import-status" class="status" role="status">Two traceable public examples are ready; the local runner will load the team’s full public case list when reachable.</div>
 <div id="case-panel" hidden>
 <label for="case-select">Review case</label><select id="case-select"></select>
 <div class="meta"><div><strong id="case-count">0</strong>Imported rows</div><div><strong id="field-count">0</strong>Mapped fields</div><div><strong id="case-index">0</strong>Selected row</div></div>
@@ -101,6 +101,10 @@ const el=id=>document.getElementById(id);
 const schema="zebra-final-review-handoff/v1";
 const maxRows=300,maxBytes=700000;
 let rows=[],mapped=[],selected=0,lastPacket=null,lastAI=null,accessCode="",aiRunning=false,aiSequence=0;
+const PUBLIC_DEMO_CASES=[
+ {id:"SC13",title:"DataWedge 13.0 · SET_CONFIG",question:"Is the SET_CONFIG clarification properly supported and version-scoped?",product:"DataWedge",category:"Revision support",recommendation:"Clarify the relationship between CONFIG_MODE and RESET_CONFIG without claiming a device fix.",version:"13.0",source_url:"",official_url:"https://techdocs.zebra.com/datawedge/13-0/guide/api/setconfig/",proposal_url:"https://zebra-techdocs-practicum.vercel.app/document-reader/sc13-revised.html#plugin_configbundle",row_number:0},
+ {id:"EHS28",title:"Enterprise Home Screen 2.8 · Link Removal",question:"Does the proposed link-removal clarification add precise, supported steps?",product:"EHS",category:"Existing guidance",recommendation:"Identify whether the proposed clarification adds evidence not already in the original instructions.",version:"2.8",source_url:"",official_url:"https://techdocs.zebra.com/ehs/2-8/guide/settings/",proposal_url:"https://zebra-techdocs-practicum.vercel.app/document-reader/ehs28-revised.html#linkremoval",row_number:0}
+];
 const allowedHosts=new Set(["techdocs.zebra.com","developer.zebra.com","zebra-techdocs-practicum.vercel.app","github.com"]);
 function safeURL(s){
  if(typeof s!=="string"||s.length>2048||!/^https:\/\//i.test(s))return "";
@@ -252,7 +256,7 @@ async function localInit(){
    if(!cr.ok||typeof data.csv!=="string")throw Error(data.error||"Published case data unavailable");
    const v=importText(data.csv);
    el("import-status").textContent="Loaded "+v.count+" published public cases automatically; "+v.mapped+" columns mapped. Select a case to review.";
-  }catch(err){el("import-status").textContent="Auto-load unavailable: "+String(err.message).slice(0,150)+". You can still import the public CSV manually."}
+  }catch(err){el("import-status").textContent="Auto-load unavailable: "+String(err.message).slice(0,150)+". Two traced public examples remain available, or import the public CSV manually."}
  }catch{el("ai-status").textContent="No local campus model runner detected. Manual case review works without an API."}
 }
 async function runAI(){
@@ -307,6 +311,7 @@ el("build").addEventListener("click",build);el("reset").addEventListener("click"
 el("export").addEventListener("click",()=>{if(lastPacket){exportJSON(lastPacket);el("export-status").textContent="Local handoff JSON downloaded."}});
 el("copy").addEventListener("click",async()=>{if(!lastPacket)return;try{await navigator.clipboard.writeText(summary(lastPacket));el("export-status").textContent="Summary copied."}catch{el("export-status").textContent="Clipboard unavailable. Select the summary text above."}});
 if(typeof module!=="undefined"&&module.exports)module.exports={safeURL,parseCSV,mapColumns,normalize,importText,buildPacket,approvedPair};
+rows=PUBLIC_DEMO_CASES.map(c=>({...c}));refresh();
 if(typeof window!=="undefined")localInit();
 </script>
 </body></html>
