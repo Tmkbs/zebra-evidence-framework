@@ -7,11 +7,12 @@ The working UI and AI review server now run together using the campus Qwen Chat 
 ```bash
 git clone https://github.com/Tmkbs/zebra-evidence-framework.git
 cd zebra-evidence-framework
+git checkout final-delivery-review-handoff-20261120
 npm run campus:check
 npm run campus
 ```
 
-**Use this branch until the PR is merged:** `git checkout final-delivery-review-handoff-20261120` (after cloning, before `npm run campus:check`). Requires Node 20+ and no external npm dependencies.
+After PR #8 is merged, the checkout line is unnecessary. Requires Node 20+ and no external npm dependencies.
 
 - `npm run campus:check` sends **one harmless synthetic prompt** to the lab model and prints the actual response and token count (if supplied); failures are explicit.
 - `npm run campus` starts the full Zebra Evidence Review site at **http://127.0.0.1:3000/**, with an actual `/api/review` route routed to the campus model. The terminal prints the temporary review access code. Open **AI connection**, enter that code, and click **Run AI document review** on **SET_CONFIG 13.0** or **EHS 2.8**. The backend retrieves the exact paired public official and proposed pages; the model assesses their excerpts and returns source-linked findings. For a different case, choose the case and provide two approved public original/revised text files. Device testing and publication remain outside scope.
