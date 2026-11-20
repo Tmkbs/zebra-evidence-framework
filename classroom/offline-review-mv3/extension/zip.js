@@ -19,7 +19,7 @@ export function mirrorZip(files) {
   const local=[],central=[];
   let offset=0, directory=0;
   for(const [path,source] of [...files.entries()].sort(([a],[b])=>a<b?-1:a>b?1:0)){
-    if(typeof path!=='string'||!/^(?:index\.html|manifest\.json|site\.css|pages\/[0-9]{3}\.html)$/.test(path)||path.trim()!==path||
+    if(typeof path!=='string'||!/^(?:index\.html|manifest\.json|site\.css|pages\/(?:[0-9]{3}|original-excerpt|clean-excerpt)\.html)$/.test(path)||path.trim()!==path||
       typeof source!=='string'||source.length>25_000_000)throw new Error('Unsafe or oversized mirror entry.');
     const name=encoder.encode(path), data=encoder.encode(source), checksum=crc(data);
     const h=buffer(30), c=buffer(46);

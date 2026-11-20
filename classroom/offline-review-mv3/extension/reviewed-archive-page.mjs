@@ -27,7 +27,7 @@ form.addEventListener('submit',async event=>{
       if(!(file instanceof File)||!file.size||file.size>max)throw Error('Missing or oversized input.');
       return [key,new Uint8Array(await file.arrayBuffer())];
     })));
-    const {buffer,report}=await assembleSelectedArchive({...selected,trustPin,pairPin});
+    const {buffer,report}=await assembleSelectedArchive({...selected,trustPin,pairPin,excerptViews:data.get('excerptViews')==='on'});
     if(current!==generation)return;
     const zipBlob=new Blob([buffer],{type:'application/zip'});
     const receiptBlob=new Blob([archiveCheckReceiptText(report)],{type:'application/json'});

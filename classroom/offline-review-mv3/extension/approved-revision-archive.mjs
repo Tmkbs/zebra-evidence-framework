@@ -83,7 +83,7 @@ function insertBeforeGeneratedParagraph(page,found,addition){
  return page.slice(0,at)+addition+page.slice(at);
 }
 
-export async function buildApprovedRevisionArchive({input,grantBytes,trustedGrantSha256,receipt,baselineBytes,workingCopyBytes}={}){
+export async function buildApprovedRevisionArchive({input,grantBytes,trustedGrantSha256,receipt,baselineBytes,workingCopyBytes,excerptViews=false}={}){
  grantBytes=boundedCopy(grantBytes,16_384,fail);
  baselineBytes=boundedCopy(baselineBytes,500_000,fail);
  workingCopyBytes=boundedCopy(workingCopyBytes,600_000,fail);
@@ -140,6 +140,27 @@ export async function buildApprovedRevisionArchive({input,grantBytes,trustedGran
  const deep=target.path+'#'+grant.target_anchor;
  files.set('index.html',index.slice(0,-close.length)+
     '<section><h2>Locally reviewed paragraph excerpt</h2><p><a href="'+esc(deep)+'">Open the added paragraph in the captured context</a>. This excerpt does not recreate the full reviewed working copy or the original site.</p></section>'+close);
+ if(excerptViews===true){
+  const original='pages/original-excerpt.html', clean='pages/clean-excerpt.html';
+  if(files.has(original)||files.has(clean))fail();
+  const marked=files.get(target.path), pure='<p id="'+esc(grant.target_anchor)+'">'+esc(text)+'</p>';
+  if(typeof marked!=='string'||marked.indexOf(insertion)<0||marked.indexOf(insertion)!==marked.lastIndexOf(insertion))fail();
+  const fragment=cap.blocks.filter(b=>b.anchor===grant.source_anchor).length===1?'#'+esc(grant.source_anchor):'';
+  const viewNav='<nav aria-label="Local excerpt views"><a href="'+esc(target.path.split('/')[1])+'#'+esc(grant.target_anchor)+'">Revision marks</a> · <a href="clean-excerpt.html#'+esc(grant.target_anchor)+'">Clean excerpt</a> · <a href="original-excerpt.html'+fragment+'">Original captured excerpt</a></nav>';
+  const decorate=(html,label)=>{
+    const point='<article>';
+    if(html.indexOf(point)<0||html.indexOf(point)!==html.lastIndexOf(point))fail();
+    return html.replace(point,()=>'<p>'+label+'</p>'+viewNav+point);
+  };
+  files.set(target.path,decorate(marked,'Revision marks. This is a bounded structured capture.'));
+  files.set(original,decorate(page,'Original captured excerpt. This is not the complete official source page.'));
+  files.set(clean,decorate(marked.replace(insertion,()=>pure),'Clean revision excerpt. This is not the complete reviewed working copy.'));
+  files.set('index.html',files.get('index.html').slice(0,-close.length)+'<p>Excerpt views: <a href="'+original+fragment+'">Original captured excerpt</a> · <a href="'+clean+'#'+esc(grant.target_anchor)+'">Clean revision excerpt</a>.</p>'+close);
+  manifest.local_revision_excerpt_views={
+   schema:'zebra-local-revision-excerpt-views/v1',original_path:original+fragment,
+   marked_path:deep,clean_path:clean+'#'+grant.target_anchor,complete_source_mirror:false
+  };
+ }
  manifest.local_revision_overlay={schema:'zebra-archive-revision-overlay/v1',case_id:grant.case_id,run_id:grant.run_id,
   source_url:route.url,source_version:edition,capture_sha256:grant.capture_sha256,working_copy_sha256:grant.working_copy_sha256,
   source_anchor:grant.source_anchor,target_anchor:grant.target_anchor,archive_path:deep,rendered_working_copy_embedded:false,

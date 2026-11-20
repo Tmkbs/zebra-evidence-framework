@@ -68,5 +68,15 @@ test('one selected-input command assembles actual reviewed ZIP and refuses inval
   await assert.rejects(verifyLocalZip({...verifierInput,expectedReceiptSha256:'0'.repeat(64)}));
   await assert.rejects(verifyLocalZip({...verifierInput,zipFile:new Blob([pairedBytes,'changed'])}));
 
+  const outViews=path.join(dir,'paired-views.zip');
+  const views=spawnSync(process.execPath,[here,'--paired-views-local',selected,sha(grant),outViews,sha(pair)],{encoding:'utf8',timeout:5000});
+  assert.equal(views.status,0,views.stderr);
+  const vr=JSON.parse(views.stdout), viewBytes=readFileSync(outViews), raw=viewBytes.toString();
+  assert.equal(vr.member_count,7);
+  for(const key of ['pages/clean-excerpt.html','pages/original-excerpt.html'])assert.ok(Object.hasOwn(vr.members,key));
+  assert.match(raw,/Original captured excerpt/);assert.match(raw,/Clean revision excerpt/);
+  assert.equal(vr.forum_pairing,'EXACT_LOCAL_PAIR_PIN_MATCHED');
+  await verifyLocalZip({receiptFile:new Blob([views.stdout]),zipFile:new Blob([viewBytes]),expectedReceiptSha256:sha(views.stdout)});
+
  }finally{rmSync(dir,{recursive:true,force:true});}
 });

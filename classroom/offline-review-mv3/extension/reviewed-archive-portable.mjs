@@ -15,7 +15,7 @@ function selected(raw,kind) {
  // This bounded mode intentionally builds only the two selected roots; no link edges are used.
  return row.capture;
 }
-export async function assembleSelectedArchive({forum,techdocs,grant,trustPin,receipt,baseline,workingCopy,pairBytes,pairPin}) {
+export async function assembleSelectedArchive({forum,techdocs,grant,trustPin,receipt,baseline,workingCopy,pairBytes,pairPin,excerptViews=false}) {
  forum=boundedCopy(forum,360_000,fail);
  techdocs=boundedCopy(techdocs,360_000,fail);
  grant=boundedCopy(grant,16_384,fail);
@@ -27,7 +27,7 @@ export async function assembleSelectedArchive({forum,techdocs,grant,trustPin,rec
   budget:{maxPages:2,maxDepth:0,maxBytes:48_000,maxLinksPerPage:4}};
  // Prior r41 replay pinned a separate smaller archive budget (48k), preserve it for reproducible archives.
  const out=await buildApprovedRevisionArchive({input,grantBytes:grant,trustedGrantSha256:trustPin,
-    receipt:parse(receipt),baselineBytes:baseline,workingCopyBytes:workingCopy});
+    receipt:parse(receipt),baselineBytes:baseline,workingCopyBytes:workingCopy,excerptViews});
  let pair;
  if(pairBytes!==undefined||pairPin!==undefined){
   pair=await checkReviewedPair({pairBytes,pin:pairPin,grantBytes:grant,forum:captures[0],techdocs:captures[1],binding:out.manifest.local_revision_overlay});

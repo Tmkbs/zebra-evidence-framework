@@ -19,13 +19,14 @@ function local(filename,max) {
 }
 async function main(args){
  const [flag,dir,trustPin,output,...extra]=args;
- const paired=flag==='--paired-local';
- if((!paired&&flag!=='--reviewed-local')||!dir||!output||extra.length!==(paired?1:0)||!/^[a-f0-9]{64}$/.test(trustPin??''))fail();
+ const paired=flag==='--paired-local'||flag==='--paired-views-local';
+ const excerptViews=flag==='--reviewed-views-local'||flag==='--paired-views-local';
+ if((!paired&&flag!=='--reviewed-local'&&!excerptViews)||!dir||!output||extra.length!==(paired?1:0)||!/^[a-f0-9]{64}$/.test(trustPin??''))fail();
  if(!path.isAbsolute(dir)||fs.realpathSync(dir)!==dir||!fs.lstatSync(dir).isDirectory()||dir===path.parse(dir).root)fail();
  const read=(name,max)=>local(path.join(dir,name),max);
  const r=await assembleSelectedArchive({forum:read('forum.json',360_000),techdocs:read('techdocs.json',360_000),
    grant:read('grant.json',32_000),trustPin,receipt:read('receipt.json',32_000),
-   baseline:read('baseline.html',500_000),workingCopy:read('working-copy.html',500_000),
+   baseline:read('baseline.html',500_000),workingCopy:read('working-copy.html',500_000),excerptViews,
    ...(paired?{pairBytes:read('pair.json',8192),pairPin:extra[0]}:{})});
  fs.writeFileSync(output,r.buffer,{flag:'wx',mode:0o600});
  return r.report;
