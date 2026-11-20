@@ -136,7 +136,8 @@ function start(){
  const cfg=configure();
  const server=buildServer(cfg);
  server.listen(cfg.port,"127.0.0.1",()=>{
-  console.log("Zebra live-review page: http://127.0.0.1:"+cfg.port+"/");
+  console.log("Zebra final AI review: http://127.0.0.1:"+cfg.port+"/final-delivery.html");
+  console.log("Classroom evidence demo: http://127.0.0.1:"+cfg.port+"/");
   console.log("Campus status check: http://127.0.0.1:"+cfg.port+"/api/campus-status");
   console.log("Configured model: "+cfg.model);
   console.log("Session review access code (enter under AI connection): "+cfg.passcode);
