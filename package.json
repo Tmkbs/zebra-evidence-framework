@@ -7,6 +7,6 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node classroom/test_one_click.cjs && node classroom/test_ai_review.cjs && node classroom/test_end_to_end.cjs"
+    "test": "node classroom/test_final_delivery.cjs && node classroom/test_one_click.cjs && node classroom/test_ai_review.cjs && node classroom/test_end_to_end.cjs"
   }
 }
