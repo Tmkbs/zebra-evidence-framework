@@ -1,5 +1,27 @@
 # Zebra Evidence Framework — research workbench and classroom demo
 
+## Run the real Northwestern model (local/VPN, no API key needed)
+
+The working UI and AI review server now run together using the campus Qwen Chat Completions API. **This is a real inference path, not a simulated model response.** It must be started on a computer with Northwestern VPN or eduroam; the public GitHub Pages deployment cannot reach the campus-only HTTP service.
+
+```bash
+git clone https://github.com/Tmkbs/zebra-evidence-framework.git
+cd zebra-evidence-framework
+git checkout final-delivery-review-handoff-20261120
+npm run campus:check
+npm run campus
+```
+
+After PR #8 is merged, the checkout line is unnecessary. Requires Node 20+ and no external npm dependencies.
+
+- `npm run campus:check` sends **one harmless synthetic prompt** to the lab model and prints the actual response and token count (if supplied); failures are explicit.
+- `npm run campus` starts the full Zebra Evidence Review site at **http://127.0.0.1:3000/**, with an actual `/api/review` route routed to the campus model. The terminal prints the temporary review access code. Open **AI connection**, enter that code, and click **Run AI document review** on **SET_CONFIG 13.0** or **EHS 2.8**. The backend retrieves the exact paired public official and proposed pages; the model assesses their excerpts and returns source-linked findings. For a different case, choose the case and provide two approved public original/revised text files. Device testing and publication remain outside scope.
+- If Harper changed the port from the November 10 example, use `AI_BASE_URL=http://c3dgx0.cs.northwestern.edu:8080/v1` (or the currently confirmed port) in your environment. The default is **8000**, matching Harper's latest Python example.
+- `http://127.0.0.1:3000/api/campus-status` verifies the model-list route separately; a successful status request does not claim a completed inference. `npm test` runs only offline/mocked checks; `npm run campus:check` is the explicit real inference check.
+
+**Safety:** The local listener binds only to `127.0.0.1`; no campus or provider credential is embedded in the public UI. Do not submit the five-year customer SPR file, private notes, or confidential Zebra material to any model without approval. The backend does not automatically adopt or publish edits.
+
+
 ## Real AI comparison added (November 16)
 
 The default [Zebra Evidence Review](https://tmkbs.github.io/zebra-evidence-framework/classroom/) now offers **Run AI document review** alongside the always-working offline evidence rules. The AI feature has a **real Vercel serverless backend** (`api/review.js`), which retrieves the pinned official DataWedge 13.0 or EHS 2.8 source page plus the teammate's revised article, sends relevant extracted sections to an approved OpenAI-compatible Chat Completions model, checks quoted snippets against the actual model input, and returns structured findings and an exportable report. Original/revised local text files are supported as a fallback for authorized use.

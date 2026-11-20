@@ -1,5 +1,20 @@
 # Evidence Framework — Public-source research release
 
+## Final delivery review (November 20)
+
+**[Open Final Delivery Review](final-delivery.html)** for the closing client handoff. This is a separate, single-purpose workflow that complements the team's already-published revised TechDocs pages:
+
+1. Download the team's **public** [case CSV](https://zebra-techdocs-practicum.vercel.app/document-reader/zebra-cases.csv); import it locally (no automatic fetching).
+2. Choose a case, open the original and proposed-revision links, and record what was actually inspected.
+3. Mark the disposition as evidence missing, version check needed, ready for client review, or out of scope. A ready-for-review label **never means client approval**.
+4. Export **zebra-final-review-handoff/v1** JSON including case identity, mapped public URLs, clarification, limitations, next owner action and explicit NOT VERIFIED flags.
+
+The page never uploads the CSV, accepts only a public/approved case table, and does not ingest the private five-year SPR workbook. Missing columns are not fabricated. It does not fetch TechDocs, call a model, test a device, modify the team's site, or approve publication. The default classroom page now highlights its always-working local evidence checks; secure AI remains explicitly optional and requires a separate deployed backend.
+
+Run `npm test` to exercise the offline UI, final handoff parsing and no-approval invariants. The team's 57-case release is documented in the separate public repository; this framework deliberately does not hard-code that count as a live statistic.
+
+---
+
 ## Live AI document comparison (optional secure backend)
 
 The home page now includes **Run AI document review**. This button is connected to committed code at `api/review.js`, but **the public GitHub Pages site is static**. To run a real model, deploy the same repo to Vercel and set server-only `AI_API_KEY` plus a separate `AI_REVIEW_ACCESS_TOKEN`, then enter the review passcode on the Vercel-hosted homepage. From GitHub Pages, enter that HTTPS backend URL under **AI connection**. The service retrieves an official original and a public team revision for DataWedge 13.0 or EHS 2.8, extracts relevant sections and asks the model to compare them. Alternative: upload approved original and revision text files. See [AI_REVIEW_SETUP.md](../AI_REVIEW_SETUP.md). **Offline checks** work without any backend.
