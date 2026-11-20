@@ -56,6 +56,9 @@ async function main(){
   assert.equal(res.data.source_receipts.length,2);
   assert.equal(res.data.source_receipts[0].source,"public_url");
   assert.equal(res.data.mode,"live_ai_document_comparison");
+  assert.match(res.data.run_id,/^[0-9a-f-]{36}$/i);
+  assert.match(res.data.review_input_sha256,/^[0-9a-f]{64}$/);
+  assert.match(res.data.prompt_sha256,/^[0-9a-f]{64}$/);
   assert.equal(res.data.publication_approved,false);
   assert.equal(calls.length,n+3,"two public pages and one model call");
  });
