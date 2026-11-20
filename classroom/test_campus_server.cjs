@@ -16,8 +16,11 @@ async function main(){
  assert.equal(allowHost({headers:{host:"evil.example:3000"}},3000),false);
  assert.equal(allowHost({headers:{host:"localhost:3000"}},3000),true);
  const mockFetch=async url=>{
-  assert.equal(url,cfg.base+"/models");
-  return{ok:true,json:async()=>({data:[{id:cfg.model},{id:"another/model"}]})};
+  if(url===cfg.base+"/models")
+   return{ok:true,json:async()=>({data:[{id:cfg.model},{id:"another/model"}]})};
+  if(url==="https://zebra-techdocs-practicum.vercel.app/document-reader/zebra-cases.csv")
+   return{ok:true,headers:{get:k=>k==="content-type"?"text/csv":"120"},text:async()=>"SPR Key,Feature / Component\nZF-test,DataWedge\n"};
+  throw Error("Unexpected mock source URL: "+url);
  };
  const status=await campusStatus(cfg,mockFetch);
  assert.equal(status.connected,true);
@@ -27,7 +30,7 @@ async function main(){
  const port=server.address().port;
  async function request(path,options={}){
   return new Promise((resolve,reject)=>{
-   const req=http.request({hostname:"127.0.0.1",port,path,method:options.method||"GET",headers:{Host:options.host||"127.0.0.1:3000"}},res=>{
+   const req=http.request({hostname:"127.0.0.1",port,path,method:options.method||"GET",headers:{Host:options.host||"127.0.0.1:3000",...(options.origin?{Origin:options.origin}:{})}},res=>{
     const chunks=[];res.on("data",x=>chunks.push(x));res.on("end",()=>resolve({status:res.statusCode,body:Buffer.concat(chunks).toString("utf8")}))});
    req.on("error",reject);
    if(options.body)req.write(options.body);
@@ -44,6 +47,17 @@ async function main(){
   const m=await request("/api/campus-status");
   assert.equal(m.status,200);
   assert.equal(JSON.parse(m.body).connected,true);
+  const session=await request("/api/session");
+  assert.equal(session.status,200);
+  assert.equal(JSON.parse(session.body).review_access,cfg.passcode);
+  assert.equal(JSON.parse(session.body).local_session,true);
+  const publicCase=await request("/api/public-cases");
+  assert.equal(publicCase.status,200);
+  assert.equal(JSON.parse(publicCase.body).ok,true);
+  assert.ok(JSON.parse(publicCase.body).csv.includes("ZF-test"));
+  const crossOrigin=await request("/api/session",{origin:"https://evil.example"});
+  assert.equal(crossOrigin.status,403);
+
   const denied=await request("/api/campus-status",{host:"evil.example:3000"});
   assert.equal(denied.status,403);
   const missing=await request("/any-unlisted-file");
