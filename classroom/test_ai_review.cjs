@@ -44,6 +44,47 @@ async function main(){
   assert.equal(res.statusCode,200);assert.equal(calls.length,n+1);assert.equal(res.data.source_receipts[0].source,"manual_text");
  });
  await test("unrecognized case with no documents rejected",async()=>{const res=response();await handler(request("POST",{case_id:"UNKNOWN"}),res);assert.equal(res.statusCode,422)});
+ await test("any public team revision can be reviewed with the live model route",async()=>{
+  const n=calls.length,res=response();
+  await handler(request("POST",{
+    case_id:"ZF-PUBLIC-CASE-57",question:"Does the proposed note explain the missing scope?",
+    topic:"DataWedge",original_url:"https://techdocs.zebra.com/datawedge/13-0/guide/api/setconfig/",
+    proposal_url:"https://zebra-techdocs-practicum.vercel.app/document-reader/sc13-revised.html#plugin_configbundle"
+  }),res);
+  assert.equal(res.statusCode,200);
+  assert.equal(res.data.case_id,"ZF-PUBLIC-CASE-57");
+  assert.equal(res.data.source_receipts.length,2);
+  assert.equal(res.data.source_receipts[0].source,"public_url");
+  assert.equal(res.data.mode,"live_ai_document_comparison");
+  assert.equal(res.data.publication_approved,false);
+  assert.equal(calls.length,n+3,"two public pages and one model call");
+ });
+ await test("hostile public-source URL does not reach the network",async()=>{
+  const n=calls.length,res=response();
+  await handler(request("POST",{
+   case_id:"ZF-2",question:"Should this document change?",
+   original_url:"https://evil.test/secret",
+   proposal_url:"https://zebra-techdocs-practicum.vercel.app/document-reader/revised.html"
+  }),res);
+  assert.equal(res.statusCode,422);
+  assert.equal(res.data.code,"unapproved_source");
+  assert.equal(calls.length,n);
+ });
+ await test("official and proposed hosts cannot be silently swapped",async()=>{
+  const n=calls.length,res=response();
+  await handler(request("POST",{
+   case_id:"ZF-3",question:"Compare revisions",
+   original_url:"https://zebra-techdocs-practicum.vercel.app/document-reader/test.html",
+   proposal_url:"https://techdocs.zebra.com/ehs/2-8/guide/settings/"
+  }),res);
+  assert.equal(res.statusCode,422);
+  assert.equal(calls.length,n);
+ });
+ await test("partial URL pairs and private query links are rejected",async()=>{
+  assert.throws(()=>handler._internals.dynamicSourceConfig({original_url:"https://techdocs.zebra.com/foo/"}));
+  assert.throws(()=>handler._internals.dynamicSourceConfig({original_url:"https://techdocs.zebra.com/foo/?token=abcd",proposal_url:"https://zebra-techdocs-practicum.vercel.app/document-reader/x.html"}));
+  assert.throws(()=>handler._internals.dynamicSourceConfig({original_url:"https://techdocs.zebra.com/foo/",proposal_url:"https://zebra-techdocs-practicum.vercel.app/secret/private.html"}));
+ });
  await test("unapproved source URLs rejected",async()=>{
   assert.throws(()=>handler._internals.validateURL("http://techdocs.zebra.com/private"));
   assert.throws(()=>handler._internals.validateURL("https://localhost/private"));
