@@ -5,7 +5,8 @@ import os
 import re
 import stat
 from runtime import Locate, MARK, apply_reviewed_local_copy
-from trusted_operation import authorize_local_operation, check_link, check, SHA, digest, equal, parse
+from native_before import select_before
+from trusted_operation import authorize_local_operation, check_link, check, SHA, BEFORE, digest, equal, parse
 
 def bad():raise ValueError('Reviewed typed copy reference does not match.')
 class Sections(Locate):
@@ -39,13 +40,19 @@ def bound_copy(*,operation_bytes,trust_bytes,operator_trust_sha256,baseline_byte
     if not isinstance(r.get('evidence'),list) or r['evidence'].count(source_url)!=1:bad()
     pins=[x for x in intake['capture_binding']['captures'] if x['kind']=='techdocs' and x['url']==source_url]
     if len(pins)!=1 or not check(pins[0]["sha256"],SHA):bad()
-    if not isinstance(source_anchor,str) or re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}',source_anchor) is None or target_anchor!=MARK:bad()
+    before=op['schema']==BEFORE
+    if not isinstance(source_anchor,str) or re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}',source_anchor) is None:bad()
     original=baseline_bytes.decode('utf-8')
-    parser=Sections(original,op['step']);parser.feed(original);parser.close()
-    if len(parser.matches_by_article)!=1 or parser.ids.count(source_anchor)!=1:bad()
-    article,target_pos=parser.matches_by_article[0]
-    candidates=[a for parent,at,a in parser.headings if parent==article and at<target_pos]
-    if not candidates or candidates[-1]!=source_anchor:bad()
+    if before:
+        if source_anchor!=op['section_anchor'] or target_anchor!=op['target_anchor']:bad()
+        select_before(original,op,Locate,bad)
+    else:
+        if target_anchor!=MARK:bad()
+        parser=Sections(original,op['step']);parser.feed(original);parser.close()
+        if len(parser.matches_by_article)!=1 or parser.ids.count(source_anchor)!=1:bad()
+        article,target_pos=parser.matches_by_article[0]
+        candidates=[a for parent,at,a in parser.headings if parent==article and at<target_pos]
+        if not candidates or candidates[-1]!=source_anchor:bad()
     copied,out=apply_reviewed_local_copy(operation_bytes=operation_bytes,trust_bytes=trust_bytes,
         operator_trust_sha256=operator_trust_sha256,baseline_bytes=baseline_bytes)
     if not equal(out['working_copy_sha256'],r.get('clean_sha256')):bad()
@@ -55,6 +62,7 @@ def bound_copy(*,operation_bytes,trust_bytes,operator_trust_sha256,baseline_byte
       'source_version':op['source_version'],'source_sha256':op['source_sha256'],
       'capture_sha256':pins[0]['sha256'],'paragraph_sha256':op['paragraph_sha256'],
       'operation_sha256':out['operation_sha256'],'working_copy_sha256':out['working_copy_sha256'],
+      **({'operation_schema':BEFORE} if before else {}),
       'capture_status':'CAPTURE_REVIEW_REQUIRED','original_modified':False,'write_performed':False,
       'model_execution':'NOT_RUN','publication':'NOT_AUTHORIZED'}
 def read(path,limit):

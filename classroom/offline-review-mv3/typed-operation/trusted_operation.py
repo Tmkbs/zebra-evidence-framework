@@ -7,6 +7,8 @@ from urllib.parse import urlsplit
 
 OP='zebra-paragraph-after/v1'
 TRUST='zebra-trusted-local-operation/v1'
+BEFORE='zebra-paragraph-before/v1'
+ANCHOR=r'[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}'
 SHA=r'[a-f0-9]{64}'
 FIELDS={'case_id':r'[A-Za-z0-9_-]{1,100}','run_id':r'CAPTURE-[a-f0-9]{24}',
         'source_version':r'[0-9]{1,4}(?:-[0-9]{1,4}){1,4}',
@@ -46,10 +48,13 @@ def authorize_local_operation(*,operation_bytes,trust_bytes,operator_trust_sha25
     trust=parse(trust_bytes,16_384)
     op=parse(operation_bytes,64_000)
     if set(trust)!=set(FIELDS)|{'schema','scope','operation_sha256','allowed_link'} or trust['schema']!=TRUST or trust['scope']!='LOCAL_RENDERED_COPY_ONLY':reject()
-    if set(op)!=set(FIELDS)|{'schema','step','segments'} or op['schema']!=OP:reject()
+    before=op.get('schema')==BEFORE
+    locator_fields={'section_anchor','target_anchor'} if before else {'step'}
+    if set(op)!=set(FIELDS)|{'schema','segments'}|locator_fields or op['schema'] not in (OP,BEFORE):reject()
+    if before and (not all(check(op[key],ANCHOR) for key in locator_fields) or op['section_anchor']==op['target_anchor']):reject()
     if any(not check(op[k],syntax) or op[k]!=trust[k] for k,syntax in FIELDS.items()):reject()
     if type(baseline_bytes) is not bytes or len(baseline_bytes)>500_000 or not equal(digest(baseline_bytes),op['source_sha256']):reject()
-    if type(op['step']) is not int or not 1<=op['step']<=100:reject()
+    if not before and (type(op['step']) is not int or not 1<=op['step']<=100):reject()
     if type(op['segments']) is not list or not 1<=len(op['segments'])<=24:reject()
     allowed=trust['allowed_link']
     if allowed is not None:check_link(allowed,op['source_version'])

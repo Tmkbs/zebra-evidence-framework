@@ -2,7 +2,8 @@
 import re
 from html.parser import HTMLParser
 from runtime import Locate
-from trusted_operation import parse,digest,equal,check,SHA
+from native_before import select_before
+from trusted_operation import parse,digest,equal,check,SHA,BEFORE
 ANCHOR=r'[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}'
 def fail():raise ValueError('Structured capture locator could not be verified.')
 def normalize(value):
@@ -12,7 +13,7 @@ class Text(HTMLParser):
     def __init__(self,s):
         super().__init__(convert_charrefs=True);self.parts=[];self.feed(s);self.close()
     def handle_data(self,data):self.parts.append(data)
-def locate(*,capture,receipt,baseline,step,intake_bytes,intake_sha256):
+def locate(*,capture,receipt,baseline,intake_bytes,intake_sha256,step=None):
     """Receipt is from the already validated bound runtime, not the captured page."""
     if not equal(digest(intake_bytes),intake_sha256):fail()
     r=parse(intake_bytes,1_000_000)
@@ -24,10 +25,21 @@ def locate(*,capture,receipt,baseline,step,intake_bytes,intake_sha256):
     docs=[p for p in binding['captures'] if p['kind']=='techdocs' and p['url']==source]
     if len(docs)!=1 or not equal(docs[0]['sha256'],receipt['capture_sha256']) or capture['source_url']!=source:fail()
     if type(baseline) is not bytes or len(baseline)>500_000 or not equal(digest(baseline),receipt['source_sha256']):fail()
-    if type(step) is not int or not 1<=step<=100:fail()
-    s=baseline.decode('utf-8'); p=Locate(s,step);p.feed(s);p.close()
-    if p.frames or len(p.matches)!=1:fail()
-    start,end=p.matches[0]; raw=s[start:end]
+    schema=receipt.get('operation_schema')
+    if schema not in (None,BEFORE):fail()
+    before=schema==BEFORE
+    s=baseline.decode('utf-8')
+    if before:
+        if step is not None or not check(receipt.get('target_anchor'),ANCHOR) or not check(receipt.get('source_anchor'),ANCHOR):fail()
+        if receipt['source_anchor']==receipt['target_anchor']:fail()
+        start,end=select_before(s,{'section_anchor':receipt['source_anchor'],'target_anchor':receipt['target_anchor'],
+                                   'paragraph_sha256':receipt['paragraph_sha256']},Locate,fail)
+    else:
+        if type(step) is not int or not 1<=step<=100:fail()
+        p=Locate(s,step);p.feed(s);p.close()
+        if p.frames or len(p.matches)!=1:fail()
+        start,end=p.matches[0]
+    raw=s[start:end]
     if not equal(digest(raw.encode()),receipt['paragraph_sha256']):fail()
     normalized=normalize(''.join(Text(raw).parts))
     anchor=receipt['source_anchor']
@@ -39,7 +51,7 @@ def locate(*,capture,receipt,baseline,step,intake_bytes,intake_sha256):
     if type(level) is not int or not 1<=level<=6:fail()
     end=next((j for j in range(lo+1,len(blocks)) if blocks[j]['kind']=='heading' and blocks[j]['level']<=level),len(blocks))
     resolved=[(j,x) for j,x in enumerate(blocks[lo+1:end],lo+1)
-              if x['kind'] in ('paragraph','list_item') and normalize(x['text'])==normalized]
+              if x['kind'] in (('paragraph',) if before else ('paragraph','list_item')) and normalize(x['text'])==normalized]
     if len(resolved)!=1:fail()
     j,block=resolved[0]
     return {'schema':'zebra-structured-locator-proof/v1','case_id':receipt['case_id'],'run_id':receipt['run_id'],

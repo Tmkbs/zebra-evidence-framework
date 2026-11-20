@@ -1,7 +1,8 @@
 """Dependency-free static typed insertion into a trusted local baseline."""
 from html import escape
 from html.parser import HTMLParser
-from trusted_operation import authorize_local_operation,digest
+from trusted_operation import authorize_local_operation,digest,BEFORE
+from native_before import select_before
 
 VOID={'area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'}
 MARK='arming-before-trigger'
@@ -48,11 +49,15 @@ def apply_reviewed_local_copy(*,operation_bytes,trust_bytes,operator_trust_sha25
     a=authorize_local_operation(operation_bytes=operation_bytes,trust_bytes=trust_bytes,
         operator_trust_sha256=operator_trust_sha256,baseline_bytes=baseline_bytes)
     op=a['operation']; source=baseline_bytes.decode('utf-8')
-    parser=Locate(source,op['step'])
-    parser.feed(source)
-    parser.close()
-    if parser.frames or len(parser.matches)!=1:fail()
-    first,last=parser.matches[0]
+    before=op['schema']==BEFORE
+    if before:
+        first,last=select_before(source,op,Locate,fail)
+    else:
+        parser=Locate(source,op['step'])
+        parser.feed(source)
+        parser.close()
+        if parser.frames or len(parser.matches)!=1:fail()
+        first,last=parser.matches[0]
     if digest(source[first:last].encode('utf-8'))!=op['paragraph_sha256']:fail()
     insertion=[]
     for seg in op['segments']:
@@ -61,10 +66,12 @@ def apply_reviewed_local_copy(*,operation_bytes,trust_bytes,operator_trust_sha25
         if kind=='code':val='<code>'+val+'</code>'
         if kind=='link':val='<a href="'+escape(seg['url'],quote=True)+'">'+val+'</a>'
         insertion.append(val)
-    marked='<p class="proposal" id="'+MARK+'">'+''.join(insertion)+'</p>'
+    marked='<p class="proposal" id="'+(op['target_anchor'] if before else MARK)+'">'+''.join(insertion)+'</p>'
     # Preserve the baseline paragraph's ordinary layout whitespace ahead of the new sibling.
-    while last<len(source) and source[last] in ' \t\r\n':last+=1
-    copy=(source[:last]+marked+source[last:]).encode('utf-8')
+    if not before:
+        while last<len(source) and source[last] in ' \t\r\n':last+=1
+    idx=first if before else last
+    copy=(source[:idx]+marked+source[idx:]).encode('utf-8')
     return copy,{'schema':'zebra-typed-static-local-copy/v1','case_id':op['case_id'],'run_id':op['run_id'],
         'source_version':op['source_version'],'original_sha256':op['source_sha256'],
         'operation_sha256':a['approved_operation_sha256'],'working_copy_sha256':digest(copy),
