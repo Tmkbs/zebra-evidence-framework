@@ -408,7 +408,7 @@ test('real scoped serializer envelope reaches classroom intake despite a quoted 
  const result=scoped([H('readerparams','Reader Parameters'),
   ['blockquote',{},[H('quote-heading','Quoted heading'),P('Still in this quote')]],P('Retained prose'),
   H('peer','Next real heading'),P('Out of scope')]);
- assert.ok(result.capture.blocks.some(b=>b.kind==='heading'&&b.anchor==='quote-heading'&&b.level===2));
+ assert.ok(result.capture.blocks.some(b=>b.kind==='quote'&&b.anchor==='quote-heading'));
  assert.ok(!result.capture.blocks.some(b=>b.anchor==='peer'));
  const input=intake({forum,techdocs:JSON.parse(JSON.stringify(result))});
  assert.equal(input.capture_binding.captures[1].section_scope.boundary,'next_heading');

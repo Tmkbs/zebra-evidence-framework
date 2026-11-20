@@ -178,7 +178,9 @@ export function capturePage(source, limits, options) {
     const next=clip(value,Math.min(limits.blockBytes,limits.totalBytes-size));
     if (next!==value) truncated=true;
     if(!next.trim())break;
-    const kind=tag==='p'?(el.parentElement.closest('blockquote')?'quote':el.parentElement.closest('li')?'list_item':'paragraph'):tag==='li'?'list_item':tag==='pre'?'code':tag==='tr'?'table_row':tag==='blockquote'?'quote':'heading';
+    const nestedHeading=scoped&&headingRank(el)>0&&!isSectionHeading(el);
+    if(nestedHeading&&!el.parentElement?.closest('blockquote,li'))continue;
+    const kind=nestedHeading?(el.parentElement.closest('blockquote')?'quote':'list_item'):tag==='p'?(el.parentElement.closest('blockquote')?'quote':el.parentElement.closest('li')?'list_item':'paragraph'):tag==='li'?'list_item':tag==='pre'?'code':tag==='tr'?'table_row':tag==='blockquote'?'quote':'heading';
     const block={kind,text:next};
     if(kind==='heading')block.level=Number(tag[1]);
     if(el.id && /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/.test(el.id))block.anchor=el.id;
