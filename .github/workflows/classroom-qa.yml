@@ -3,7 +3,8 @@ name: Classroom end-to-end QA
 on:
   push:
     branches:
-      - classroom-safe-framework-20261113
+      - main
+      - final-delivery-review-handoff-20261120
   pull_request:
     branches:
       - main
@@ -23,4 +24,4 @@ jobs:
         with:
           node-version: '22'
       - name: Run offline demo tests (no dependencies)
-        run: node classroom/test_end_to_end.cjs
+        run: npm test
