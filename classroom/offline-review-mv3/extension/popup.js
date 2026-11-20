@@ -1,4 +1,4 @@
-import {readActiveTab} from './capture.js';
+import {readActiveTab,captureSectionActive} from './capture.js';
 import {createCaptureMirrorSession} from './session.js';
 import {mirrorZip} from './zip.js';
 import {describeLinkDiscovery} from './engine.js';
@@ -6,15 +6,21 @@ import {describeLinkDiscovery} from './engine.js';
 const el=id=>document.getElementById(id);
 const permit=el('public'), capture=el('capture'), save=el('save'), status=el('status'), review=el('reviewed'), zip=el('mirror');
 const entry=el('collection-entry');
-let selected=null, session=null, result=null, busy=false;
+const sectionPanel=el('section-controls'), sectionInput=el('section-anchor'), sectionCapture=el('capture-section'), sectionSave=el('save-section');
+const anchorOK=()=>/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/.test(sectionInput.value);
+let selected=null, session=null, result=null, sectionResult=null, sectionCapable=false, busy=false, generation=0;
 const sync=()=>{
   capture.disabled=busy||!selected||!permit.checked;
   permit.disabled=busy||!selected;
-  review.disabled=busy||!result||!permit.checked;
-  save.disabled=zip.disabled=entry.disabled=review.disabled||!review.checked;
+  review.disabled=busy||!(result||sectionResult)||!permit.checked;
+  save.disabled=zip.disabled=entry.disabled=review.disabled||!review.checked||!result;
+  sectionInput.disabled=busy||!permit.checked;
+  sectionCapture.disabled=sectionInput.disabled||!sectionCapable||!anchorOK();
+  sectionSave.disabled=review.disabled||!review.checked||!sectionResult;
 };
 const discard=()=>{
-  session?.clear();result=null;review.checked=false;
+  ++generation;
+  session?.clear();result=null;sectionResult=null;review.checked=false;
   el('preview').hidden=true;el('blocks').replaceChildren();
   el('links').hidden=true;el('links').replaceChildren();el('linkCount').textContent='';el('captureTitle').textContent='';
   sync();
@@ -27,12 +33,18 @@ function download(blob, filename) {
 }
 permit.addEventListener('change',()=>{if(!permit.checked)discard();sync();});
 review.addEventListener('change',sync);
+sectionInput.addEventListener('input',()=>{
+  if(sectionResult){discard();status.textContent='Selection changed. Capture the new section before saving.';}
+  sync();
+});
 el('clear').addEventListener('click',()=>{discard();status.textContent='Capture discarded.';});
 capture.addEventListener('click',async()=>{
   if(capture.disabled)return;
-  discard();busy=true;sync();status.textContent='Reading this approved page…';
+  discard();const current=generation;busy=true;sync();status.textContent='Reading this approved page…';
   try {
-    result=await session.capture({expected:selected,approved:permit.checked});
+    const captured=await session.capture({expected:selected,approved:permit.checked});
+    if(current!==generation)return;
+    result=captured;
     el('captureTitle').textContent='Captured title: '+result.packet.title;
     el('blocks').replaceChildren(...result.packet.blocks.map(b=>item(b.kind.replaceAll('_',' ')+': '+b.text)));
     el('links').replaceChildren(...result.links.map(link=>item((link.label ?? link.target_url)+' | '+link.target_url)));
@@ -41,8 +53,34 @@ capture.addEventListener('click',async()=>{
     el('preview').hidden=false;el('preview').open=true;
     status.textContent=result.packet.truncated?'Capture was truncated. Inspect before export.':'Capture ready. Inspect before export.';
   } catch {
+    if(current!==generation)return;
     discard();status.textContent='Capture stopped or discarded. Verify the public page and try again.';
   } finally{busy=false;sync();}
+});
+sectionCapture.addEventListener('click',async()=>{
+  if(sectionCapture.disabled)return;
+  const sectionAnchor=sectionInput.value;
+  discard();const current=generation;busy=true;sync();status.textContent='Reading the approved section in this tab…';
+  try{
+    const captured=await captureSectionActive(chrome,{...selected,sectionAnchor},{approved:permit.checked,sectionAnchor});
+    if(current!==generation)return;
+    sectionResult=captured;
+    el('captureTitle').textContent='Partial capture: #'+sectionResult.section_scope.heading_anchor;
+    el('blocks').replaceChildren(...sectionResult.capture.blocks.map(b=>item(b.kind.replaceAll('_',' ')+': '+b.text)));
+    el('linkCount').textContent='No links were collected. This is not the whole document.';
+    el('preview').hidden=false;el('preview').open=true;
+    status.textContent=sectionResult.section_scope.boundary==='capture_limit'
+      ?'The section exceeded a capture limit. Inspect this partial excerpt before you save.'
+      :'Section captured. Inspect the partial evidence before you save.';
+  }catch{
+    if(current!==generation)return;
+    discard();status.textContent='No section saved. Check the exact heading ID and that the active tab has not changed.';
+  }finally{busy=false;sync();}
+});
+sectionSave.addEventListener('click',()=>{
+  if(sectionSave.disabled)return;
+  download(new Blob([JSON.stringify(sectionResult,null,2)+'\n'],{type:'application/json;charset=utf-8'}),'zebra-partial-section-capture.json');
+  status.textContent='Partial capture download requested. Check the browser downloads.';
 });
 save.addEventListener('click',()=>{
   if(save.disabled)return;
@@ -69,6 +107,8 @@ zip.addEventListener('click',()=>{
 (async()=>{
   try {
     selected=await readActiveTab(chrome);
+    sectionCapable=selected.source.kind==='techdocs'&&/^https:\/\/techdocs\.zebra\.com\/[a-z][a-z0-9-]*\/\d{1,4}(?:-\d{1,4}){1,4}\//.test(selected.source.url);
+    sectionPanel.hidden=!sectionCapable;
     session=createCaptureMirrorSession(chrome,{roots:[selected.source.url]});
     el('target').textContent=selected.source.url;
   }catch {
