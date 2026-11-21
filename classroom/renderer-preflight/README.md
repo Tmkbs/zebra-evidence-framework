@@ -1,0 +1,8 @@
+# Portable renderer preflight
+This optional local module tests whether a v0.4 handoff could pass a caller-supplied, trusted copy renderer's baseline checks. Inject only the application's pure `applyReturn`; never inject its CLI/file writer or load adapters from untrusted sources. The renderer computes a proposed copy in memory and the guard discards it. The guard returns a verdict and pinned reference identifiers, never HTML, an apply receipt, a review attestation, or permission to apply/publish. It does not authenticate reviewers or validate renderer code, customer acceptance, or browser provenance. Capture-only and unbound revision schemas cannot be promoted by this check.
+
+`node --test renderer-preflight.test.cjs` runs portable unit checks. For optional app conformance, set `ZEBRA_LOCAL_RENDERER_ADAPTER` to the absolute path to the locally trusted application's pure adapter and rerun. Test fixtures are wholly synthetic (reserved example.org addresses); required `fictional_demo:false` exists solely to exercise the real adapter's incoming validation branch. No public or private case content is copied to the fixture.
+
+Passing results record the baseline document edition. A different or missing proposal edition is rejected before the renderer runs, even if paragraph text and source digest are unchanged. The optional app test also verifies the renderer rejects changed evidence scope.
+
+Accepted edition markers are bounded ASCII keys, source digest is lowercase SHA-256, and commit IDs must be immutable lowercase full Git SHA-1 values, not decorated local-candidate labels. Section/case identifiers are bounded plain ASCII references. Returned values come only from the prevalidated caller-provided baseline and must exactly match the renderer receipt.

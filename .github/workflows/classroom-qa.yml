@@ -25,3 +25,5 @@ jobs:
           node-version: '22'
       - name: Run offline demo tests (no dependencies)
         run: npm test
+      - name: Run offline extension evidence and ZIP regressions
+        run: node --test classroom/offline-review-mv3/bind-source-paragraph.test.cjs classroom/offline-review-mv3/approved-revision-archive.test.mjs classroom/offline-review-mv3/reviewed-archive-cli.test.mjs classroom/offline-review-mv3/verified-zip.test.mjs
