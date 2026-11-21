@@ -1,5 +1,20 @@
 # Evidence Framework — Public-source research release
 
+## Final delivery review (November 20)
+
+**[Open Final Delivery Review](final-delivery.html)** for the client handoff. The local campus runner now supports a real Qwen document review of *any* published TechDocs revision with a valid source pair:
+
+1. On the Northwestern-connected computer run `npm run campus`; open `http://127.0.0.1:3000/final-delivery.html`. The page automatically fetches only the team's **public** case CSV via the local backend. Manual public CSV upload remains available.
+2. Select a case. The page maps the 6-column SPR-style public table and additional CSV columns when present. It pre-fills an unverified proposed action and follow-up checks. If either public document URL is missing, open the team's case and paste the exact official TechDocs URL and published document-reader revision URL.
+3. Press **Run real AI review**. The backend retrieves only the approved public pages and submits excerpts to the configured campus Qwen API. It returns source hashes, model identity, quoted findings, limitations and next checks; no synthetic/model-cache response is substituted. Export the actual model-run JSON.
+4. Independently inspect the evidence, select a human review disposition and export `zebra-final-review-handoff/v1`. A ready-for-client-review label **never** means customer approval. When a real model result exists for that same case, it is attached to the handoff and marked as model-generated, not independently verified.
+
+The GitHub Pages copy is static: it supports manual review/import, not campus model inference. No private five-year SPR workbook is fetched or sent. The review tool does not edit the teammate's site, test a scanner or publish official Zebra documentation.
+
+`npm test` runs zero-dependency mocked regression checks; `npm run campus:check` makes an **actual** campus model request on the connected computer.
+
+---
+
 ## Live AI document comparison (optional secure backend)
 
 The home page now includes **Run AI document review**. This button is connected to committed code at `api/review.js`, but **the public GitHub Pages site is static**. To run a real model, deploy the same repo to Vercel and set server-only `AI_API_KEY` plus a separate `AI_REVIEW_ACCESS_TOKEN`, then enter the review passcode on the Vercel-hosted homepage. From GitHub Pages, enter that HTTPS backend URL under **AI connection**. The service retrieves an official original and a public team revision for DataWedge 13.0 or EHS 2.8, extracts relevant sections and asks the model to compare them. Alternative: upload approved original and revision text files. See [AI_REVIEW_SETUP.md](../AI_REVIEW_SETUP.md). **Offline checks** work without any backend.

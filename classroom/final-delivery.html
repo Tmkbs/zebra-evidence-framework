@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Zebra · Final Delivery Review</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:#f3f6f7;color:#183946;font-synthesis:none}*{box-sizing:border-box}
+body{margin:0}a{color:#086e69}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #6abdb2;outline-offset:3px}
+header{background:white;border-bottom:1px solid #dce5e7}header>div{max-width:1180px;margin:auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{font-weight:800;letter-spacing:-.02em}.brand span{background:#145b57;color:#fff;border-radius:8px;padding:8px 11px;margin-right:10px}
+main{max-width:1180px;margin:auto;padding:32px 24px 70px}.eyebrow{text-transform:uppercase;color:#077e71;font-size:11px;font-weight:800;letter-spacing:.12em}
+h1{font-size:clamp(30px,4vw,47px);letter-spacing:-.05em;line-height:1.1;margin:12px 0}h2{font-size:19px;margin:0 0 12px;letter-spacing:-.025em}h3{font-size:14px;margin:0 0 10px}
+p{line-height:1.65} .muted{color:#647e85}.small{font-size:12px}.intro{max-width:830px;margin-bottom:26px}
+.layout{display:grid;grid-template-columns:minmax(300px,.9fr) minmax(0,1.1fr);gap:18px;align-items:start}.panel{background:white;border:1px solid #dbe5e7;border-radius:16px;padding:22px;box-shadow:0 6px 18px #19454e08}
+.panel+.panel{margin-top:16px}.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.btn{border:1px solid #b4cecd;border-radius:9px;color:#145e5a;background:#fff;padding:11px 15px;font-size:12px;font-weight:750}.btn:hover{background:#e6f5f1}.btn.primary{background:#087a70;color:#fff;border-color:#087a70}.btn.primary:hover{background:#075d56}
+.file{border:1px dashed #a3c4bf;border-radius:11px;background:#f5faf8;padding:13px;width:100%;font-size:12px}
+label{display:block;color:#476872;font-size:12px;font-weight:750;margin:13px 0 7px}input[type=text],input[type=url],select,textarea{display:block;width:100%;padding:11px;border:1px solid #cadbde;border-radius:8px;background:#fff;color:#24434a;font-size:13px}textarea{min-height:96px;resize:vertical;line-height:1.6}
+.preview{padding:14px;border-left:3px solid #2c9e8b;background:#ecf7f3;border-radius:8px;font-size:13px;line-height:1.6}.pill{display:inline-block;padding:4px 9px;background:#e9f1f2;color:#32636b;border-radius:100px;font-size:10px;font-weight:800}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}.meta>div{border:1px solid #dfe9e9;border-radius:9px;padding:11px;font-size:11px;color:#668087}.meta strong{display:block;color:#174651;font-size:16px;margin-bottom:3px}
+.banner{padding:11px 14px;border-radius:9px;background:#fff5e6;color:#79562c;font-size:12px;line-height:1.5} .banner.good{background:#eaf6ef;color:#1b6753}
+ul{padding-left:18px;font-size:13px;line-height:1.75;margin:7px 0}.links{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:12px;font-weight:750}.step{border-top:1px solid #e8eeee;padding:13px 0}.step:first-child{border-top:0}.step b{display:block;font-size:13px}.step p{margin:5px 0 0;color:#657d84;font-size:12px}
+#result[hidden],#case-panel[hidden],#ai-result[hidden]{display:none}.danger{color:#a14933}.status{font-size:12px;margin-top:10px;color:#617d84;min-height:19px}
+footer{margin-top:26px;color:#6b8288;font-size:12px;border-top:1px solid #d5e1e3;padding-top:18px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}}@media(max-width:540px){main{padding:25px 16px 50px}.panel{padding:17px}.meta{grid-template-columns:1fr}.controls .btn{flex:1}}
+</style>
+</head>
+<body>
+<header><div><div class="brand"><span>Z</span>Zebra · Final Delivery Review</div><a href="./" class="small">Evidence Framework</a></div></header>
+<main>
+<section class="intro"><div class="eyebrow">Client handoff · public-data only · local review</div>
+<h1>From proposed edits to a review-ready handoff.</h1>
+<p class="muted">Load the team's public case list, run optional real AI document comparisons on published source pairs, and export a review handoff. AI findings remain suggestions until a human inspects the evidence. No device testing or Zebra publication is implied.</p>
+<div class="controls"><a href="https://zebra-techdocs-practicum.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn">Open team's documentation demo ↗</a><a href="https://zebra-techdocs-practicum.vercel.app/document-reader/zebra-cases.csv" target="_blank" rel="noopener noreferrer" class="btn">Get public case CSV ↗</a></div></section>
+<div class="layout">
+<div>
+<section class="panel">
+<div class="eyebrow">01 / Intake</div><h2>Choose one real case</h2>
+<label for="case-file">Public case CSV (loads automatically when the local runner is available)</label>
+<input class="file" id="case-file" type="file" accept=".csv,text/csv">
+<p class="small muted">The local runner may fetch only the team’s published public CSV; manual import remains available. No private customer SPR spreadsheet, no automatic model submission.</p>
+<div id="import-status" class="status" role="status">Two traceable public examples are ready; the local runner will load the team’s full public case list when reachable.</div>
+<div id="case-panel" hidden>
+<label for="case-select">Review case</label><select id="case-select"></select>
+<div class="meta"><div><strong id="case-count">0</strong>Imported rows</div><div><strong id="field-count">0</strong>Mapped fields</div><div><strong id="case-index">0</strong>Selected row</div></div>
+<div class="preview" id="case-preview"></div>
+<div class="links" id="case-links"></div>
+<label for="official-url">Official TechDocs page (public URL)</label><input id="official-url" type="url" autocomplete="off" placeholder="https://techdocs.zebra.com/...">
+<label for="revision-url">Published revised page (public URL)</label><input id="revision-url" type="url" autocomplete="off" placeholder="https://zebra-techdocs-practicum.vercel.app/document-reader/...">
+<p class="small muted">URLs are mapped from the public CSV when available. If absent, paste the exact two public links from the teammate’s case page.</p>
+</div>
+</section>
+<section class="panel"><div class="eyebrow">Delivery scope</div><h2>What is—and is not—delivered</h2>
+<div class="step"><b>Already in the team's site</b><p>In-place documentation revisions, original/marked/clean views, and linked research cases.</p></div>
+<div class="step"><b>Added by this framework</b><p>Case-level evidence gates, explicit reviewer decisions, missing-information record, and portable handoff JSON.</p></div>
+<div class="step"><b>Still separate</b><p>Customer signoff, real-device verification, permission to use private customer records, and official document publication.</p></div></section>
+</div>
+<div>
+<section class="panel"><div class="eyebrow">02 / Live AI · optional</div><h2>Check original vs revised documentation</h2>
+<p class="small muted">Uses the campus Qwen model through the local server. Only the two approved public documentation pages are sent. The AI result is an unapproved assessment of excerpts, not a device verification.</p>
+<div class="controls"><button id="ai-run" class="btn primary" type="button" disabled>Run real AI review</button><span id="ai-model" class="pill">Local model not connected</span></div>
+<p id="ai-status" class="status" role="status">Start the local campus runner to enable model review. You can still import and export cases offline.</p>
+<div id="ai-result" hidden aria-live="polite"><div class="banner" id="ai-verdict"></div><p id="ai-summary" class="small"></p><div id="ai-findings"></div><p id="ai-limit" class="small muted"></p><button id="ai-export" class="btn" type="button">Export actual AI run JSON</button></div>
+</section>
+<section class="panel"><div class="eyebrow">03 / Reviewer decision</div><h2>Record a bounded decision</h2>
+<label for="decision">Disposition</label>
+<select id="decision">
+<option value="NEEDS_EVIDENCE">Needs more source evidence</option>
+<option value="NEEDS_VERSION">Needs product/runtime version check</option>
+<option value="READY_FOR_CLIENT_REVIEW">Ready for client review — not approved</option>
+<option value="OUT_OF_SCOPE">Out of scope / defer</option>
+</select>
+<label for="claim">What the proposed document revision actually clarifies</label>
+<textarea id="claim" maxlength="1600" placeholder="Describe the documentation clarification; do not claim a device fix."></textarea>
+<label for="evidence">Evidence inspected and its limitations</label>
+<textarea id="evidence" maxlength="2400" placeholder="Specify which source/section was read and what remains unverified."></textarea>
+<label for="checks">Outstanding technical checks / unresolved conditions</label>
+<textarea id="checks" maxlength="1600" placeholder="Device version, code sample, reproduction, source coverage, etc."></textarea>
+<label for="next">Next action and owner</label>
+<input id="next" type="text" maxlength="400" placeholder="For example: Zebra TechDocs owner to review revised section">
+<label for="reviewer">Reviewer label (optional; avoid personal data)</label>
+<input id="reviewer" type="text" maxlength="100" placeholder="Team review">
+<div class="controls" style="margin-top:17px"><button class="btn primary" id="build" type="button">Generate handoff</button><button class="btn" id="reset" type="button">Clear review</button></div>
+<p class="status" id="review-status" role="status">Choose a public case and record what you actually checked.</p>
+</section>
+<section class="panel" id="result" hidden>
+<div class="eyebrow">04 / Deliver</div><h2>Review-ready handoff</h2>
+<div id="gate" class="banner"></div>
+<p class="small muted" id="summary"></p>
+<ul id="gate-list"></ul>
+<div class="controls"><button class="btn primary" id="export" type="button">Download handoff JSON</button><button class="btn" id="copy" type="button">Copy summary</button></div>
+<p class="status" id="export-status" role="status"></p>
+</section>
+</div></div>
+<footer>Local-first review · Read-only source links · No confidential SPR workbook or credentials in this public tool · No automated approval.</footer>
+</main>
+<script>
+"use strict";
+const el=id=>document.getElementById(id);
+const schema="zebra-final-review-handoff/v1";
+const maxRows=300,maxBytes=700000;
+let rows=[],mapped=[],selected=0,lastPacket=null,lastAI=null,accessCode="",aiRunning=false,aiSequence=0;
+const PUBLIC_DEMO_CASES=[
+ {id:"SC13",title:"DataWedge 13.0 · SET_CONFIG",question:"Is the SET_CONFIG clarification properly supported and version-scoped?",product:"DataWedge",category:"Revision support",recommendation:"Clarify the relationship between CONFIG_MODE and RESET_CONFIG without claiming a device fix.",version:"13.0",source_url:"",official_url:"https://techdocs.zebra.com/datawedge/13-0/guide/api/setconfig/",proposal_url:"https://zebra-techdocs-practicum.vercel.app/document-reader/sc13-revised.html#plugin_configbundle",row_number:0},
+ {id:"EHS28",title:"Enterprise Home Screen 2.8 · Link Removal",question:"Does the proposed link-removal clarification add precise, supported steps?",product:"EHS",category:"Existing guidance",recommendation:"Identify whether the proposed clarification adds evidence not already in the original instructions.",version:"2.8",source_url:"",official_url:"https://techdocs.zebra.com/ehs/2-8/guide/settings/",proposal_url:"https://zebra-techdocs-practicum.vercel.app/document-reader/ehs28-revised.html#linkremoval",row_number:0}
+];
+const allowedHosts=new Set(["techdocs.zebra.com","developer.zebra.com","zebra-techdocs-practicum.vercel.app","github.com"]);
+function safeURL(s){
+ if(typeof s!=="string"||s.length>2048||!/^https:\/\//i.test(s))return "";
+ try{const u=new URL(s);return u.protocol==="https:"&&!u.username&&!u.password&&allowedHosts.has(u.hostname.toLowerCase())?u.href:""}catch{return ""}
+}
+function parseCSV(s){
+ if(typeof s!=="string"||!s.trim()||s.length>maxBytes)throw Error("CSV empty or too large");
+ s=s.replace(/^\uFEFF/,"");let table=[],row=[],field="",quoted=false,started=false;
+ for(let i=0;i<s.length;i++){let ch=s[i];
+  if(quoted){if(ch==='"'){if(s[i+1]==='"'){field+='"';i++}else quoted=false}else field+=ch;continue}
+  if(ch==='"'&&!started){quoted=true;started=true;continue}
+  if(ch==='"')throw Error("Malformed CSV quoting");
+  if(ch===","){row.push(field);field="";started=false;continue}
+  if(ch==="\r"||ch==="\n"){if(ch==="\r"&&s[i+1]==="\n")i++;row.push(field);if(row.some(x=>x.trim()))table.push(row);row=[];field="";started=false;if(table.length>maxRows+1)throw Error("Too many rows");continue}
+  field+=ch;started=true;
+ }
+ if(quoted)throw Error("Unclosed CSV quote");
+ if(field||row.length){row.push(field);if(row.some(x=>x.trim()))table.push(row)}
+ if(table.length<2)throw Error("CSV requires a header and at least one case");
+ const headers=table.shift().map(x=>x.trim().toLowerCase());
+ if(headers.length<2||headers.length>80||table.some(r=>r.length!==headers.length))throw Error("Inconsistent CSV column count");
+ return{headers,rows:table};
+}
+function column(headers,patterns){for(const p of patterns){const i=headers.findIndex(x=>p.test(x));if(i>=0)return i}return -1}
+function mapColumns(headers){return {
+ id:column(headers,[/^spr[\s_-]?key$/,/^case[\s_-]?id$/,/^id$/,/^case[\s_-]?#$/,/^ticket[\s_-]?id$/]),
+ title:column(headers,[/^case[\s_-]?(title|name)$/,/^title$/,/^name$/,/^case$/,/^issue[\s_-]?title$/,/^feature\s*\/\s*component$/]),
+ question:column(headers,[/^question$/,/^problem(\s|_|-)?statement$/,/^summary$/,/^description$/,/issue.*(description|summary)/,/^issue$/,/root cause breakdown.*missing content/]),
+ version:column(headers,[/^doc(ument)?[\s_-]?version$/,/^version$/,/product.*version/]),
+ forum:column(headers,[/forum.*(link|url)/,/original.*forum.*(link|url)/,/developer.*(link|url)/]),
+ official:column(headers,[/official.*techdocs.*(url|link)/,/original.*techdocs.*(url|link)/,/^techdocs.*(url|link)/,/target techdocs.*(url|link)/,/^target techdocs page\s*\/\s*section$/,/^official.*source.*(url|link)/]),
+ proposal:column(headers,[/(revision|revised|proposal|review).*(link|url)/,/proposed.*doc.*(url|link)/,/^edited.*techdocs.*(url|link)/]),
+ product:column(headers,[/^product$/,/^product[\s_-]?name$/,/^feature\s*\/\s*component$/]),
+ category:column(headers,[/^documentation root cause category$/,/^root cause category$/]),
+ recommendation:column(headers,[/^recommended techdocs action$/,/^recommended.*action$/,/^proposed.*edit$/])
+}}
+function normalize(h,values,i){
+ const val=k=>mapped[k]===-1?"":String(values[mapped[k]]??"").trim().slice(0,2000);
+ const id=val("id")||"ROW-"+String(i+1);
+ const official=safeURL(val("official")),proposal=safeURL(val("proposal")),forum=safeURL(val("forum"));
+ const version=val("version")||(/\/(\d+)-(\d+)\//.exec(official)?.slice(1).join(".")||"");
+ const title=val("title")||val("product")||val("question").slice(0,95)||"Case "+String(i+1);
+ return{id,title,question:val("question")||val("category"),category:val("category"),recommendation:val("recommendation"),version,product:val("product"),source_url:forum,official_url:official,proposal_url:proposal,row_number:i+1};
+}
+function textNode(tag,value){const n=document.createElement(tag);n.textContent=String(value);return n}
+function addHref(parent,label,url){if(!url)return;const a=textNode("a",label+" ↗");a.href=url;a.target="_blank";a.rel="noopener noreferrer";parent.append(a)}
+function renderSourceLinks(c){
+ const box=el("case-links");box.replaceChildren();addHref(box,"Original question",c.source_url);addHref(box,"Official TechDocs",c.official_url);addHref(box,"Proposed revision",c.proposal_url);
+ if(!c.source_url&&!c.official_url&&!c.proposal_url)box.append(textNode("span","No direct public source link mapped; provide approved URLs before running AI."));
+}
+function refresh(){
+ if(!rows.length){el("case-panel").hidden=true;return}
+ const c=rows[selected];el("case-panel").hidden=false;
+ el("case-count").textContent=String(rows.length);
+ el("field-count").textContent=String(Object.values(mapped).filter(v=>v>=0).length);
+ el("case-index").textContent=String(selected+1);
+ const sel=el("case-select");sel.replaceChildren();
+ rows.forEach((r,i)=>{const o=textNode("option",String(i+1)+". "+r.title.slice(0,105));o.value=String(i);sel.append(o)});
+ sel.value=String(selected);
+ el("case-preview").replaceChildren(textNode("b",c.title),textNode("p",(c.question||"Question not mapped")+" · "+(c.version||"Version not mapped")));
+ el("official-url").value=c.official_url||"";el("revision-url").value=c.proposal_url||"";
+ renderSourceLinks(c);
+ el("claim").value=c.recommendation||"";
+ el("checks").value="Compare the official original and proposed revision; verify product/version applicability and any device claims.";
+ el("next").value="Team: confirm missing evidence; Zebra TechDocs owner: review the proposed wording.";
+ el("evidence").value="";el("reviewer").value="";el("decision").value="NEEDS_EVIDENCE";
+ el("result").hidden=true;el("ai-result").hidden=true;lastPacket=null;lastAI=null;aiSequence++;
+}
+function importText(s){
+ const p=parseCSV(s);mapped=mapColumns(p.headers);
+ if(mapped.title<0&&mapped.question<0&&mapped.product<0)throw Error("Cannot locate a case title, feature or problem column. Check the public CSV headers.");
+ const next=p.rows.map((r,i)=>normalize(p.headers,r,i));
+ rows=next;selected=0;refresh();return{count:next.length,mapped:Object.values(mapped).filter(x=>x>=0).length};
+}
+function clearReview(){
+ for(const id of ["claim","evidence","checks","next","reviewer"])el(id).value="";
+ el("decision").value="NEEDS_EVIDENCE";el("result").hidden=true;lastPacket=null;el("review-status").textContent="Review fields cleared. No source data was changed.";
+}
+function buildPacket(c,form){
+ if(!c)throw Error("Import a public case CSV first.");
+ const tidy=(s,n)=>String(s??"").trim().slice(0,n);
+ const disposition=form.decision;
+ if(!["NEEDS_EVIDENCE","NEEDS_VERSION","READY_FOR_CLIENT_REVIEW","OUT_OF_SCOPE"].includes(disposition))throw Error("Invalid review decision");
+ const note=tidy(form.claim,1600),evidence=tidy(form.evidence,2400),checks=tidy(form.checks,1600),next=tidy(form.next,400);
+ if(!note||!checks||!next)throw Error("Fill in the proposed clarification, outstanding checks and next action.");
+ if(disposition==="READY_FOR_CLIENT_REVIEW"&&!evidence)throw Error("Client-review readiness requires an actual evidence inspection note.");
+ const gates=[];
+ if(!c.official_url&&!c.source_url)gates.push("Public original-source link not mapped.");
+ if(!c.proposal_url)gates.push("Published revision link not mapped.");
+ if(!c.version)gates.push("Documentation version not mapped.");
+ if(!evidence)gates.push("Evidence inspection not recorded.");
+ gates.push("Device behavior and customer approval are NOT VERIFIED in this tool.");
+ return{
+  schema,case:{id:c.id,title:c.title,question:c.question,product:c.product,document_version:c.version||null,original_source_url:c.source_url||null,official_techdocs_url:c.official_url||null,proposed_revision_url:c.proposal_url||null,source_csv_row:c.row_number},
+  review:{disposition,proposed_clarification:note,evidence_inspected:evidence||null,unresolved_checks:checks,next_action_owner:next,reviewer_label:tidy(form.reviewer,100)||null,unresolved_gates:gates},
+  provenance:{mode:"HUMAN_REVIEW_RECORD",original_techdocs_fetched:false,source_text_compared:false,model_executed:false,device_test_executed:false,customer_approved:false,published_to_zebra:false},
+  publication_authorized:false
+ };
+}
+function currentForm(){return Object.fromEntries(["decision","claim","evidence","checks","next","reviewer"].map(k=>[k,el(k).value]))}
+function summary(p){return p.case.title+" — "+p.review.disposition.replace(/_/g," ")+". Proposed clarification: "+p.review.proposed_clarification+". Next action: "+p.review.next_action_owner+"."}
+function build(){
+ try{lastPacket=buildPacket(rows[selected],currentForm());if(lastAI&&lastAI.case_id===rows[selected]?.id&&lastAI.mode==="live_ai_document_comparison"){
+ lastPacket.ai_assessment={model:lastAI.model,ran_at:lastAI.ran_at,review:lastAI.review,source_receipts:lastAI.source_receipts,technical_approval:false};
+ lastPacket.provenance.model_executed=true;
+ lastPacket.provenance.ai_excerpt_comparison_executed=true;
+ lastPacket.provenance.original_techdocs_fetched=(lastAI.source_receipts||[]).some(x=>x.kind==="original"&&x.source==="public_url");
+}el("result").hidden=false;
+ const p=lastPacket;el("gate").className="banner"+(p.review.disposition==="READY_FOR_CLIENT_REVIEW"?" good":"");
+ el("gate").textContent=p.review.disposition.replace(/_/g," ")+" · Client review is not publication approval";
+ el("summary").textContent=summary(p);const list=el("gate-list");list.replaceChildren();
+ p.review.unresolved_gates.forEach(g=>list.append(textNode("li",g)));
+ el("review-status").textContent="Handoff generated for this case; technical and customer decisions remain separate.";
+ el("export-status").textContent="Review the scope and export locally. No information was sent.";
+ el("result").scrollIntoView?.({behavior:"smooth",block:"start"});
+ }catch(e){lastPacket=null;el("result").hidden=true;el("review-status").textContent="Cannot generate: "+e.message}
+}
+function exportJSON(packet){
+ const contents=JSON.stringify(packet,null,2)+"\n";
+ const b=new Blob([contents],{type:"application/json;charset=utf-8"}),url=URL.createObjectURL(b),a=document.createElement("a");
+ a.href=url;a.download="zebra-review-"+packet.case.id.replace(/[^A-Za-z0-9_-]/g,"-").slice(0,75)+".json";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function updateSources(){
+ const c=rows[selected];if(!c)return;
+ c.official_url=safeURL(el("official-url").value);
+ c.proposal_url=safeURL(el("revision-url").value);
+ renderSourceLinks(c);el("result").hidden=true;lastPacket=null;
+ el("ai-result").hidden=true;lastAI=null;aiSequence++;
+}
+function approvedPair(c){
+ try{
+  const a=new URL(c?.official_url||""),b=new URL(c?.proposal_url||"");
+  return a.protocol==="https:"&&a.hostname==="techdocs.zebra.com"&&
+    b.protocol==="https:"&&b.hostname==="zebra-techdocs-practicum.vercel.app"&&
+    b.pathname.startsWith("/document-reader/")&&!a.search&&!b.search;
+ }catch{return false}
+}
+async function localInit(){
+ if(typeof window==="undefined"||!["localhost","127.0.0.1"].includes(window.location.hostname))return;
+ try{
+  const r=await fetch("/api/session",{cache:"no-store"}),session=await r.json();
+  if(!r.ok||!session?.local_session||!session.review_access)throw Error("No local model session");
+  accessCode=session.review_access;el("ai-run").disabled=false;
+  el("ai-model").textContent=String(session.model||"campus model").slice(0,80);
+  el("ai-status").textContent="Local Qwen route available. A model response is recorded only after Run real AI review completes.";
+  // Fetch the team's PUBLIC site CSV only; never send a private workbook here.
+  try{
+   const cr=await fetch("/api/public-cases",{cache:"no-store"}),data=await cr.json();
+   if(!cr.ok||typeof data.csv!=="string")throw Error(data.error||"Published case data unavailable");
+   const v=importText(data.csv);
+   el("import-status").textContent="Loaded "+v.count+" published public cases automatically; "+v.mapped+" columns mapped. Select a case to review.";
+  }catch(err){el("import-status").textContent="Auto-load unavailable: "+String(err.message).slice(0,150)+". Two traced public examples remain available, or import the public CSV manually."}
+ }catch{el("ai-status").textContent="No local campus model runner detected. Manual case review works without an API."}
+}
+async function runAI(){
+ const c=rows[selected];
+ if(aiRunning||!c)return;
+ updateSources();
+ if(!approvedPair(c)){el("ai-status").textContent="Use an official TechDocs URL and the team's public document-reader revision URL for this case.";return}
+ if(!accessCode){el("ai-status").textContent="Open this page through the campus local runner (npm run campus).";return}
+ const seq=++aiSequence,record=c;
+ aiRunning=true;el("ai-run").disabled=true;el("ai-run").textContent="Checking real documents…";
+ el("ai-status").textContent="Fetching the two public pages and requesting campus Qwen; no approval is issued.";
+ try{
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),65000);
+  let response,data;
+  try{
+   response=await fetch("/api/review",{method:"POST",headers:{"Content-Type":"application/json","X-Review-Access":accessCode},
+    body:JSON.stringify({case_id:record.id,question:record.question||record.title,original_url:record.official_url,
+     proposal_url:record.proposal_url,topic:record.product||record.title}),signal:controller.signal,cache:"no-store"});
+   data=await response.json();
+  }finally{clearTimeout(timer)}
+  if(!response.ok||!data.ok||data.mode!=="live_ai_document_comparison")throw Error(data.error||"Model review did not complete");
+  if(seq!==aiSequence||rows[selected]!==record)return;
+  lastAI=data;el("ai-result").hidden=false;
+  const r=data.review||{};
+  el("ai-verdict").textContent=String(r.verdict||"inconclusive").replace(/_/g," ")+" · AI suggestion, not client approval";
+  el("ai-summary").textContent=String(r.summary||"No summary returned");
+  const list=el("ai-findings");list.replaceChildren();
+  for(const finding of r.findings||[]){
+   const p=textNode("p",String(finding.issue||"Finding")+" — "+String(finding.reasoning||""));
+   p.className="small";list.append(p);
+   if(finding.quote_verified&&finding.quote){const q=textNode("p",String(finding.source||"Source")+": “"+String(finding.quote)+"”");q.className="preview small";list.append(q)}
+  }
+  el("ai-limit").textContent="Real model: "+String(data.model||"unknown")+
+   ". Retrieved excerpts: "+String((data.source_receipts||[]).length)+
+   ". Run: "+String(data.run_id||"").slice(0,8)+". Input hash: "+String(data.review_input_sha256||"").slice(0,12)+
+   ". No device test or publication authorization.";
+  el("ai-status").textContent="Live model response received. Inspect the linked documents before marking this case client-review ready.";
+ }catch(err){if(seq===aiSequence){lastAI=null;el("ai-result").hidden=true;el("ai-status").textContent="AI review not completed: "+String(err.message).slice(0,240)}}
+ finally{aiRunning=false;el("ai-run").disabled=!accessCode;el("ai-run").textContent="Run real AI review";}
+}
+el("case-file").addEventListener("change",async e=>{
+ const f=e.target.files?.[0];if(!f)return;
+ try{if(f.size>maxBytes||f.size===0)throw Error("CSV must be 1–700 KB");const r=importText(await f.text());el("import-status").textContent="Imported "+r.count+" local rows; "+r.mapped+" fields mapped. Review one case at a time."}
+ catch(err){el("import-status").textContent="Import not accepted: "+err.message}
+ e.target.value="";
+});
+el("case-select").addEventListener("change",e=>{selected=Number(e.target.value);clearReview();refresh()});
+el("official-url").addEventListener("change",updateSources);el("revision-url").addEventListener("change",updateSources);
+el("ai-run").addEventListener("click",runAI);
+el("ai-export").addEventListener("click",()=>{if(lastAI){const p={case:{id:lastAI.case_id},...lastAI};exportJSON(p)}});
+el("build").addEventListener("click",build);el("reset").addEventListener("click",clearReview);
+el("export").addEventListener("click",()=>{if(lastPacket){exportJSON(lastPacket);el("export-status").textContent="Local handoff JSON downloaded."}});
+el("copy").addEventListener("click",async()=>{if(!lastPacket)return;try{await navigator.clipboard.writeText(summary(lastPacket));el("export-status").textContent="Summary copied."}catch{el("export-status").textContent="Clipboard unavailable. Select the summary text above."}});
+if(typeof module!=="undefined"&&module.exports)module.exports={safeURL,parseCSV,mapColumns,normalize,importText,buildPacket,approvedPair};
+rows=PUBLIC_DEMO_CASES.map(c=>({...c}));refresh();
+if(typeof window!=="undefined")localInit();
+</script>
+</body></html>

@@ -19,9 +19,30 @@ function permitted(origin,req){
 function reply(res,status,obj){res.statusCode=status;res.setHeader("Content-Type","application/json; charset=utf-8");res.setHeader("Cache-Control","no-store");res.end(JSON.stringify(obj))}
 function error(res,status,code,message){reply(res,status,{ok:false,code,error:message})}
 function validateURL(raw){
+ if(typeof raw!=="string"||raw.length>1600)throw Error("Invalid source URL");
  const u=new URL(raw);
- if(u.protocol!=="https:"||u.username||u.password||u.port||!HOSTS.has(u.hostname.toLowerCase()))throw Error("Unapproved source host");
+ if(u.protocol!=="https:"||u.username||u.password||u.port||u.search||!HOSTS.has(u.hostname.toLowerCase()))throw Error("Unapproved source host");
  return u;
+}
+// Accept a case-specific public TechDocs page and the team's published revision page.
+// This is NOT arbitrary URL fetching: only two pinned public hosts and a public revision path.
+function dynamicSourceConfig(input){
+ const rawOriginal=String(input.original_url||""),rawProposal=String(input.proposal_url||"");
+ if(!rawOriginal||!rawProposal)throw Error("An official TechDocs URL and published revision URL are both required");
+ const original=validateURL(rawOriginal),proposal=validateURL(rawProposal);
+ if(original.hostname!=="techdocs.zebra.com"||proposal.hostname!=="zebra-techdocs-practicum.vercel.app"||
+    !/^\/document-reader\/[A-Za-z0-9_./-]+$/.test(proposal.pathname)||
+    /%|\\|\/\.\.?($|\/)/.test(original.pathname+proposal.pathname))throw Error("Only public official TechDocs and published document-reader revisions are accepted");
+ const anchor=String(input.proposal_anchor||decodeURIComponent(proposal.hash.slice(1))||"").trim();
+ const officialAnchor=String(input.official_anchor||"").trim();
+ const topic=String(input.topic||"").trim().slice(0,100);
+ if((anchor&&!/^[A-Za-z0-9_.:-]{1,100}$/.test(anchor))||
+    (officialAnchor&&!/^[A-Za-z0-9_.:-]{1,100}$/.test(officialAnchor)))throw Error("Invalid documentation anchor");
+ return{
+  original:original.href,proposal:proposal.href,
+  originalCfg:{anchor:officialAnchor,hint:topic},
+  proposalCfg:{anchor,hint:topic}
+ };
 }
 function decodeHTML(s){
  const entities={"nbsp":" ","amp":"&","lt":"<","gt":">","quot":'"',"apos":"'","mdash":"—","ndash":"–"};
@@ -30,10 +51,11 @@ function decodeHTML(s){
 }
 function extractPage(html,cfg){
  const clean=String(html).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi," ").replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi," ").replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi," ");
- let i=clean.toLowerCase().indexOf('id="'+cfg.anchor.toLowerCase()+'"');
- if(i<0)i=clean.toLowerCase().indexOf("id='"+cfg.anchor.toLowerCase()+"'");
+ const anchor=String(cfg?.anchor||"").toLowerCase(),hint=String(cfg?.hint||"").toLowerCase();
+ let i=anchor?clean.toLowerCase().indexOf('id="'+anchor+'"'):-1;
+ if(i<0&&anchor)i=clean.toLowerCase().indexOf("id='"+anchor+"'");
  let method="anchor";
- if(i<0){i=clean.toLowerCase().indexOf(cfg.hint.toLowerCase());method=i>=0?"heading_search":"page_fallback"}
+ if(i<0){i=hint?clean.toLowerCase().indexOf(hint):-1;method=i>=0?"heading_search":"page_fallback"}
  const excerpt=i>=0?clean.slice(Math.max(0,i-2500),i+75000):clean.slice(0,75000);
  const text=decodeHTML(excerpt.replace(/<!--[\s\S]*?-->/g," ").replace(/<\/?(?:div|section|article|main|h[1-6]|p|li|ul|ol|br|pre|code|tr|td|th|blockquote)\b[^>]*>/gi,"\n").replace(/<[^>]*>/g," ").replace(/[ \t]{2,}/g," ").replace(/\n\s*\n\s*\n/g,"\n\n")).trim();
  return{text:text.slice(0,MAX_TEXT),method,truncated:text.length>MAX_TEXT,extracted_chars:text.length};
@@ -112,7 +134,12 @@ async function handler(req,res){
  if(!input||typeof input!=="object"||Array.isArray(input))return error(res,400,"bad_request","JSON object expected");
  const caseId=String(input.case_id||"").slice(0,60),known=CASES[caseId];
  const hasTexts=typeof input.original_text==="string"&&typeof input.proposal_text==="string";
- if(!known&&!hasTexts)return error(res,422,"missing_source","Supply original and proposed text for this case");
+ const hasPublicURLs=Object.hasOwn(input,"original_url")||Object.hasOwn(input,"proposal_url");
+ if((Object.hasOwn(input,"original_text")!==Object.hasOwn(input,"proposal_text"))||
+    (hasPublicURLs&&hasTexts))return error(res,422,"ambiguous_source","Provide one source mode: either two approved public URLs or two supplied texts");
+ let dynamic=null;
+ if(hasPublicURLs){try{dynamic=dynamicSourceConfig(input)}catch(e){return error(res,422,"unapproved_source",String(e.message).slice(0,260))}}
+ if(!known&&!hasTexts&&!dynamic)return error(res,422,"missing_source","Supply two approved public document URLs or original and proposed text");
  const question=String(input.question||known?.question||"").trim().slice(0,800);
  if(!question)return error(res,422,"missing_question","Question required");
  let original,proposal,receipts;
@@ -122,15 +149,22 @@ async function handler(req,res){
    if(original.length<120||proposal.length<120||original.length>MAX_TEXT||proposal.length>MAX_TEXT)throw Error("Each text must be 120–26,000 characters");
    receipts=[{kind:"original",source:"manual_text",chars:original.length,hash:digest(original),truncated:false},{kind:"proposal",source:"manual_text",chars:proposal.length,hash:digest(proposal),truncated:false}];
   }else{
-   const docs=await Promise.all([fetchDocument(known.original,known),fetchDocument(known.proposal,known)]);
+   const cfg=dynamic||known;
+   const docs=await Promise.all([
+    fetchDocument(cfg.original,cfg.originalCfg||cfg),
+    fetchDocument(cfg.proposal,cfg.proposalCfg||cfg)
+   ]);
    original=docs[0].text;proposal=docs[1].text;
    receipts=docs.map((d,i)=>({kind:i?"proposal":"original",source:"public_url",url:d.url,hash:d.hash,chars:d.text.length,truncated:d.truncated,extraction:d.method,retrieved_at:d.retrieved_at}));
   }
  }catch(e){return error(res,422,"document_unavailable",String(e.message).slice(0,330))}
  try{
   const ai=await callAI(question,original,proposal),review=normalizeModel(ai.result,original,proposal);
-  return reply(res,200,{ok:true,mode:"live_ai_document_comparison",case_id:caseId,model:ai.model,source_receipts:receipts,review,ran_at:new Date().toISOString(),device_tested:false,publication_approved:false,note:"Model assessment of retrieved document excerpts; no live device validation or approved publication."});
+  return reply(res,200,{ok:true,mode:"live_ai_document_comparison",case_id:caseId,model:ai.model,source_receipts:receipts,review,ran_at:new Date().toISOString(),
+   run_id:crypto.randomUUID(),review_input_sha256:digest(JSON.stringify({question,original,proposal})),
+   prompt_sha256:digest(JSON.stringify(messages(question,original,proposal))),
+   device_tested:false,publication_approved:false,note:"Model assessment of retrieved document excerpts; no live device validation or approved publication."});
  }catch(e){return error(res,502,"model_error",String(e.message).slice(0,340))}
 }
 module.exports=handler;
-module.exports._internals={CASES,validateURL,extractPage,parseModel,normalizeModel,messages,digest};
+module.exports._internals={CASES,validateURL,dynamicSourceConfig,extractPage,parseModel,normalizeModel,messages,digest};
