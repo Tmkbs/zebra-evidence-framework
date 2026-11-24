@@ -25,6 +25,10 @@ const PAGES=Object.freeze({
  "/classroom/final-delivery.html":"final-delivery.html",
  "/answer-guidance.html":"answer-guidance.html",
  "/classroom/answer-guidance.html":"answer-guidance.html",
+ "/guidance-planner.js":"guidance-planner.js",
+ "/classroom/guidance-planner.js":"guidance-planner.js",
+ "/guidance-intake.js":"guidance-intake.js",
+ "/classroom/guidance-intake.js":"guidance-intake.js",
  "/analysis/zebra-pattern-analysis.html":"../analysis/zebra-pattern-analysis.html",
  "/evidence-framework-sandbox.html":"evidence-framework-sandbox.html",
  "/classroom/evidence-framework-sandbox.html":"evidence-framework-sandbox.html",
@@ -141,8 +145,8 @@ function buildServer(cfg,request=fetch){
   try{
    const html=fs.readFileSync(path.join(UI_ROOT,page));
    res.statusCode=200;
-   res.setHeader("Content-Type","text/html; charset=utf-8");
-   res.setHeader("Content-Security-Policy","default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self' https:; img-src 'self' data: https:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'");
+   res.setHeader("Content-Type",page.endsWith(".js")?"application/javascript; charset=utf-8":"text/html; charset=utf-8");
+   res.setHeader("Content-Security-Policy","default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self' https:; img-src 'self' data: https:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'");
    return res.end(html);
   }catch{return json(res,500,{ok:false,error:"Bundled page unavailable"})}
  });
