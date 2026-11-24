@@ -1,36 +1,33 @@
-# Zebra: Qwen / OpenAI relay
+# Zebra: campus Qwen and GitHub reviewer handoff
 
-This is an **opt-in proposal handoff**, not an autonomous agent that writes and merges code. It is designed to leave a reviewable trail and to avoid using customer SPR data in a public GitHub repository.
+## Model boundary
 
-## What exists
+**Northwestern's campus Qwen endpoint is the only model API called by this relay.** No separately billed model API, external inference credentials, or public-cloud inference fallback is required or permitted. The relay rejects non-campus endpoints and redirects.
 
-- `relay/public_task.json`: scope and acceptance checks using *public* project references only.
-- `relay/agent_relay.py`: invokes a campus Qwen-compatible endpoint for a proposal, then invokes an OpenAI **API model** for a critical review, and saves both results to an auditable JSON handoff.
-- `.github/workflows/qwen-openai-relay.yml`: scheduled at 17 and 47 minutes after each hour. GitHub Actions schedule timing is **best effort**, not exact. Also supports manual dispatch.
-- `relay/tests/`: offline validation tests requiring no API credentials.
+The independent reviewer can be ChatGPT using the existing subscription and its GitHub connection, or a teammate. The reviewer reads the public handoff and writes the next round of feedback in `relay/reviewer_feedback.md`. This is not a programmatic invocation of ChatGPT, and a reviewer is not automatically available on a fixed cadence.
 
-**ChatGPT conversations are not invoked by this workflow.** The reviewer is an OpenAI API model selected in `RELAY_OPENAI_MODEL`; ChatGPT does not silently continue coding in the background.
+## Run one proposal on an authorized campus-connected machine
 
-## Status and prerequisites (not yet operational)
+From a separate checkout of this branch, with Python 3.10+ and campus network access:
 
-The workflow is intentionally disabled until the following have been provisioned:
+    python -m unittest discover -s relay/tests -v
+    python relay/agent_relay.py --validate-only
+    python relay/agent_relay.py --state relay_state.json --output relay_state.json
 
-1. A **trusted, dedicated self-hosted GitHub Actions runner** with both labels `self-hosted` and `zebra-campus`, running on a machine that can reach Northwestern's approved campus Qwen endpoint via eduroam or VPN. A GitHub-hosted runner cannot assume access to that private network.
-2. GitHub repository Actions variable `ZEBRA_RELAY_ENABLED=true`; variable `RELAY_OPENAI_MODEL` set to a real, authorized OpenAI model API identifier; optionally `RELAY_QWEN_BASE` (default `http://c3dgx0.cs.northwestern.edu:8080/v1`) and `RELAY_QWEN_MODEL`.
-3. Repository Actions secret `OPENAI_API_KEY` with appropriate use/budget limits, and optional `RELAY_QWEN_KEY` if required by the campus deployment. Never place credentials in commits.
-4. Merge this PR into the default branch **after review**. Scheduled workflows only run from the default branch.
-5. Allow GitHub Actions to write repository contents *only as needed*, then restrict and review permissions. Relay results are stored on a separate `agent-relay-state` branch, not `main`.
+The script sends only the bounded public task, prior proposal, and supplied public feedback to Qwen. It saves a JSON proposal locally. It does not fetch the linked URLs, modify project files, push, or merge. Review the contents before committing a public handoff. Keep private SPR records and credentials outside the repository.
 
-## Safety
+Optional environment variables: RELAY_QWEN_BASE (defaults to the campus endpoint on port 8080), RELAY_QWEN_MODEL, RELAY_QWEN_KEY (only if the campus service explicitly requires it; actual credentials require HTTPS). Confirm the current endpoint and institutional permission before use.
 
-- No customer spreadsheet, root-cause records, transcripts, private names, or sensitive attachments are committed.
-- A proposal or review is **not code**, a passed test, a model benchmark, or client approval. No code-writing automation is included.
-- The single public task is user-maintained and bounded; incoming model messages are labeled untrusted.
-- Output is truncated and limited to public/research descriptions. Do not feed private client material into the task field.
-- The OpenAI API is a **different service and billing surface** from ChatGPT. Verify data handling and institutional approvals before enabling.
-- Run unit tests locally: `python3 -m unittest discover -s relay/tests -v`, then `python3 relay/agent_relay.py --validate-only`.
-- Before any unattended deployment, have a maintainer review permissions, runner security, billing safeguards, GitHub Actions budget, and institutional data-sharing requirements.
+## Thirty-minute cadence
 
-## Why this is a useful start
+For recurring Qwen proposals, an authorized operator may configure Windows Task Scheduler, or cron on a dedicated campus-connected machine, to run the command above every 30 minutes. Use a separate checkout, a single-instance task, and a local output file; stop the task if the machine disconnects or the lab withdraws access. This repository intentionally does not install or enable a background service or expose the campus machine as a self-hosted runner for a public repository.
 
-A reviewer can examine the Qwen proposal and independent OpenAI critique across rounds before deciding what patch should be made. Actual engineering edits still require a separate PR with tests and maintainers' approval. This avoids two models reinforcing each other's guesses in an uncontrolled loop.
+ChatGPT or a teammate can review approved public outputs in GitHub, update the feedback file, and submit tested code changes as separate pull requests. A local scheduler can run Qwen, but does not wake ChatGPT or ensure it is reviewing at the same cadence. Do not claim this is an autonomous two-model loop until actual scheduling and handoff are independently demonstrated.
+
+## Validation
+
+- CI runs offline tests, never model inference.
+- Every model proposal is marked awaiting independent review.
+- Preserve the evidence and verification boundaries in the existing project.
+- Do not publish or send private customer files through this relay.
+- Actual code changes require tests and a separate reviewed PR; no auto-merge.
