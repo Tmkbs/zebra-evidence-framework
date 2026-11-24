@@ -10,6 +10,7 @@ const fs=require("node:fs");
 const path=require("node:path");
 const crypto=require("node:crypto");
 const review=require("./api/review.js");
+const guidance=require("./analysis/answer-guidance.cjs");
 
 const DEFAULT_API="http://c3dgx0.cs.northwestern.edu:8000/v1";
 const DEFAULT_MODEL="nvidia/Qwen3.8-Flash-Next-FP4-Local";
@@ -22,6 +23,8 @@ const PAGES=Object.freeze({
  "/classroom/index.html":"index.html",
  "/final-delivery.html":"final-delivery.html",
  "/classroom/final-delivery.html":"final-delivery.html",
+ "/answer-guidance.html":"answer-guidance.html",
+ "/classroom/answer-guidance.html":"answer-guidance.html",
  "/evidence-framework-sandbox.html":"evidence-framework-sandbox.html",
  "/classroom/evidence-framework-sandbox.html":"evidence-framework-sandbox.html",
  "/course.html":"course.html",
@@ -114,6 +117,18 @@ function buildServer(cfg,request=fetch){
    if(!sameOriginRequest(req,cfg))return json(res,403,{ok:false,error:"Same-origin local review only"});
    return json(res,200,await campusStatus(cfg,request));
   }
+  if(route==="/api/answer-guidance"){
+   if(req.method!=="POST")return json(res,405,{ok:false,error:"POST required"});
+   if(!sameOriginRequest(req,cfg))return json(res,403,{ok:false,error:"Same-origin local guidance only"});
+   const supplied=String(req.headers["x-review-access"]||"");
+   if(!cfg.passcode||supplied.length!==cfg.passcode.length||
+      !crypto.timingSafeEqual(Buffer.from(supplied),Buffer.from(cfg.passcode)))
+    return json(res,401,{ok:false,error:"Local session required"});
+   let input;
+   try{input=JSON.parse(await readBody(req,12000))}catch{return json(res,400,{ok:false,error:"Invalid JSON or request too large"})}
+   try{return json(res,200,await guidance.run(input,cfg,request))}
+   catch(e){return json(res,422,{ok:false,error:String(e.message).slice(0,300),model_calls_confirmed:false})}
+  }
   if(route==="/api/review"){
    if(req.method==="POST"){
     try{req.body=JSON.parse(await readBody(req))}catch{return json(res,400,{ok:false,error:"Invalid JSON or request too large"})}
@@ -138,6 +153,7 @@ function start(){
  server.listen(cfg.port,"127.0.0.1",()=>{
   console.log("Zebra final AI review: http://127.0.0.1:"+cfg.port+"/final-delivery.html");
   console.log("Classroom evidence demo: http://127.0.0.1:"+cfg.port+"/");
+  console.log("New-question answer guidance: http://127.0.0.1:"+cfg.port+"/answer-guidance.html");
   console.log("Campus status check: http://127.0.0.1:"+cfg.port+"/api/campus-status");
   console.log("Configured model: "+cfg.model);
   console.log("Session review access code (enter under AI connection): "+cfg.passcode);
