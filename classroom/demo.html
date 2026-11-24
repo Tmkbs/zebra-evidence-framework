@@ -7,6 +7,7 @@
 
 #video-example{margin:0 0 16px}#video-example>summary{font-size:17px;color:#245b55}#video-example>p{margin:12px 0}.story-player{padding:12px;border:1px solid #d8e4e5;border-radius:10px;background:#f5f8f8}.story-player:empty{display:none}.story-heading{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;padding-bottom:8px}.story-scene{background:#fff;border-radius:8px;overflow:hidden}.story-scene svg{display:block;width:100%;height:auto;max-height:300px}.story-scene g[role=button]{cursor:pointer}.story-controls,.story-rail,.story-video-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:8px 0}.story-player button{border:1px solid #b8ceca;background:white;color:#245b55;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:600}.story-player button[aria-pressed=true]{background:#e5f3ee;border-color:#8cbfb1}.story-player button[data-story-action=play],.story-player button[data-story-video=create]{background:#126d64;color:white}.story-player button:disabled{opacity:.5;cursor:default}.story-controls input[type=range]{flex:1;width:auto;min-width:80px;padding:0;accent-color:#126d64}.story-info{padding:10px;border-radius:7px;background:white}.story-info .vision-kicker{font-size:11px;color:#397570;text-transform:uppercase}.story-evidence{background:#f5f8f8;border-left:2px solid #8cbab6;padding:8px;margin-top:7px;overflow-wrap:anywhere}.story-evidence blockquote{margin:5px 0;font-size:13px}.story-evidence span,.story-evidence a{font-size:12px;margin-right:8px}.vision-foot{font-size:12px;color:#57717a}.story-video{border-top:1px solid #d8e4e5;margin-top:12px;padding-top:10px}.story-video-output video{display:block;width:100%;max-width:780px;height:auto;border-radius:8px;margin:8px 0}.story-video-output a{overflow-wrap:anywhere}
 
+#narrated-video{width:100%;max-width:860px;height:auto;display:block;background:#17393f;border-radius:10px;margin:12px 0;aspect-ratio:16/9}#video-tools{margin-top:14px}#video-tools>summary{font-size:13px;font-weight:600}
 </style></head>
 <body>
 <header><div class="wrap"><div class="eyebrow">Zebra Technologies · Northwestern Forge</div><h1>From support cases to better AI answers</h1><p class="muted">Interactive Tech Docs with Conversation and Video · answer-side research prototype</p></div></header>
@@ -30,7 +31,13 @@
 <details><summary>Instructions prepared for the assistant</summary><ul id="rules"></ul><div id="source-result"></div></details>
 </div>
 </section>
-<details class="card" id="video-example"><summary>Optional bonus · Explain with a short video</summary><p><b>Example: How does DataWedge process scan data?</b> Some questions are easier to understand with a visual explanation. This is a separate, source-backed concept example, not an answer generated for the question above.</p><div id="optional-player" class="story-player"></div><p id="video-message" class="muted" role="status"></p><p class="muted">Use Play for an immediate walkthrough, or Create short video for a silent, captioned video. No AI video model is used. <a href="https://techdocs.zebra.com/datawedge/15-0/guide/profiles/" target="_blank" rel="noopener noreferrer">Official documentation ↗</a></p></details>
+<details class="card" id="video-example"><summary>Optional bonus · Watch a narrated explanation</summary>
+<p><b>What does DataWedge do?</b> A short introduction to how a profile captures, optionally formats, and delivers data.</p>
+<p class="muted">33 seconds · English narration · DataWedge 15.0</p>
+<video id="narrated-video" controls playsinline preload="none" poster="media/datawedge-profiles-poster.svg" aria-label="Narrated DataWedge Profiles concept explainer"><source src="media/datawedge-profiles.mp4" type="video/mp4"><track kind="captions" src="media/datawedge-profiles.vtt" srclang="en" label="English"><p><a href="media/datawedge-profiles.mp4">Open the narrated video</a></p></video>
+<p class="muted">Prepared in advance by our local rendering and speech-synthesis pipeline from reviewed documentation. No user video creation is required. <a href="https://techdocs.zebra.com/datawedge/15-0/guide/profiles/" target="_blank" rel="noopener noreferrer">Official source ↗</a></p>
+<details id="video-tools"><summary>Research tool · Try interactive explanation and silent video export</summary><p class="muted">This optional prototype is separate from the ready-to-watch narrated video above.</p><div id="optional-player" class="story-player"></div><p id="video-message" class="muted" role="status"></p></details>
+</details>
 <footer>Student prototype. Candidate patterns come from a small, team-authored research snapshot. The public demo prepares an answer plan; no live model, device diagnosis or measured improvement is claimed. <details><summary>Additional project materials</summary><a href="visual-companion.html?reader=dw62-intent-receiver">Optional contextual diagram and video prototype</a> · <a href="answer-guidance.html">Full research interface</a> · <a href="https://zebra-techdocs-practicum.vercel.app/document-reader/project-shift.html#main" target="_blank" rel="noopener noreferrer">Team Project Shift</a></details></footer>
 </main><script src="guidance-planner.js"></script><script src="pattern-demo.js"></script><script src="guidance-intake.js"></script><script src="guidance-visual.js"></script><script src="guidance-storyboard.js"></script><script>
 "use strict";
@@ -61,7 +68,10 @@ if(window.ZebraPatternDemo&&window.ZebraGuidance){
 }else{$("status").textContent="Required local modules are unavailable.";$("question-form").querySelector("button[type=submit]").disabled=true}
 let bonusController=null;
 $("video-example").addEventListener("toggle",()=>{
- if(!$("video-example").open){
+ if(!$("video-example").open){$("narrated-video").pause();$("video-tools").open=false;if(bonusController){bonusController.destroy();bonusController=null} $("video-message").textContent="";}
+});
+$("video-tools").addEventListener("toggle",()=>{
+ if(!$("video-tools").open||!$("video-example").open){
   if(bonusController){bonusController.destroy();bonusController=null}
   $("video-message").textContent="";
   return;
