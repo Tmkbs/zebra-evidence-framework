@@ -129,3 +129,9 @@
 - 不 push 你的站点仓库，不改 Zebra 公开代码（等你给 repo 后我先开分支再提 PR）
 - 不编会议内容、不编证据、不把 `recurring` 当 `defensible` 讲
 - 不为了让数字好看而造案例
+
+---
+
+## 7. 11/24 answer-side continuation (separate from the document editor)
+
+See [ANSWER_GUIDANCE_HANDOFF.md](ANSWER_GUIDANCE_HANDOFF.md). The new Ask & Guide route applies provisional answer safeguards, retrieves edition-matched public evidence, and can compare ordinary and guided campus Qwen answers with frozen inputs. Preserve the original recurring/defensible snapshot. The team site should link or integrate, not duplicate its case reader. The first independent campus answer comparison remains pending.
