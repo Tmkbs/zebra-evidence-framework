@@ -9,6 +9,7 @@
   "scripts": {
     "test": "node classroom/test_campus_server.cjs && node classroom/test_final_delivery.cjs && node classroom/test_one_click.cjs && node classroom/test_ai_review.cjs && node classroom/test_end_to_end.cjs && node --test analysis/test_answer_guidance.cjs && node --test analysis/test_offline_guidance.cjs && node --test analysis/test_visual_guidance.cjs",
     "campus": "node campus_review_server.cjs",
-    "campus:check": "node campus_api_check.cjs"
+    "campus:check": "node campus_api_check.cjs",
+    "test:vision:browser": "node analysis/test_visual_browser.cjs"
   }
 }
