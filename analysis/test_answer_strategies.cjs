@@ -59,7 +59,7 @@ test("a documented prerequisite is applied only from an exact matching official 
 });
 test("source discrepancy needs both exact identifiers in the same edition-matched source",()=>{
  const url="https://techdocs.zebra.com/datawedge/6-8/guide/api/resultinfo/";
- const p=plan("Which result parameter is correct?","datawedge","6.8");
+ const p=plan("What is the difference between SEND_RESULT and RECEIVE_RESULT in the result code example?","datawedge","6.8");
  const card=I.offlineEvidence({...p,source_urls:[url]}).cards[0];
  const result=S.select(p,[card]);
  assert.ok(result.some(x=>x.id==="example_body_conflict"));
