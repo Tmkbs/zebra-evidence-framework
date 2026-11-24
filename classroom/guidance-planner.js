@@ -93,5 +93,5 @@ function prepare(input){
   installed_version_verified:false,global_pattern_validated:false};
 }
 
-return Object.freeze({prepare,officialURL,routeSources,policySelection,edition,products:[...PRODUCTS]});
+return Object.freeze({prepare,officialURL,routeSources,policySelection,edition,clean,products:[...PRODUCTS]});
 });
