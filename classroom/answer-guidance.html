@@ -42,20 +42,20 @@ button.vision-node[aria-pressed=true]{outline:3px solid #a7d3ca;outline-offset:2
 </section>
 <section class="box">
 <h2>Ask a different question</h2>
-<label for="question">Developer question</label><textarea id="question">Why do the DataWedge result-code instructions mention RECEIVE_RESULT while the sample uses SEND_RESULT? Which should I use?</textarea>
+<label for="question">Developer question</label><textarea id="question">Why might the software scan trigger fail to start scanning in DataWedge 6.8?</textarea>
 <div class="grid"><div><label for="product">Software product</label><select id="product"><option value="">Not specified</option><option value="datawedge" selected>DataWedge</option><option value="ehs">Enterprise Home Screen</option><option value="enterprise-browser">Enterprise Browser</option><option value="emdk-for-android">EMDK for Android</option><option value="stagenow">StageNow</option></select></div>
 <div><label for="version">Reported installed version</label><input id="version" value="6.8" placeholder="e.g. 6.8 (leave blank if unknown)"></div></div>
 <label for="context">Public configuration / observation (optional)</label><textarea id="context" placeholder="What was tried? What result was observed? Do not enter private ticket or customer details."></textarea>
-<label for="sources">Official source URLs (optional; up to two, one per line)</label><textarea id="sources" class="sources" placeholder="Leave blank for limited DataWedge topic routing">https://techdocs.zebra.com/datawedge/6-8/guide/api/resultinfo/</textarea>
+<label for="sources">Official source URLs (optional; up to two, one per line)</label><textarea id="sources" class="sources" placeholder="Leave blank for limited DataWedge topic routing">https://techdocs.zebra.com/datawedge/6-8/guide/api/softscantrigger/</textarea>
 <p class="muted">Automatic routing currently covers a few DataWedge topics. Other topics require the relevant version-specific article. It is not a full TechDocs search engine.</p>
 <details><summary>Import public case handoff</summary><p class="muted">Accepts the team's public case contract, including question and official evidence URLs. Imported text is not treated as verified evidence. Installed version is left blank for confirmation.</p><input id="importFile" type="file" accept=".json,application/json"><p id="importStatus" class="muted"></p></details>
 <details><summary>Import team public case CSV</summary><p class="muted">Question-only intake: never copies a root-cause label or recommended edit into a model question. Case IDs do not prove original-question provenance.</p><div class="actions"><button id="fetchCSV">Load published team CSV</button><input id="csvFile" type="file" accept=".csv,text/csv"></div><p id="csvStatus" class="muted" role="status"></p><label for="csvCase">Select imported public case</label><select id="csvCase" disabled><option value="">No cases loaded</option></select><button id="useCSV" disabled>Use selected question</button><div id="caseOrigin" class="muted"></div></details>
 <label class="check"><input id="consent" type="checkbox">I confirm the question and context contain only public or explicitly approved material. No customer SPRs, credentials or private device data.</label>
 <div class="actions"><button id="plan">Offline guidance · no model</button><button id="evidence">Fetch official excerpts only</button><button id="ask" class="primary">Ask campus Qwen</button><button id="compare">Compare baseline / guided</button></div><p id="status" class="muted" role="status" aria-live="polite"></p>
 </section>
-<section class="box" id="planBox" hidden><h2>2. Decide what to do</h2><div id="planOutput"></div></section>
-<section class="box" id="sourceBox" hidden><h2>3. Inspect source evidence</h2><div id="sourceOutput"></div></section>
-<section class="box" id="answerBox" hidden><h2>4. Review the answer</h2><div id="answerOutput"></div></section><button id="download" hidden>Download result / handoff (JSON)</button>
+<section class="box" id="planBox" hidden><h2>Response safeguards</h2><div id="planOutput"></div></section>
+<section class="box" id="sourceBox" hidden><h2>Source evidence</h2><div id="sourceOutput"></div></section>
+<section class="box" id="answerBox" hidden><h2>Model answer review</h2><div id="answerOutput"></div></section><button id="download" hidden>Download result / handoff (JSON)</button>
 <footer>Independent student research prototype. A quoted passage is not a verified technical answer. No device validation, document publication, or measured reduction in support demand is claimed. Campus model only.</footer>
 </main><script src="guidance-planner.js"></script><script src="guidance-intake.js"></script><script src="guidance-visual.js"></script><script>
 "use strict";
@@ -72,7 +72,7 @@ function resetVisualState(){
  removeVisualReport();visualState={};visualFocus="";visualConfirmed=false;visualKey="";
 }
 function invalidate(){
- runEpoch++;last=null;resetVisualState();
+ runEpoch++;last=null;resetVisualState();busy(false);
  $("planBox").hidden=true;$("sourceBox").hidden=true;$("answerBox").hidden=true;$("download").hidden=true;
  $("visionOutput").replaceChildren(text("p","Question or context changed. Choose Offline guidance to rebuild the visual explanation.","vision-empty"));
 }
@@ -119,6 +119,8 @@ function busy(value){
  for(const id of ["plan","loadExample","loadUnknown","loadPrereq","question","product","version","context","sources","importFile","csvFile","consent"])$(id).disabled=value;
  for(const id of ["evidence","ask","compare"])$(id).disabled=value||!access;
  $("fetchCSV").disabled=value;
+ $("csvCase").disabled=value||!csvRows.length;
+ $("useCSV").disabled=value||!csvRows.length||$("csvCase").value==="";
 }
 async function session(){
  busy(false);
@@ -175,7 +177,7 @@ function drawAnswers(result){
 async function run(action){
  if(action!=="plan"&&!access)return;
  if(action!=="plan"&&!$("consent").checked){$("status").textContent="Confirm public/approved material before the network request.";return}
- const epoch=++runEpoch;busy(true);last=null;$("planBox").hidden=true;$("sourceBox").hidden=true;$("answerBox").hidden=true;$("download").hidden=true;
+ const epoch=++runEpoch;busy(true);last=null;$("visionOutput").replaceChildren(text("p","Preparing the current evidence map…","vision-empty"));$("planBox").hidden=true;$("sourceBox").hidden=true;$("answerBox").hidden=true;$("download").hidden=true;
  $("status").textContent=action==="plan"?"Preparing offline guidance without network or model…":action==="evidence"?"Fetching official excerpts only. No model call…":"Retrieving version-pinned official sources and requesting campus inference…";
  try{
   const input={action,case_id:caseId,question:$("question").value,product:$("product").value,version:$("version").value,context:$("context").value,source_urls:$("sources").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean),public_only:$("consent").checked};
@@ -229,6 +231,6 @@ $("importFile").addEventListener("change",async()=>{
  }catch(e){$("importStatus").textContent=e.message}
 });
 $("download").addEventListener("click",()=>{if(!last)return;const b=new Blob([JSON.stringify(last,null,2)+"\n"],{type:"application/json"}),url=URL.createObjectURL(b),a=document.createElement("a");a.href=url;a.download="zebra-answer-"+(last.run_id||"plan")+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
-for(const id of ["question","product","version","context","sources"])$(id).addEventListener("input",invalidate);
+for(const id of ["question","product","version","context","sources"])$(id).addEventListener("input",()=>{if(id==="question")caseId="";invalidate()});
 if(window.ZebraGuidance&&window.ZebraIntake&&window.ZebraVisual){busy(false);session();run("plan")}else{$("environment").textContent="Required offline modules are missing; open the page from the full repository checkout.";for(const id of ["plan","evidence","ask","compare"])$(id).disabled=true}
 </script></body></html>
