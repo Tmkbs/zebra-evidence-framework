@@ -1,5 +1,9 @@
 # Zebra Evidence Framework — research workbench and classroom demo
 
+## Interactive Vision — evidence into action
+
+The existing [Ask & Guide](classroom/answer-guidance.html) now leads with an interactive, source-linked decision map. Explore the DataWedge 6.8 scan-trigger conditions, inspect the actual supporting passages, or compare the two result-code spellings in the prose and prototype. Scenario choices change the next diagnostic check; they are never treated as observed hardware state. Only explicit user confirmation transfers them into the next answer's reported context. The visual guide is independent of the model connection and does not replace the team's case/document reader. Unsupported topics and versions receive a generic evidence route, not an invented device visualization.
+
 ## New-question answer guidance (campus-only)
 
 [Integration and evaluation handoff](analysis/ANSWER_GUIDANCE_HANDOFF.md). The [Ask & Guide page](classroom/answer-guidance.html) adds a new-question workflow rather than a second documentation editor: clarification, version-pinned public evidence, candidate safeguards, and optional same-evidence baseline/guided comparison. The public page now runs the shared offline planner and checked source cards without a model. For live official-source retrieval or campus inference, open `http://127.0.0.1:3000/answer-guidance.html` from the existing authorized campus runner. Use **Fetch official excerpts only** when the campus model is unavailable; import public team CSV questions without copying diagnoses or recommended edits. No external paid-model API calls or automatic publication. This does not change the historical [pattern snapshot](analysis/zebra-pattern-analysis.html).
