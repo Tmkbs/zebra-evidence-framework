@@ -2,6 +2,8 @@
 
 ## Interactive Vision — evidence into action
 
+**Visual walkthroughs:** the same Ask & Guide page now offers three source-linked SVG illustration forms: a scan-trigger diagnostic scene, a side-by-side result-code comparison, and a DataWedge 15.0 nested configuration scene. Select illustrated components, advance or seek through steps, or play the short timed walkthrough with captions. Playback and the illustrations are deterministic and work without Qwen. This is not a captured device video or a live hardware simulation. Each scene is derived from the validated visual map, and the JSON handoff includes a portable `zebra-visual-storyboard/v1` contract. No new model API or separate case database is required.
+
 The existing [Ask & Guide](classroom/answer-guidance.html) now leads with an interactive, source-linked decision map. Explore the DataWedge 6.8 scan-trigger conditions, inspect the actual supporting passages, or compare the two result-code spellings in the prose and prototype. Scenario choices change the next diagnostic check; they are never treated as observed hardware state. Only explicit user confirmation transfers them into the next answer's reported context. The visual guide is independent of the model connection and does not replace the team's case/document reader. Unsupported topics and versions receive a generic evidence route, not an invented device visualization.
 
 ## New-question answer guidance (campus-only)
