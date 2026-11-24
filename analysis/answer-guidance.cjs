@@ -169,8 +169,8 @@ function normalize(raw,sources){
  const by=new Map(sources.map(s=>[s.id,s]));
  const text=(s,n)=>typeof s==="string"?s.trim().slice(0,n):"";
  const claims=(Array.isArray(obj.claims)?obj.claims:[]).slice(0,10).map(c=>{
-  const id=text(c?.evidence_id,40),quote=text(c?.quote,320),claim=text(c?.claim,900),s=by.get(id);
-  return {claim,evidence_id:id,quote,quote_exact:!!(claim&&s&&quote.length>=8&&s.text.includes(quote)),url:s?.url||null};
+  const id=text(c?.evidence_id,40),rawQuote=typeof c?.quote==="string"?c.quote.trim():"",quote=rawQuote.slice(0,320),claim=text(c?.claim,900),s=by.get(id);
+  return {claim,evidence_id:id,quote,quote_exact:!!(claim&&s&&rawQuote.length>=8&&rawQuote.length<=320&&s.text.includes(rawQuote)),url:s?.url||null};
  }).filter(c=>c.claim);
  const exact=claims.filter(c=>c.quote_exact),rejected=claims.filter(c=>!c.quote_exact);
  const strings=v=>(Array.isArray(v)?v:[]).slice(0,6).map(s=>text(s,350)).filter(Boolean);
@@ -184,7 +184,7 @@ async function infer(cfg,messages,sources,request){
  const base=campusBase(cfg);
  const model=clean(cfg.model,180,"model",true);
  // No other provider or generic API key can be used by this route.
- const token=process.env.GUIDANCE_QWEN_TOKEN||"token-is-ignored";
+ const token=process.env.CAMPUS_QWEN_TOKEN||"token-is-ignored";
  if(base.startsWith("http:")&&token!=="token-is-ignored")throw Error("Real authentication tokens require HTTPS");
  const res=await request(base+"/chat/completions",{method:"POST",redirect:"error",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},
   body:JSON.stringify({model,messages,temperature:0,max_tokens:1800}),signal:AbortSignal.timeout(90000)});
