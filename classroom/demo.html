@@ -20,7 +20,7 @@
 "use strict";
 const stages=["overview","visual","guide"],$=id=>document.getElementById(id);
 let selected="overview";
-const observers=new Map();
+const observers=new Map(),boundDocs=new WeakSet();
 function stageForURL(raw){
  try{const url=new URL(raw,location.href);
   for(const stage of ["visual","guide"]){const desired=new URL($("frame-"+stage).dataset.src,location.href);
@@ -36,11 +36,11 @@ function bindFrame(stage){
   const doc=frame.contentDocument;if(!doc?.body||doc.location.href==="about:blank")return;
   // Route only the two existing, exact same-site demo links within the shell.
   // Source citations and downloads retain their own normal behavior.
-  doc.addEventListener("click",e=>{
+  if(!boundDocs.has(doc)){boundDocs.add(doc);doc.addEventListener("click",e=>{
    if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
    const a=e.target.closest?.("a[href]"),dest=a?stageForURL(a.href):"";
    if(dest&&!a.hasAttribute("download")){e.preventDefault();select(dest,true)}
-  },true);
+  },true)}
   const fit=()=>{
    if(selected!==stage)return;
    const body=doc.body,main=doc.querySelector("main");
