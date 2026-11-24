@@ -63,7 +63,13 @@ function importCSV(s){
  }
  return {schema:"zebra-public-question-intake/v1",rows:out,skipped_rows:skipped,total_input_rows:rows.length,question_column:map.question<0?null:headers[map.question],eligible_for_evaluation:0};
 }
+const PROFILE_SOURCE="https://techdocs.zebra.com/datawedge/15-0/guide/profiles/";
 const CARDS=Object.freeze([
+ {url:PROFILE_SOURCE,product:"datawedge",version:"15.0",title:"DataWedge Profiles",checked:"2026-11-24",sections:[
+  {section:"Profile options — Input",quote:"how the data is acquired (input)",note:"Input plugins specify how data is captured."},
+  {section:"Profile options — Process",quote:"processed for data formatting (if needed)",note:"Formatting is optional."},
+  {section:"Profile options — Output",quote:"delivered to the app (output)",note:"Output plugins deliver data to the application."}
+ ],next:"Learn the capture, optional formatting and delivery stages. Check the applicable feature matrix and plugin page before inferring support for a particular device or operation."},
  {url:"https://techdocs.zebra.com/datawedge/15-0/guide/api/setconfig/",product:"datawedge",version:"15.0",title:"Set Config",checked:"2026-11-24",sections:[
   {section:"MAIN BUNDLE",quote:"A bundle array (nested within the main bundle)",note:"The main configuration contains the plugin configuration array."},
   {section:"PLUGIN_CONFIG BUNDLE",quote:"A parameter list bundle nested within the PLUGIN_CONFIG bundle",note:"A plugin configuration contains its own parameter list."}
@@ -83,5 +89,28 @@ function offlineEvidence(plan){
  return {mode:"offline_curated_source_cards",model_attempts:0,model_runs_completed:0,cards,
    notice:"Short excerpts inspected on the official pages on 2026-11-24; not a current retrieval, complete source, or model-generated answer. Review the original pages when connected.",device_tested:false};
 }
-return Object.freeze({parseCSV,importCSV,offlineEvidence});
+// A media recommendation is separate from a live answer, video analysis or
+// a newly generated video. The official page lists the assets below.
+function contextualMedia(plan,map){
+ const base={schema:"zebra-contextual-media/v1",assets:[],auto_load:false,video_playback_verified:false,model_calls:0};
+ if(!plan||!map||plan.state!=="ready_for_source_retrieval"||plan.product!=="datawedge"||plan.version!=="15.0"||
+    plan.explanation_intent!=="concept_overview"||map.kind!=="profile_learning")
+  return {...base,selection:"not_selected",reason:"No matched introductory source and explanation need. Avoid irrelevant or cross-edition media."};
+ const sourceOK=map.nodes.filter(n=>["input","process","output"].includes(n.id)).length===3&&
+  ["input","process","output"].every(id=>map.nodes.find(n=>n.id===id)?.evidence.some(e=>e.url===PROFILE_SOURCE&&e.quote));
+ if(!sourceOK)return {...base,selection:"not_selected",reason:"The matched source passages are not available."};
+ return {...base,selection:"official_media_and_interactive_concept",reason:"The question asks how the profile works. A visual explanation of the data path and the official introduction are relevant.",
+  assets:[
+   {kind:"diagram",title:"Official DataWedge Profile diagram",url:"https://techdocs.zebra.com/datawedge/15-0/guide/profiles/dw_profile.png",source_url:PROFILE_SOURCE,edition:"15.0",provenance:"official_documentation_image_inspected",checked:"2026-11-24"},
+   {kind:"video",title:"An introduction to DataWedge profiles",url:"https://www.youtube.com/watch?v=LCaPhWxk4y0",source_url:PROFILE_SOURCE,edition:"15.0",provenance:"video_embed_listed_on_official_documentation",checked:"2026-11-24",playback_verified:false,timecode_verified:false}
+  ],
+  checkpoint:{id:"profile_formatting",prompt:"Which stage optionally formats acquired data before delivery?",options:[{id:"input",label:"Input"},{id:"process",label:"Process"},{id:"output",label:"Output"}],
+   explanation:"The Process stage handles optional formatting; Input acquires data and Output delivers it.",evidence_node:"process"}
+ };
+}
+function checkUnderstanding(packet,choice){
+ if(packet?.selection!=="official_media_and_interactive_concept"||packet.checkpoint?.id!=="profile_formatting"||!packet.checkpoint.options.some(o=>o.id===choice))return null;
+ return {checkpoint_id:packet.checkpoint.id,choice,correct:choice==="process",feedback:choice==="process"?"Correct. "+packet.checkpoint.explanation:"Not quite. "+packet.checkpoint.explanation,scope:"single_optional_self_check_not_learning_outcome",device_tested:false};
+}
+return Object.freeze({parseCSV,importCSV,offlineEvidence,contextualMedia,checkUnderstanding});
 });
