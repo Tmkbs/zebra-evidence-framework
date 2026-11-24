@@ -28,3 +28,6 @@ jobs:
 
       - name: Interactive vision in actual Chromium (offline)
         run: npm run test:vision:browser
+
+      - name: Team reader visual companion (offline)
+        run: node analysis/test_team_visual_browser.cjs

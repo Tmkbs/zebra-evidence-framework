@@ -1,5 +1,9 @@
 # Zebra Evidence Framework — research workbench and classroom demo
 
+## Team reader integration — first real public case
+
+[Team visual companion](classroom/visual-companion.html?reader=dw62-intent-receiver) reuses the existing storyboard engine to explain the r61 DataWedge Intent Output report. It links back to the team document reader and forwards the historical question context into Ask & Guide without assuming an applicable version or official evidence. See [integration instructions](analysis/TEAM_VISUAL_INTEGRATION.md). The live private reader has not been modified.
+
 ## Contextual learning media — aligned with the original project
 
 See [Client-aligned visual scope](analysis/CLIENT_VISUAL_SCOPE.md). The same Ask & Guide now supports a DataWedge 15.0 Profiles concept lesson with an interactive data-path story, optional official diagram and officially listed introduction video, and an optional self-check. The selection is question/edition/evidence gated; remote media is never loaded automatically. This is a first implementation, not a confirmed customer approval, a new generated video, or measured learning improvement.

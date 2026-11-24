@@ -98,7 +98,7 @@ const harness=String.raw`
 </script>
 `;
 try{
- for(const file of ["guidance-planner.js","guidance-intake.js","guidance-visual.js","guidance-storyboard.js"])fs.copyFileSync(path.join(source,file),path.join(dir,file));
+ for(const file of ["guidance-planner.js","guidance-intake.js","guidance-visual.js","guidance-storyboard.js","guidance-team-bridge.js"])fs.copyFileSync(path.join(source,file),path.join(dir,file));
  const html=fs.readFileSync(path.join(source,"answer-guidance.html"),"utf8")
   .replace('<script src="guidance-planner.js">','<script>window.__visionFetches=0;window.fetch=()=>{window.__visionFetches++;throw Error("Unexpected network fetch")};</script><script src="guidance-planner.js">')
   .replace("</body>",harness+"</body>");
