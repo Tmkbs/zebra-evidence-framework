@@ -65,7 +65,7 @@ function routeSources(question,product,version){
 function policySelection(q,context){
  const s=q+" "+context;
  const ids=[];
- const versionSensitive=/\b(after (?:a |the )?update|after updating|since (?:the )?update|after (?:an )?upgrade|after upgrading|upgrade(?:d)?|version(?:s)?|compatib(?:ility|le)|deprecated|across releases|between releases|changed in (?:version )?\d)\b/i.test(s);
+ const versionSensitive=/\b(after (?:(?:a|an|the) )?update|after updating|since (?:the )?update|after (?:an )?upgrade|after upgrading|upgrade(?:d)?|version(?:s)?|compatib(?:ility|le)|deprecated|across releases|between releases|changed in (?:version )?\d)\b/i.test(s);
  const failure=/\b(fail(?:ed|ure|s|ing)?|error|not working|does not work|doesn't work|no longer|not received|cannot|can't|won't|stopped|not responding|does not start|won't start|problem|issue)\b/i.test(s);
  const device=/\b(device|scanner|scan|barcode|app|application|profile|trigger|broadcast|receiver|runtime|android|firmware)\b/i.test(s);
  if(versionSensitive)ids.push("version_boundary");
