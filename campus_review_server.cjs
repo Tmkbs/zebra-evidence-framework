@@ -120,9 +120,8 @@ function buildServer(cfg,request=fetch){
   if(route==="/api/answer-guidance"){
    if(req.method!=="POST")return json(res,405,{ok:false,error:"POST required"});
    if(!sameOriginRequest(req,cfg))return json(res,403,{ok:false,error:"Same-origin local guidance only"});
-   const supplied=String(req.headers["x-review-access"]||"");
-   if(!cfg.passcode||supplied.length!==cfg.passcode.length||
-      !crypto.timingSafeEqual(Buffer.from(supplied),Buffer.from(cfg.passcode)))
+   const supplied=Buffer.from(String(req.headers["x-review-access"]||"")),expected=Buffer.from(String(cfg.passcode||""));
+   if(!expected.length||supplied.length!==expected.length||!crypto.timingSafeEqual(supplied,expected))
     return json(res,401,{ok:false,error:"Local session required"});
    let input;
    try{input=JSON.parse(await readBody(req,12000))}catch{return json(res,400,{ok:false,error:"Invalid JSON or request too large"})}
