@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>TechDocs · Visual companion</title>
+<style>
+:root{font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#18343e;background:#f3f6f6}*{box-sizing:border-box}body{margin:0}main{max-width:1050px;margin:auto;padding:18px}h1{font-size:25px;line-height:1.2;letter-spacing:-.025em;margin:7px 0 10px}h3{font-size:15px;margin:8px 0}p{margin:7px 0}a{color:#076969;text-underline-offset:3px}button,input{font:inherit}button{padding:8px 12px;border:1px solid #b8cecc;border-radius:7px;color:#0d5551;background:white;cursor:pointer;font-weight:650}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #8dc9bf;outline-offset:2px}button:disabled{cursor:default;opacity:.5}button[aria-pressed=true]{border-color:#168378;background:#e2f2ec}.muted{font-size:12px;color:#526671}.vision-kicker{font-size:10px;font-weight:750;letter-spacing:.1em;color:#467075;text-transform:uppercase}.vision-foot{font-size:11px;color:#60737b}blockquote{margin:6px 0;white-space:pre-wrap;overflow-wrap:anywhere}.box{padding:14px;border:1px solid #dce5e5;background:white;border-radius:10px;margin:12px 0}.actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:10px 0}.boundary{border-left:3px solid #bf9656;background:#fff8eb;padding:11px 13px;border-radius:6px;color:#624a2c}.nav{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px}.nav a{font-weight:650}.check-result{min-height:20px;color:#315b54}.status{font-size:12px;color:#526671}footer{font-size:11px;color:#526671;margin-top:12px}.story-player{margin-top:14px}
+/* Illustrated visual walkthrough: a single compact, source-linked player. */
+.story-player{padding:14px;background:#f5f8f8;border:1px solid #d9e5e5;border-radius:12px;margin:0 0 19px}
+.story-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:0 1px 9px}
+.story-heading strong{font-size:15px;color:#25444a}.story-scene{background:#fff;border-radius:10px;overflow:hidden}.story-scene svg{display:block;width:100%;height:auto;max-height:330px}
+.story-scene g[role=button]{cursor:pointer}.story-scene g[role=button]:focus-visible{outline:3px solid #168378;outline-offset:2px}
+.story-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:10px 0 7px}.story-controls button{padding:7px 11px;font-size:12px}.story-controls button[data-story-action=play]{background:#126e64;color:#fff;min-width:66px}.story-controls button:disabled{opacity:.45}.story-controls input[type=range]{flex:1;min-width:80px;accent-color:#08796d;cursor:pointer}
+.story-rail{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}.story-step{font-size:11px;padding:5px 8px;background:white;border-color:#d6e2e2}.story-step[aria-pressed=true]{background:#e5f3ee;color:#08796d;border-color:#8cbfb1}
+.story-info{background:#fff;border-radius:9px;padding:12px}.story-info h3{margin:4px 0}.story-info p{margin:5px 0}.story-source{display:grid;gap:6px;margin-top:8px}.story-evidence{padding:8px 10px;border-left:2px solid #8cbab6;background:#f6faf9;overflow-wrap:anywhere}.story-evidence blockquote{margin:5px 0;font-size:13px}.story-evidence span,.story-evidence a{font-size:11px;display:inline-block;margin:3px 12px 0 0}.story-info .vision-foot{margin-top:8px}
+@media(max-width:700px){.story-player{padding:9px}.story-step{font-size:10px}.story-info{padding:10px}.story-scene svg{min-height:155px}}
+
+@media(min-width:901px){
+ .story-player:not([hidden]){display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);grid-template-areas:"heading heading" "scene info" "controls info" "rail info";gap:8px 14px;align-items:start}
+ .story-heading{grid-area:heading;padding-bottom:1px}.story-scene{grid-area:scene}.story-controls{grid-area:controls;margin:0}.story-rail{grid-area:rail;margin:0}.story-info{grid-area:info;align-self:stretch}
+}
+
+
+@media(max-width:500px){main{padding:10px}h1{font-size:22px}.story-player{padding:8px}.story-step{font-size:10px}.box{padding:11px}}
+</style></head>
+<body><main>
+<div class="vision-kicker">TECHDOCS · VISUAL COMPANION</div>
+<h1 id="title">Understand the reported behavior</h1><p id="scope" class="muted"></p>
+<nav id="nav" class="nav" aria-label="Case and answer links" hidden><a id="reader" target="_blank" rel="noopener noreferrer">Open team document reader ↗</a><a id="ask" target="_blank" rel="noopener noreferrer">Continue in Ask &amp; Guide ↗</a><a id="archive" target="_blank" rel="noopener noreferrer">Original archived report ↗</a></nav>
+<div id="error" class="boundary" hidden role="status"></div>
+<div id="player" class="story-player" hidden></div>
+<section id="check" class="box" hidden><div class="vision-kicker">CONCEPT CHECK</div><h3>Does receiving an ADB test broadcast establish that the DataWedge scan-delivery path works?</h3><div id="choices" class="actions"><button type="button" data-choice="yes" aria-pressed="false">Yes</button><button type="button" data-choice="no" aria-pressed="false">No</button><button type="button" data-choice="unknown" aria-pressed="false">Not sure</button></div><p id="feedback" class="check-result" role="status"></p><p class="muted">Optional self-check; not a measured user study.</p></section>
+<div id="boundary" class="boundary" hidden>Historical user-reported observations, not a verified device failure or fix. The r61 review note is a secondary summary, not official technical evidence. Check the applicable official documentation before giving a specific configuration instruction.</div>
+<div id="exportRow" class="actions" hidden><button type="button" id="download">Export visual handoff</button><span class="status">No model or device call. No remote image/video loaded.</span></div>
+<footer>Reusable explanation component. The team's existing case table and document reader remain the source of case identity and editorial review.</footer>
+</main><script src="guidance-team-bridge.js"></script><script src="guidance-storyboard.js"></script><script>
+"use strict";
+const $=id=>document.getElementById(id);
+let record=null;
+function openCompanion(){
+ const api=window.ZebraTeamVisual,story=window.ZebraStoryboard;
+ if(!api||!story){$("error").hidden=false;$("error").textContent="Visual modules unavailable.";return}
+ const key=location.search?api.keyFromSearch(location.search):api.defaultReader;
+ const item=api.get(key);
+ if(!item){$("error").hidden=false;$("error").textContent="No reviewed visual companion is mapped to this reader key. Return to the team document reader; no technical visual was generated.";return}
+ const map=api.graph(key);
+ record={schema:"zebra-team-companion-result/v1",reader_key:key,source:api.handoff(key),visual_guidance:map,visual_storyboard:story.build(map),self_check:null,model_calls:0,device_tested:false};
+ $("title").textContent=item.title;$("scope").textContent="Public forum report · DataWedge "+item.reported_version+" (self-reported) · team article edition "+item.reader_document_edition+" · "+item.release+" review";
+ $("reader").href=item.reader_url;$("ask").href="answer-guidance.html?reader="+encodeURIComponent(key);$("archive").href=item.archive_url;
+ for(const id of ["nav","player","check","boundary","exportRow"])$(id).hidden=false;
+ const controller=story.mount($("player"));controller.update(map);
+ window.addEventListener("pagehide",()=>controller.destroy(),{once:true});
+ for(const b of $("choices").querySelectorAll("button"))b.addEventListener("click",()=>{
+  record.self_check=api.checkpoint(key,b.dataset.choice);$("feedback").textContent=record.self_check.feedback;
+  for(const option of $("choices").querySelectorAll("button"))option.setAttribute("aria-pressed",String(option===b));
+ });
+ $("download").addEventListener("click",()=>{const blob=new Blob([JSON.stringify(record,null,2)+"\n"],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="zebra-visual-"+key+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+}
+openCompanion();
+</script></body></html>
