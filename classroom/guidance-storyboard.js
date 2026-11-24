@@ -30,7 +30,7 @@ function clampIndex(story,index){
 function createSVG(doc,map,story,index,onSelect=()=>{}){
  const c=themes,frame=story.frames[clampIndex(story,index)],by=new Map(map.nodes.map(n=>[n.id,n]));
  const element=(tag,attrs={},value)=>{const n=doc.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,String(v));if(value!==undefined)n.textContent=String(value);return n};
- const svg=element("svg",{viewBox:"0 0 640 292",role:"group","aria-label":story.title+" — "+frame.title,xmlns:NS});
+ const svg=element("svg",{viewBox:"0 0 640 292",role:"group","aria-label":story.title+" — "+frame.title});
  svg.append(element("title",{},story.title),element("desc",{},"Conceptual visual explanation. Select an illustrated component to inspect its source and explanation. No live device operation."));
  const rect=(p,x,y,w,h,fill=c.paper,stroke=c.line,rx=12,sw=1.5)=>{const v=element("rect",{x,y,width:w,height:h,rx,fill,stroke,"stroke-width":sw});p.append(v);return v};
  const line=(p,x1,y1,x2,y2,stroke=c.line,sw=2,dash="")=>{const v=element("line",{x1,y1,x2,y2,stroke,"stroke-width":sw,"stroke-linecap":"round",...(dash?{"stroke-dasharray":dash}:{})});p.append(v);return v};
@@ -215,9 +215,162 @@ function createSVG(doc,map,story,index,onSelect=()=>{}){
  }
  return svg;
 }
+
+/* Local, silent short-video export. The same source-linked SVG scenes used
+ * by the interactive guide are rasterized to a canvas, captioned, and
+ * encoded using the browser's own MediaRecorder. No remote asset, model,
+ * speech service, capture permission, or paid API is involved.
+ */
+const CLIP_KINDS=new Set(["scan_prerequisite","result_discrepancy","configuration_hierarchy","profile_learning","reported_path_comparison"]);
+function videoPlan(map){
+ if(!map||!CLIP_KINDS.has(map.kind))return null;
+ const story=build(map);
+ if(!story.frames.some(f=>f.evidence.some(e=>typeof e.quote==="string"&&e.quote.length>0)))return null;
+ const frames=story.frames.map(f=>{
+  const caption=String(f.caption||"").trim();
+  if(!caption||caption.length>520)throw Error("A short, complete scene caption is required");
+  const words=caption.split(/\s+/).length;
+  return {...f,caption,duration_ms:Math.max(5500,Math.min(10500,Math.ceil(words/3.2)*1000+1000))};
+ });
+ return {schema:"zebra-contextual-clip/v1",kind:story.kind,scene:story.scene,title:story.title,frames,
+  total_duration_ms:frames.reduce((n,f)=>n+f.duration_ms,0),
+  representation:"silent_captioned_conceptual_explainer",device_recording:false,device_tested:false,model_generated:false,
+  source_links:[...new Set(frames.flatMap(f=>f.evidence.map(e=>e.url).filter(Boolean)))],
+  scope:"Rendered from the reviewed visual guide; not a device reproduction or an independently validated answer."};
+}
+function videoSupport(doc){
+ const win=doc?.defaultView;
+ const canvas=doc?.createElement?.("canvas");
+ if(!win?.MediaRecorder||!canvas||typeof canvas.captureStream!=="function"||!win.URL?.createObjectURL||!win.XMLSerializer)return "";
+ return ["video/webm;codecs=vp8","video/webm;codecs=vp9","video/webm"].find(m=>win.MediaRecorder.isTypeSupported(m))||"";
+}
+function wrapCaption(ctx,value,width){
+ const lines=[];let line="";
+ for(const word of String(value||"").split(/\s+/).filter(Boolean)){
+  // Avoid invisible truncation of long identifiers or a source caption.
+  if(ctx.measureText(word).width>width)throw Error("Caption contains an overlong unbroken token");
+  const next=line?line+" "+word:word;
+  if(line&&ctx.measureText(next).width>width){lines.push(line);line=word}
+  else line=next;
+ }
+ if(line)lines.push(line);return lines;
+}
+function fitText(ctx,value,width,maxLines,maxSize,minSize,weight=500){
+ for(let size=maxSize;size>=minSize;size--){
+  ctx.font=weight+" "+size+"px system-ui, sans-serif";
+  let lines;try{lines=wrapCaption(ctx,value,width)}catch{continue}
+  if(lines.length<=maxLines)return {size,lines};
+ }
+ throw Error("Caption cannot fit without losing content");
+}
+function drawLines(ctx,block,x,y,spacing){for(let i=0;i<block.lines.length;i++)ctx.fillText(block.lines[i],x,y+i*spacing)}
+function sourceLabel(frame){
+ const kinds=new Set(frame.evidence.map(e=>e.origin));
+ const labels=[];
+ if(kinds.has("public_forum_report"))labels.push("Archived public self-report");
+ if(kinds.has("team_release_note"))labels.push("Team release summary (not official evidence)");
+ if(kinds.has("retrieved_excerpt"))labels.push("Retrieved official excerpt");
+ if(kinds.has("checked_source_card"))labels.push("Checked official source card");
+ if(kinds.has("selected_link"))labels.push("Selected source link (not inspected)");
+ const scopes=new Set();
+ for(const e of frame.evidence){try{const u=new URL(e.url),p=u.pathname.split("/").filter(Boolean);if(u.hostname==="techdocs.zebra.com"&&p[0]&&/^\d+(?:-\d+)+$/.test(p[1]||""))scopes.add(p[0]+" "+p[1].replaceAll("-","."))}catch{}}
+ return labels.length?labels.join(" / ")+(scopes.size?" · "+[...scopes].join(", "):""):"Conceptual transition; no additional source claim";
+}
+function clipCanvas(doc,map,plan,images){
+ const canvas=doc.createElement("canvas");canvas.width=1280;canvas.height=720;
+ const ctx=canvas.getContext("2d",{alpha:false});if(!ctx)throw Error("Canvas rendering unavailable");
+ const heading=fitText(ctx,"TECHDOCS / "+plan.title,1030,1,17,12,700);
+ const titles=plan.frames.map(f=>fitText(ctx,f.title,1168,1,34,22,700));
+ const captions=plan.frames.map(f=>fitText(ctx,f.caption,1168,4,27,20,500));
+ function draw(index,fraction){
+  const frame=plan.frames[index],caption=captions[index];
+  ctx.fillStyle="#f4f8f8";ctx.fillRect(0,0,1280,720);
+  ctx.fillStyle="#176b64";ctx.font="700 "+heading.size+"px system-ui, sans-serif";drawLines(ctx,heading,54,35,20);
+  ctx.fillStyle="#17393f";ctx.font="700 "+titles[index].size+"px system-ui, sans-serif";drawLines(ctx,titles[index],54,76,38);
+  ctx.fillStyle="#526671";ctx.font="600 19px system-ui, sans-serif";ctx.textAlign="right";ctx.fillText((index+1)+" / "+plan.frames.length,1226,35);ctx.textAlign="left";
+  ctx.fillStyle="#ffffff";ctx.fillRect(184,94,912,418);
+  ctx.drawImage(images[index],184,94,912,416);
+  ctx.fillStyle="#17393f";ctx.font="500 "+caption.size+"px system-ui, sans-serif";
+  drawLines(ctx,caption,54,548,caption.size+5);
+  ctx.fillStyle="#526671";ctx.font="600 17px system-ui, sans-serif";
+  ctx.fillText(sourceLabel(frame),54,678);
+  ctx.textAlign="right";ctx.fillText("Conceptual illustration · not a device recording",1226,700);ctx.textAlign="left";
+  ctx.fillStyle="#d2e3e2";ctx.fillRect(0,713,1280,7);ctx.fillStyle="#08796d";
+  ctx.fillRect(0,713,1280*(index+Math.max(0,Math.min(1,fraction)))/plan.frames.length,7);
+ }
+ return {canvas,draw};
+}
+function cancelled(signal){if(signal?.aborted)throw new Error("Video generation cancelled")}
+async function svgImage(doc,svg,signal){
+ const win=doc.defaultView,serialized=new win.XMLSerializer().serializeToString(svg);
+ const url=win.URL.createObjectURL(new win.Blob([serialized],{type:"image/svg+xml;charset=utf-8"}));
+ try{
+  cancelled(signal);
+  return await new Promise((resolve,reject)=>{
+   const image=new win.Image();
+   let done=false,timer;
+   const finish=(err)=>{if(done)return;done=true;win.clearTimeout(timer);signal?.removeEventListener("abort",abort);image.onload=null;image.onerror=null;err?reject(err):resolve(image)};
+   const abort=()=>finish(Error("Video generation cancelled"));
+   image.onload=()=>finish();image.onerror=()=>finish(Error("Unable to rasterize visual scene"));
+   timer=win.setTimeout(()=>finish(Error("Visual scene rasterization timed out")),5000);
+   signal?.addEventListener("abort",abort,{once:true});image.src=url;
+  });
+ }finally{win.URL.revokeObjectURL(url)}
+}
+async function renderClip(map,{doc,signal,onProgress=()=>{},frameMs}={}){
+ if(!doc?.defaultView)throw Error("Video encoding requires a browser document");
+ const win=doc.defaultView,mime=videoSupport(doc),plan=videoPlan(map);
+ if(!plan)throw Error("No reviewed contextual visual is available for video export");
+ if(!mime)throw Error("This browser cannot encode a local WebM video");
+ if(frameMs!==undefined&&(!Number.isFinite(frameMs)||frameMs<300||frameMs>11000))throw Error("Invalid frame duration");
+ const durations=plan.frames.map(f=>frameMs??f.duration_ms),total=durations.reduce((n,d)=>n+d,0);
+ if(total>60000)throw Error("Video exceeds the one-minute limit");
+ const story=build(map),images=[];
+ let stream=null,recorder=null,recorderError=null,stopResolve=null,stopWait=null;
+ const chunks=[];
+ const delay=ms=>new Promise(resolve=>win.setTimeout(resolve,ms));
+ try{
+  for(let i=0;i<story.frames.length;i++){cancelled(signal);images.push(await svgImage(doc,createSVG(doc,map,story,i),signal))}
+  cancelled(signal);
+  const {canvas,draw}=clipCanvas(doc,map,plan,images);
+  draw(0,0);
+  stream=canvas.captureStream(12);
+  recorder=new win.MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:1500000});
+  stopWait=new Promise(resolve=>{stopResolve=resolve});
+  recorder.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};
+  recorder.onerror=e=>{recorderError=e.error||Error("Browser video encoding failed");stopResolve()};
+  recorder.onstop=()=>stopResolve();
+  recorder.start(500);
+  let elapsed=0;
+  for(let i=0;i<durations.length;i++){
+   const start=win.performance.now(),duration=durations[i];
+   do{
+    cancelled(signal);if(recorderError)throw recorderError;
+    const t=Math.min(duration,win.performance.now()-start);
+    draw(i,t/duration);onProgress(Math.min(1,(elapsed+t)/total));
+    if(t>=duration)break;
+    await delay(Math.min(80,Math.max(1,duration-t)));
+   }while(true);
+   elapsed+=duration;
+  }
+  cancelled(signal);
+  if(recorder.state!=="inactive")recorder.stop();
+  let stopTimer;try{await Promise.race([stopWait,new Promise((_,reject)=>{stopTimer=win.setTimeout(()=>reject(Error("Video encoder stop timed out")),5000)})])}finally{win.clearTimeout(stopTimer)}
+  if(recorderError)throw recorderError;cancelled(signal);
+  const blob=new win.Blob(chunks,{type:recorder.mimeType.split(";")[0]||"video/webm"});
+  if(blob.size<256)throw Error("Browser returned an empty or incomplete video");
+  onProgress(1);
+  return {blob,receipt:{...plan,frames:plan.frames.map((f,i)=>({...f,duration_ms:durations[i]})),total_duration_ms:total,
+   video_file:true,mime_type:blob.type,bytes:blob.size,encoded_locally:true,model_calls:0,remote_media_loaded:false}};
+ }finally{
+  if(recorder&&recorder.state!=="inactive"){try{recorder.stop()}catch{}}
+  stream?.getTracks().forEach(t=>t.stop());
+ }
+}
+
 function mount(container,{onStep=()=>{}}={}){
  const doc=container.ownerDocument||document;
- let map=null,story=null,index=0,timer=null,playing=false,destroyed=false;
+ let map=null,story=null,index=0,timer=null,playing=false,destroyed=false,videoJob=null,videoURL="",receiptURL="",videoKey="",videoReceipt=null;
  const el=(tag,value="",cls="")=>{const e=doc.createElement(tag);e.textContent=String(value);if(cls)e.className=cls;return e};
  const top=el("div","","story-heading"),scene=el("div","","story-scene"),info=el("div","","story-info"),controls=el("div","","story-controls"),rail=el("div","","story-rail");
  const title=el("strong","Visual walkthrough"),counter=el("span","","muted");
@@ -227,7 +380,55 @@ function mount(container,{onStep=()=>{}}={}){
  prev.dataset.storyAction="prev";play.dataset.storyAction="play";next.dataset.storyAction="next";
  seek.dataset.storySeek="true";
  controls.append(prev,play,next,seek);
- container.replaceChildren(top,scene,controls,rail,info);
+ const videoBox=el("section","","story-video");videoBox.hidden=true;
+ const videoTitle=el("strong","Short explainer video"),videoNote=el("p","","muted");
+ const videoActions=el("div","","story-video-actions"),videoButton=el("button","Create short video"),cancelButton=el("button","Cancel"),videoStatus=el("p","","muted"),videoOutput=el("div","","story-video-output");
+ videoButton.type="button";videoButton.dataset.storyVideo="create";cancelButton.type="button";cancelButton.dataset.storyVideo="cancel";cancelButton.hidden=true;
+ videoStatus.setAttribute("role","status");
+ videoActions.append(videoButton,cancelButton);videoBox.append(videoTitle,videoNote,videoActions,videoStatus,videoOutput);
+ container.replaceChildren(top,scene,controls,rail,info,videoBox);
+ function clearVideo(){
+  if(videoJob){videoJob.abort();videoJob=null}
+  const old=videoOutput.querySelector("video");if(old){old.pause();old.removeAttribute("src")}
+  videoOutput.replaceChildren();
+  const win=doc.defaultView;
+  if(videoURL)win.URL.revokeObjectURL(videoURL);if(receiptURL)win.URL.revokeObjectURL(receiptURL);
+  videoURL="";receiptURL="";videoReceipt=null;videoStatus.textContent="";cancelButton.hidden=true;
+ }
+ function configureVideo(nextMap){
+  const key=JSON.stringify(nextMap);
+  if(key!==videoKey){clearVideo();videoKey=key}
+  let plan;try{plan=videoPlan(nextMap)}catch{plan=null}
+  videoBox.hidden=!plan;if(!plan)return;
+  const canEncode=videoSupport(doc);
+  videoButton.disabled=!canEncode||!!videoJob;
+  videoNote.textContent=canEncode?"Create a "+Math.round(plan.total_duration_ms/1000)+"-second silent, captioned WebM from this explanation. Keep this tab visible during local encoding. No camera, network, or model is used. Review before sharing.":"This browser does not support local WebM encoding. The interactive explanation remains available.";
+ }
+ videoButton.addEventListener("click",async()=>{
+  if(destroyed||!map||videoJob)return;
+  clearVideo();pause();
+  const win=doc.defaultView,job=new win.AbortController(),currentMap=map;
+  videoJob=job;videoButton.disabled=true;cancelButton.hidden=false;videoStatus.textContent="Preparing the current visual explanation…";
+  let progress=-1;
+  try{
+   const result=await renderClip(currentMap,{doc,signal:job.signal,onProgress:f=>{
+    if(videoJob!==job||destroyed)return;
+    const value=Math.min(100,Math.floor(f*20)*5);
+    if(value!==progress){progress=value;videoStatus.textContent="Encoding locally: "+value+"%"}
+   }});
+   if(videoJob!==job||destroyed||job.signal.aborted)return;
+   videoReceipt=result.receipt;
+   videoURL=win.URL.createObjectURL(result.blob);
+   receiptURL=win.URL.createObjectURL(new win.Blob([JSON.stringify(result.receipt,null,2)+"\n"],{type:"application/json"}));
+   const player=el("video");player.controls=true;player.playsInline=true;player.preload="metadata";player.src=videoURL;player.setAttribute("aria-label","Locally generated conceptual explainer");
+   const links=el("div","","story-video-actions"),download=el("a","Download WebM"),receipt=el("a","Download source receipt");
+   download.href=videoURL;download.download="zebra-"+currentMap.kind+".webm";receipt.href=receiptURL;receipt.download="zebra-"+currentMap.kind+"-video-sources.json";
+   links.append(download,receipt);videoOutput.append(player,links);
+   videoStatus.textContent="Video encoded locally ("+Math.ceil(result.blob.size/1024)+" KB). Preview and review before sharing.";
+  }catch(e){if(videoJob===job&&!destroyed)videoStatus.textContent=job.signal.aborted?"Video generation cancelled.":String(e.message||e).slice(0,200)}
+  finally{if(videoJob===job){videoJob=null;cancelButton.hidden=true;videoButton.disabled=!videoSupport(doc)}}
+ });
+ cancelButton.addEventListener("click",()=>{if(videoJob)videoJob.abort()});
  function cancel(){if(timer!==null){clearTimeout(timer);timer=null}}
  function pause(){cancel();playing=false;play.textContent="Play";play.setAttribute("aria-pressed","false")}
  function schedule(){
@@ -282,14 +483,14 @@ function mount(container,{onStep=()=>{}}={}){
   if(index===story.frames.length-1)select(0,false);
   playing=true;play.textContent="Pause";play.setAttribute("aria-pressed","true");schedule();
  });
- const hidden=()=>{if(doc.hidden)pause()};
+ const hidden=()=>{if(doc.hidden){pause();if(videoJob)videoJob.abort()}};
  doc.addEventListener("visibilitychange",hidden);
  return {
   update(nextMap,{focus=""}={}){
    if(destroyed)return;
    const previous=story,previousId=story?.frames[index]?.id;
    const previousState=map?JSON.stringify(map.state):"";
-   map=nextMap;story=build(map);
+   map=nextMap;story=build(map);configureVideo(map);
    const changed=!previous||previous.kind!==story.kind||previousState!==JSON.stringify(map.state);
    if(changed||focus)pause();
    let requested=focus||(!previous||previous.kind!==story.kind?"":changed?map.next.id:previousId);
@@ -297,9 +498,9 @@ function mount(container,{onStep=()=>{}}={}){
    index=found<0?0:found;draw();
    if(playing)schedule();
   },
-  destroy(){destroyed=true;pause();doc.removeEventListener("visibilitychange",hidden);container.replaceChildren()},
-  snapshot(){return story?{story,index,playing}:null}
+  destroy(){destroyed=true;pause();clearVideo();doc.removeEventListener("visibilitychange",hidden);container.replaceChildren()},
+  snapshot(){return story?{story,index,playing,video_receipt:videoReceipt}:null}
  };
 }
-return Object.freeze({build,clampIndex,createSVG,mount});
+return Object.freeze({build,clampIndex,createSVG,mount,videoPlan,videoSupport,renderClip});
 });

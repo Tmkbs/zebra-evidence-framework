@@ -19,6 +19,9 @@
 
 
 @media(max-width:500px){main{padding:10px}h1{font-size:22px}.story-player{padding:8px}.story-step{font-size:10px}.box{padding:11px}}
+
+/* Explicitly requested, browser-local video export; never auto-play. */
+.story-video{grid-column:1/-1;min-width:0;border-top:1px solid #d9e5e5;padding:12px 2px 2px;margin-top:5px}.story-video[hidden]{display:none}.story-video strong{font-size:14px;color:#25444a}.story-video p{margin:5px 0}.story-video-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:7px 0}.story-video-actions button,.story-video-actions a{font-size:12px}.story-video-actions button[hidden]{display:none}.story-video-output video{display:block;width:100%;max-width:780px;height:auto;background:#17393f;border-radius:8px;margin:8px 0}.story-video-output a{overflow-wrap:anywhere}
 </style></head>
 <body><main>
 <div class="vision-kicker">TECHDOCS · VISUAL COMPANION</div>
@@ -28,7 +31,7 @@
 <div id="player" class="story-player" hidden></div>
 <section id="check" class="box" hidden><div class="vision-kicker">CONCEPT CHECK</div><h3>Does receiving an ADB test broadcast establish that the DataWedge scan-delivery path works?</h3><div id="choices" class="actions"><button type="button" data-choice="yes" aria-pressed="false">Yes</button><button type="button" data-choice="no" aria-pressed="false">No</button><button type="button" data-choice="unknown" aria-pressed="false">Not sure</button></div><p id="feedback" class="check-result" role="status"></p><p class="muted">Optional self-check; not a measured user study.</p></section>
 <div id="boundary" class="boundary" hidden>Historical user-reported observations, not a verified device failure or fix. The r61 review note is a secondary summary, not official technical evidence. Check the applicable official documentation before giving a specific configuration instruction.</div>
-<div id="exportRow" class="actions" hidden><button type="button" id="download">Export visual handoff</button><span class="status">No model or device call. No remote image/video loaded.</span></div>
+<div id="exportRow" class="actions" hidden><button type="button" id="download">Export visual handoff</button><span class="status">No model or device call. No remote image/video loaded; optional video encoding is local.</span></div>
 <footer>Reusable explanation component. The team's existing case table and document reader remain the source of case identity and editorial review.</footer>
 </main><script src="guidance-team-bridge.js"></script><script src="guidance-storyboard.js"></script><script>
 "use strict";

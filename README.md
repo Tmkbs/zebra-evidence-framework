@@ -1,5 +1,9 @@
 # Zebra Evidence Framework — research workbench and classroom demo
 
+## Contextual short-video generation
+
+The existing visual player can render a reviewed explanation into a silent, captioned WebM locally in a supported browser. It reuses the current question-specific SVG scenes, preserves source provenance, and supplies a preview and downloadable source receipt. No paid API, external media load, or device recording. Unknown topics do not get invented technical videos. See [the video workflow](analysis/CONTEXTUAL_VIDEO.md).
+
 ## Team reader integration — first real public case
 
 [Team visual companion](classroom/visual-companion.html?reader=dw62-intent-receiver) reuses the existing storyboard engine to explain the r61 DataWedge Intent Output report. It links back to the team document reader and forwards the historical question context into Ask & Guide without assuming an applicable version or official evidence. See [integration instructions](analysis/TEAM_VISUAL_INTEGRATION.md). The live private reader has not been modified.
