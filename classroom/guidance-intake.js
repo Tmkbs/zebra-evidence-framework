@@ -64,6 +64,10 @@ function importCSV(s){
  return {schema:"zebra-public-question-intake/v1",rows:out,skipped_rows:skipped,total_input_rows:rows.length,question_column:map.question<0?null:headers[map.question],eligible_for_evaluation:0};
 }
 const CARDS=Object.freeze([
+ {url:"https://techdocs.zebra.com/datawedge/15-0/guide/api/setconfig/",product:"datawedge",version:"15.0",title:"Set Config",checked:"2026-11-24",sections:[
+  {section:"MAIN BUNDLE",quote:"A bundle array (nested within the main bundle)",note:"The main configuration contains the plugin configuration array."},
+  {section:"PLUGIN_CONFIG BUNDLE",quote:"A parameter list bundle nested within the PLUGIN_CONFIG bundle",note:"A plugin configuration contains its own parameter list."}
+ ],next:"Keep the main configuration, plugin configuration, and plugin parameters at their documented levels. Confirm plugin names, applicable parameter tables, and actual device behavior separately."},
  {url:"https://techdocs.zebra.com/datawedge/6-8/guide/api/resultinfo/",product:"datawedge",version:"6.8",title:"Intent Result Codes",checked:"2026-11-24",sections:[
   {section:"Overview",quote:"intent extras RECEIVE_RESULT and COMMAND_IDENTIFIER",note:"The overview names RECEIVE_RESULT."},
   {section:"Function Prototype",quote:'i.putExtra("SEND_RESULT","true");',note:"The code instead uses SEND_RESULT."}

@@ -11,6 +11,7 @@
 "use strict";
 const SCAN="https://techdocs.zebra.com/datawedge/6-8/guide/api/softscantrigger/";
 const RESULT="https://techdocs.zebra.com/datawedge/6-8/guide/api/resultinfo/";
+const CONFIG="https://techdocs.zebra.com/datawedge/15-0/guide/api/setconfig/";
 const SCAN_PROFILE="Functional only when Barcode Input is enabled in the active Profile.";
 const SCAN_BUSY="commands might be ignored if the scanner is busy";
 const RESULT_PROSE="intent extras RECEIVE_RESULT and COMMAND_IDENTIFIER";
@@ -26,8 +27,8 @@ function normalizeState(state={}){
 function articleURL(value){
  try{const u=new URL(value);u.hash="";return u.href}catch{return ""}
 }
-function chooseEvidence(plan,result,url,definitions){
- if(!plan||plan.state!=="ready_for_source_retrieval"||plan.product!=="datawedge"||plan.version!=="6.8"||
+function chooseEvidence(plan,result,url,definitions,version="6.8"){
+ if(!plan||plan.state!=="ready_for_source_retrieval"||plan.product!=="datawedge"||plan.version!==version||
     !(plan.source_urls||[]).some(s=>articleURL(s)===url))return null;
  // A new retrieved excerpt takes precedence. Never silently represent an
  // older curated card as current evidence when a live excerpt lacks it.
@@ -71,12 +72,25 @@ function graph(plan,result={},inputState={}){
   {section:"Overview",quote:RESULT_PROSE},
   {section:"Function Prototype",quote:RESULT_CODE}
  ]):null;
+ const configRelevant=/\b(?:set[_ ]?config|plugin_config|param_list|nested bundles?)\b/i.test(plan.question);
+ const config=configRelevant?chooseEvidence(plan,result,CONFIG,[
+  {section:"MAIN BUNDLE",quote:"A bundle array (nested within the main bundle)"},
+  {section:"PLUGIN_CONFIG BUNDLE",quote:"A parameter list bundle nested within the PLUGIN_CONFIG bundle"}
+ ],"15.0"):null;
  // Two independently applicable maps are not merged into an invented
  // dependency. Ask for a single focus if both topics were selected.
  if(scan&&codes){
   return make("scope_required","Choose a focus","Two supported topics match. Split them into separate questions instead of joining unrelated evidence.",
    [["question"],["scope"],["next"]],{id:"scope",text:"Choose either scan-trigger prerequisites or result-code naming."},
    [genericStart,node("scope","Two topics","Narrow the request","check","Separate the scan trigger from result-code naming before using a visual template."),node("next","Inspect the selected source","Pending scope","waiting","No combined device behavior is inferred.")]);
+ }
+ if(config){
+  return make("configuration_hierarchy","SET_CONFIG — nested bundle structure","Inspect the containment relationships in DataWedge 15.0. This is a structural explanation, not executable configuration or a claim that a device accepted it.",
+   [["main"],["plugin"],["params"],["boundary"]],{id:"params",text:"Place each parameter list inside its own plugin configuration; check the selected plugin's parameter table and verify on the target build."},
+   [node("main","Main configuration","SET_CONFIG","source","The main bundle contains the plugin configuration array.",[config[0]]),
+    node("plugin","Plugin configuration","PLUGIN_CONFIG","source","Each plugin configuration describes its own settings and contains its corresponding parameter list.",config),
+    node("params","Parameter list","PARAM_LIST","source","The parameter list is inside the plugin configuration, not a peer of it at the top level.",[config[1]]),
+    node("boundary","Validation boundary","No device execution","check","The hierarchy only explains documented containment. It does not verify parameter names, values, or the behavior of an actual device.")]);
  }
  if(scan){
   let next;
