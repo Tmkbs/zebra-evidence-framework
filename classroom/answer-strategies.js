@@ -41,6 +41,13 @@ function normalizeSource(s){
  const text=[String(s?.text||s?.excerpt||""),...sections.flatMap(x=>[x.section,x.quote,x.note])].filter(Boolean).join("\n");
  return {id:String(s?.id||s?.evidence_id||s?.url||"unknown"),url:typeof s?.url==="string"?s.url:"",title:String(s?.title||""),sections,text};
 }
+function sourceMatchesPlan(source,plan){
+ try{
+  const u=new URL(source.url),parts=u.pathname.split("/").filter(Boolean);
+  return u.protocol==="https:"&&u.hostname==="techdocs.zebra.com"&&!u.port&&!u.username&&!u.password&&
+   parts[0]===String(plan.product||"")&&parts[1]===String(plan.version||"").replace(/\./g,"-");
+ }catch{return false}
+}
 function make(def,matchReason,extra={}){
  return {id:def.id,label:def.label,category:def.category,research_status:def.provenance.status,match_reason:matchReason,required_context:[...def.required_context],evidence_requirements:[...def.evidence_requirements],safe_next_action:def.safe_next_action,abstain_if:def.abstain_if,provenance:JSON.parse(JSON.stringify(def.provenance)),...extra};
 }
@@ -65,6 +72,7 @@ function select(plan,evidence=[]){
   selected.push(make(def,"The question describes real-device behavior, but this workflow has no reproducible device test.",{application_status:"guardrail",next_question:"",evidence_links:[]}));
  }
  for(const source of sources){
+  if(!sourceMatchesPlan(source,plan))continue;
   const upper=source.text.toUpperCase();
   const hasA=upper.includes(TOKEN_A),hasB=upper.includes(TOKEN_B);
   const prerequisite=/\b(?:only when|only if|requires?|must be enabled|prerequisite|dependent on)\b/i.test(source.text);
