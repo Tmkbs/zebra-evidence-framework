@@ -188,9 +188,17 @@ function drawPlan(p){
  out.append(text("p",p.state==="clarification_required"?"Ask for missing context before answering.":"Version-specific source route selected; installed version is not independently verified.","pill"));
  if(p.clarification?.length)addList(out,p.clarification);
  for(const u of p.source_urls||[]){const row=text("div","","step");row.append(link(u));out.append(row)}
- const head=text("h3","Candidate response safeguards");out.append(head);
- for(const pol of p.policies||[]){const row=text("div","","step");row.append(text("strong",pol.id.replaceAll("_"," ")),text("p",pol.strategy,"muted"));out.append(row)}
- out.append(text("p","These are provisional safeguards, not confirmed recurring failure causes.","muted"));
+ const head=text("h3","Reusable answer strategies");out.append(head);
+ for(const strategy of p.strategies||[]){
+  const row=text("div","","step");
+  row.append(text("strong",strategy.label+" · "+strategy.application_status.replaceAll("_"," ")),
+   text("p",strategy.match_reason,"muted"),
+   text("p","Next: "+strategy.safe_next_action,"muted"),
+   text("p","Evidence status: "+strategy.research_status,"muted"));
+  out.append(row);
+ }
+ if(!(p.strategies||[]).length)out.append(text("p","No specialized strategy matched. Follow the source and ask only for necessary context.","muted"));
+ out.append(text("p","Candidate strategies are not validated global patterns. Source-specific checks require an exact product- and edition-matched official excerpt.","muted"));
 }
 function drawCards(packet){
  const cards=packet.cards||[];if(!cards.length)return;
