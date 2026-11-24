@@ -2,7 +2,7 @@
 
 ## New-question answer guidance (campus-only)
 
-[Integration and evaluation handoff](analysis/ANSWER_GUIDANCE_HANDOFF.md). The [Ask & Guide page](classroom/answer-guidance.html) adds a new-question workflow rather than a second documentation editor: clarification, version-pinned public evidence, candidate safeguards, and optional same-evidence baseline/guided comparison. The public page is a preview; open `http://127.0.0.1:3000/answer-guidance.html` from the existing authorized campus runner. No external paid-model API calls or automatic publication. This does not change the historical [pattern snapshot](analysis/zebra-pattern-analysis.html).
+[Integration and evaluation handoff](analysis/ANSWER_GUIDANCE_HANDOFF.md). The [Ask & Guide page](classroom/answer-guidance.html) adds a new-question workflow rather than a second documentation editor: clarification, version-pinned public evidence, candidate safeguards, and optional same-evidence baseline/guided comparison. The public page now runs the shared offline planner and checked source cards without a model. For live official-source retrieval or campus inference, open `http://127.0.0.1:3000/answer-guidance.html` from the existing authorized campus runner. Use **Fetch official excerpts only** when the campus model is unavailable; import public team CSV questions without copying diagnoses or recommended edits. No external paid-model API calls or automatic publication. This does not change the historical [pattern snapshot](analysis/zebra-pattern-analysis.html).
 
 ## Run the real Northwestern model (local/VPN, no API key needed)
 
