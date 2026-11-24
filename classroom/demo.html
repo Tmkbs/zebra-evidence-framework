@@ -1,76 +1,58 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>Zebra TechDocs · Interactive demo</title>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>Zebra TechDocs · From cases to better answers</title>
 <style>
-:root{font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;color:#203c46;background:#f5f7f7}*{box-sizing:border-box}body{margin:0}a{color:#086d66;text-underline-offset:3px}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #92cabe;outline-offset:3px}header{background:#fff;border-bottom:1px solid #d9e4e4}.wrap{max-width:1100px;margin:auto;padding:18px 24px}.eyebrow{font-size:11px;letter-spacing:.12em;font-weight:750;color:#397570;text-transform:uppercase}h1{font-size:29px;line-height:1.15;letter-spacing:-.025em;margin:5px 0 8px}h2{font-size:23px;letter-spacing:-.02em;margin:0 0 9px}h3{font-size:17px;margin:0 0 7px}p{margin:6px 0}.muted{font-size:13px;color:#57717a}.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.tabs button{background:#f5f8f8;border:1px solid #ccdedd;color:#28575a;border-radius:8px;padding:9px 14px;font-weight:650}.tabs button[aria-selected=true]{background:#126d64;border-color:#126d64;color:white}.panel{padding:20px 0}.panel[hidden]{display:none}.card{background:white;border:1px solid #d8e4e5;border-radius:13px;padding:19px}.lead{font-size:17px;max-width:800px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:17px 0}.card .eyebrow{margin-bottom:5px}.path{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 0}.path span{background:#e7f2ef;border-radius:8px;padding:9px 12px;color:#285b53;font-weight:650}.path b{color:#779a96}.primary{border:0;border-radius:8px;padding:10px 16px;color:#fff;background:#126d64;font-weight:650}.frame{width:100%;border:0;display:block;min-height:640px;background:transparent}.frame[hidden]{display:none}.stagebar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding-bottom:10px}.stagebar a{font-size:12px}.note{border-left:3px solid #9ebbb5;padding:9px 12px;background:#eef4f3;margin:14px 0}.bottom{padding-top:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}footer{font-size:12px;color:#59727a;padding:10px 0 22px}#frameNotice{font-size:13px;color:#57717a;margin:5px 0}
-@media(max-width:650px){.wrap{padding:14px 13px}h1{font-size:24px}.grid{grid-template-columns:1fr;gap:9px}.tabs button{font-size:13px;padding:8px}.card{padding:14px}.path{gap:5px}.path span{font-size:12px}}
+:root{font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;color:#203c46;background:#f5f7f7}*{box-sizing:border-box}body{margin:0}a{color:#086d66;text-underline-offset:3px}button,input,textarea,select{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #92cabe;outline-offset:3px}header{background:#fff;border-bottom:1px solid #d9e4e4}.wrap{max-width:1020px;margin:auto;padding:20px 24px}.eyebrow{font-size:11px;letter-spacing:.11em;font-weight:750;color:#397570;text-transform:uppercase}h1{font-size:29px;line-height:1.18;letter-spacing:-.025em;margin:6px 0 8px}h2{font-size:22px;letter-spacing:-.02em;margin:0 0 8px}h3{font-size:17px;margin:0 0 7px}p{margin:6px 0}.muted{font-size:13px;color:#57717a}.card{background:white;border:1px solid #d8e4e5;border-radius:13px;padding:21px;margin:0 0 16px}.lead{font-size:17px;max-width:800px}.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.case{border:1px solid #d6e2e2;border-radius:9px;padding:13px;min-width:0}.case strong{display:block;line-height:1.3;margin:5px 0 8px}.case .tag{display:inline-block;font-size:12px;color:#15594e;background:#eaf3ef;border-radius:5px;padding:3px 6px}.case .tag.neutral{color:#5c6e76;background:#edf1f2}.flow{display:grid;grid-template-columns:1fr 20px 1fr 20px 1fr;align-items:center;gap:6px;margin:16px 0}.flow>div{border:1px solid #c7ddda;border-radius:8px;padding:12px;background:#eef6f3;min-width:0}.flow>span{text-align:center;color:#658780;font-size:19px}.flow strong{display:block;font-size:20px;color:#17695e}.note{border-left:3px solid #9ebbb5;padding:8px 12px;background:#eef4f3;margin:12px 0}.primary{border:0;border-radius:8px;padding:10px 16px;color:#fff;background:#126d64;font-weight:650}.secondary{background:#fff;border:1px solid #b8ceca;border-radius:8px;padding:9px 13px;color:#245b55;font-weight:650}.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}label{display:block;font-weight:600;font-size:13px;margin:10px 0 4px}input,select,textarea{width:100%;color:#203c46;border:1px solid #c8d7da;border-radius:7px;background:white;padding:9px}textarea{min-height:76px;resize:vertical}.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.result{margin-top:17px;border-top:1px solid #d9e4e4;padding-top:15px}.result[hidden]{display:none}.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.pair>div{border:1px solid #d6e3e3;border-radius:9px;padding:14px;min-width:0;overflow-wrap:anywhere}.pair>div:last-child{border-color:#a3c9be;background:#f2f8f5}.response{font-size:16px;font-weight:600}ul{padding-left:20px;margin:8px 0}li{margin:6px 0}summary{cursor:pointer;color:#416b68;font-weight:600}details{margin-top:13px}footer{font-size:12px;color:#59727a;padding:4px 0 24px}#status{min-height:20px;color:#8a5721;font-size:13px}
+@media(max-width:650px){.wrap{padding:14px 12px}h1{font-size:24px}.card{padding:15px}.cases,.fields,.pair{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.flow>span{transform:rotate(90deg);height:20px;line-height:20px}.case{padding:10px}}
 </style></head>
 <body>
-<header><div class="wrap"><div class="eyebrow">Zebra Technologies · Northwestern Forge</div><h1>Interactive Tech Docs with Conversation and Video</h1><p class="muted">One integrated demo: understand a question, explore its visual explanation, then guide the next answer.</p>
-<nav class="tabs" role="tablist" aria-label="Demo stages"><button type="button" role="tab" id="tab-overview" aria-controls="panel-overview" aria-selected="true" data-tab="overview">1 · Project overview</button><button type="button" role="tab" id="tab-visual" aria-controls="panel-visual" aria-selected="false" tabindex="-1" data-tab="visual">2 · Visual explanation</button><button type="button" role="tab" id="tab-guide" aria-controls="panel-guide" aria-selected="false" tabindex="-1" data-tab="guide">3 · Ask &amp; Guide</button></nav></div></header>
+<header><div class="wrap"><div class="eyebrow">Zebra Technologies · Northwestern Forge</div><h1>From support cases to better AI answers</h1><p class="muted">Interactive Tech Docs with Conversation and Video · answer-side research prototype</p></div></header>
 <main class="wrap" id="main">
-<section class="panel" role="tabpanel" id="panel-overview" aria-labelledby="tab-overview"><div class="card"><div class="eyebrow">Project direction · demo summary</div><h2>From technical documentation to useful understanding</h2><p class="lead">Developers need both reliable documentation and clear explanations of technical concepts. Our prototype connects these complementary goals through contextual diagrams, short videos and an answer-guidance workflow.</p>
-<div class="grid"><div class="card"><div class="eyebrow">Documentation workstream</div><h3>Help users find answers independently</h3><p>Analyze real developer questions, locate applicable documentation, and propose evidence-based revisions. Keep the team's case catalog and article versions authoritative.</p></div><div class="card"><div class="eyebrow">Answer and visual workstream</div><h3>Help users understand and ask better questions</h3><p>Explain the concept with question-specific visuals and optional short videos. Carry the relevant context into an evidence-aware answer plan.</p></div></div>
-<h3>One real example</h3><p>A historical DataWedge 6.2.23 user reported that an ADB test broadcast reached the application, but configured scan broadcasts did not. Explore the two paths without inventing a root cause.</p><div class="path" aria-label="Workflow"><span>Public developer report</span><b>→</b><span>Visual explanation</span><b>→</b><span>Context-aware guidance</span></div>
-<div class="note">This is a locally authored overview for the demo, not a copy of the team's live Project Shift page. No device fix, live campus inference, or measured reduction in support demand is claimed.</div><div class="bottom"><button type="button" class="primary" data-next="visual">Explore the example</button><a href="https://zebra-techdocs-practicum.vercel.app/document-reader/project-shift.html#main" target="_blank" rel="noopener noreferrer">Original team Project Shift (optional source)</a></div></div></section>
-<section class="panel" role="tabpanel" id="panel-visual" aria-labelledby="tab-visual" hidden><div class="stagebar"><div><strong>Visual explanation</strong><div class="muted">Compare the reported ADB and DataWedge paths; click a scene, play the walkthrough, or create a local short video.</div></div><button type="button" class="primary" data-next="guide">Continue to Ask &amp; Guide</button></div><iframe class="frame" id="frame-visual" title="Interactive visual explanation" data-src="visual-companion.html?reader=dw62-intent-receiver" referrerpolicy="no-referrer"></iframe></section>
-<section class="panel" role="tabpanel" id="panel-guide" aria-labelledby="tab-guide" hidden><div class="stagebar"><div><strong>Ask &amp; Guide</strong><div class="muted">The historical report is already carried forward. Check the applicable edition, then try a concept or diagnostic explanation.</div></div><button type="button" class="primary" data-next="visual">Back to visual explanation</button></div><iframe class="frame" id="frame-guide" title="Interactive question and answer guidance" data-src="answer-guidance.html?reader=dw62-intent-receiver" referrerpolicy="no-referrer"></iframe></section>
-<p id="frameNotice" role="status" aria-live="polite"></p>
-<footer>Student research prototype. The public demo uses deterministic, evidence-linked visual guidance; live Qwen inference requires the authorized local campus service. No paid API or remote video auto-load.</footer>
-</main><script>
+<section class="card" aria-labelledby="research"><div class="eyebrow">01 · Learn from previous cases</div><h2 id="research">Do different questions share a common problem?</h2><p>Instead of repairing one document at a time, we look for repeated issues that could inform how the assistant handles future questions.</p>
+<div class="cases" id="cases"></div>
+<div class="flow" aria-label="Version boundary candidate"><div><strong id="hits">—</strong>Cases mentioning a version boundary</div><span aria-hidden="true">→</span><div><strong id="support">—</strong>Independent supporting case after evidence checks</div><span aria-hidden="true">→</span><div><strong id="validation">—</strong>Validated recurring pattern</div></div>
+<div class="note"><b>Candidate: check the applicable version before giving technical advice.</b> The current evidence does not establish a global pattern. Use this as a provisional answer safeguard, not a proven finding.</div>
+<p class="muted">Based on the existing three-case research snapshot, not the team's entire public case collection. <a href="../analysis/zebra-pattern-analysis.html" target="_blank" rel="noopener noreferrer">Research evidence and counting method ↗</a></p>
+</section>
+<section class="card" aria-labelledby="apply"><div class="eyebrow">02 · Apply a candidate to a new question</div><h2 id="apply">What should the assistant ask next?</h2><p>Try a new, hypothetical developer question. The offline planner applies the same provisional safeguards used by our campus-model answer pipeline.</p>
+<form id="question-form">
+<label for="question">New developer question</label><textarea id="question" maxlength="1800" required>After an update, my DataWedge scanner no longer sends scan data to the app. What should I check?</textarea>
+<div class="fields"><div><label for="product">Product</label><select id="product"><option value="datawedge">DataWedge</option><option value="ehs">Enterprise Home Screen</option><option value="enterprise-browser">Enterprise Browser</option><option value="emdk-for-android">EMDK for Android</option><option value="stagenow">StageNow</option><option value="">Not specified</option></select></div><div><label for="version">Applicable documentation edition (if known)</label><input id="version" maxlength="24" placeholder="e.g. 15.0" autocomplete="off"></div></div>
+<details><summary>Optional context and official source</summary><label for="context">What has the user already tried?</label><textarea id="context" maxlength="1200" placeholder="Public or approved information only"></textarea><label for="source">Official TechDocs URL</label><input id="source" type="url" maxlength="1200" placeholder="https://techdocs.zebra.com/..."></details>
+<div class="actions"><button class="primary" type="submit">Apply answer guidance</button><button class="secondary" id="reset" type="button">Reset example</button></div><p id="status" role="status" aria-live="polite"></p>
+</form>
+<div class="result" id="result" hidden aria-live="polite">
+<div class="eyebrow">Answer plan · rule-based, not a model response</div>
+<div class="pair"><div><h3>Original input</h3><p id="original"></p><p class="muted">Question only; no extra answer safeguard shown.</p></div><div><h3 id="next-title">Guided next step</h3><p class="response" id="next"></p><p class="muted" id="next-note"></p></div></div>
+<details><summary>Instructions prepared for the assistant</summary><ul id="rules"></ul><div id="source-result"></div></details>
+</div>
+</section>
+<footer>Student prototype. Candidate patterns come from a small, team-authored research snapshot. The public demo prepares an answer plan; no live model, device diagnosis or measured improvement is claimed. <details><summary>Additional project materials</summary><a href="visual-companion.html?reader=dw62-intent-receiver">Optional contextual diagram and video prototype</a> · <a href="answer-guidance.html">Full research interface</a> · <a href="https://zebra-techdocs-practicum.vercel.app/document-reader/project-shift.html#main" target="_blank" rel="noopener noreferrer">Team Project Shift</a></details></footer>
+</main><script src="guidance-planner.js"></script><script src="pattern-demo.js"></script><script>
 "use strict";
-const stages=["overview","visual","guide"],$=id=>document.getElementById(id);
-let selected="overview";
-const observers=new Map(),boundDocs=new WeakSet();
-function stageForURL(raw){
- try{const url=new URL(raw,location.href);
-  for(const stage of ["visual","guide"]){const desired=new URL($("frame-"+stage).dataset.src,location.href);
-   if(url.origin===desired.origin&&url.pathname===desired.pathname&&url.search===desired.search)return stage;
-  }
- }catch{}
- return "";
-}
-function bindFrame(stage){
- const frame=$("frame-"+stage);
- const old=observers.get(stage);old?.disconnect();observers.delete(stage);
+const $=id=>document.getElementById(id);
+function clear(){ $("result").hidden=true;$("status").textContent="";$("rules").replaceChildren();$("source-result").replaceChildren(); }
+function render(){
+ clear();
  try{
-  const doc=frame.contentDocument;if(!doc?.body||doc.location.href==="about:blank")return;
-  // Route only the two existing, exact same-site demo links within the shell.
-  // Source citations and downloads retain their own normal behavior.
-  if(!boundDocs.has(doc)){boundDocs.add(doc);doc.addEventListener("click",e=>{
-   if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
-   const a=e.target.closest?.("a[href]"),dest=a?stageForURL(a.href):"";
-   if(dest&&!a.hasAttribute("download")){e.preventDefault();select(dest,true)}
-  },true)}
-  const fit=()=>{
-   if(selected!==stage)return;
-   const body=doc.body,main=doc.querySelector("main");
-   const h=Math.ceil(Math.max(body.getBoundingClientRect().height,main?main.getBoundingClientRect().bottom+doc.defaultView.scrollY:0)+20);
-   if(h>0&&h<20000)frame.style.height=Math.max(640,h)+"px";
-  };
-  fit();
-  if(typeof ResizeObserver==="function"){const ro=new ResizeObserver(fit);ro.observe(doc.body);observers.set(stage,ro)}
-  frame.addEventListener("focus",fit,{once:true});
-  $("frameNotice").textContent="";
- }catch{
-  $("frameNotice").textContent="The embedded page could not be inspected. Use the same-site navigation or open the original visual page separately.";
+  const x=ZebraPatternDemo.plan({question:$("question").value,product:$("product").value,version:$("version").value,context:$("context").value,source_urls:$("source").value.trim()?[$("source").value.trim()]:[]});
+  $("original").textContent=x.plan.question;$("next-title").textContent=x.title;$("next").textContent=x.next;$("next-note").textContent=x.note;
+  for(const p of x.plan.policies){const li=document.createElement("li");li.textContent=p.strategy;$("rules").append(li)}
+  for(const url of x.plan.source_urls){const a=document.createElement("a");a.href=url;a.textContent="Selected official source (not retrieved in this demo) ↗";a.target="_blank";a.rel="noopener noreferrer";const p=document.createElement("p");p.append(a);$("source-result").append(p)}
+  $("result").hidden=false;
+ }catch(e){$("status").textContent=String(e.message||e)}
+}
+if(window.ZebraPatternDemo&&window.ZebraGuidance){
+ const data=ZebraPatternDemo.snapshot();
+ for(const row of data.cases){
+  const div=document.createElement("div");div.className="case";const small=document.createElement("span");small.className="eyebrow";small.textContent=row.id;
+  const title=document.createElement("strong");title.textContent=row.title;
+  const tag=document.createElement("span");tag.className="tag"+(row.patterns.includes("version_boundary")?"":" neutral");tag.textContent=row.patterns.includes("version_boundary")?"Version boundary":"Different issue";
+  div.append(small,title,tag);$("cases").append(div);
  }
-}
-function select(stage,updateHash=false){
- if(!stages.includes(stage))stage="overview";selected=stage;
- for(const name of stages){const active=name===stage;const tab=$("tab-"+name);tab.setAttribute("aria-selected",String(active));tab.tabIndex=active?0:-1;$("panel-"+name).hidden=!active}
- if(stage!=="overview"){
-  const frame=$("frame-"+stage);
-  if(!frame.hasAttribute("src")){frame.src=frame.dataset.src;$("frameNotice").textContent="Opening the existing "+(stage==="visual"?"visual explanation":"answer guidance")+"…"}
-  else bindFrame(stage);
- }else $("frameNotice").textContent="";
- if(updateHash&&location.hash!=="#"+stage)location.hash=stage;
-}
-for(const stage of ["visual","guide"]){$("frame-"+stage).addEventListener("load",()=>bindFrame(stage))}
-for(const b of document.querySelectorAll("[data-tab],[data-next]"))b.addEventListener("click",()=>{select(b.dataset.tab||b.dataset.next,true);window.scrollTo({top:0,behavior:"instant"})});
-document.querySelector(".tabs").addEventListener("keydown",e=>{
- if(!["ArrowLeft","ArrowRight","Home","End"].includes(e.key))return;e.preventDefault();
- const index=e.key==="Home"?0:e.key==="End"?2:(stages.indexOf(selected)+(e.key==="ArrowRight"?1:2))%3;select(stages[index],true);$("tab-"+stages[index]).focus()
-});
-window.addEventListener("hashchange",()=>{const stage=location.hash.slice(1);if(stage!==selected)select(stage)});
-select(location.hash.slice(1)||"overview");
+ $("hits").textContent=data.hits+"/"+data.cases.length;$("support").textContent=data.independent;$("validation").textContent=data.validated;
+ $("question-form").addEventListener("submit",e=>{e.preventDefault();render()});
+ for(const id of ["question","product","version","context","source"])$(id).addEventListener("input",clear);
+ $("reset").addEventListener("click",()=>{$("question-form").reset();clear()});
+}else{$("status").textContent="Required local modules are unavailable.";$("question-form").querySelector("button[type=submit]").disabled=true}
 </script></body></html>
