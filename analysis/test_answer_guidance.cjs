@@ -65,6 +65,11 @@ test("same official evidence and model settings for both arms",async()=>{
  const calls=f.calls.filter(c=>c.url.endsWith("/chat/completions")).map(c=>JSON.parse(c.opt.body));
  assert.equal(calls.length,2);assert.deepEqual(calls[0].messages[1],calls[1].messages[1]);assert.equal(calls[0].model,calls[1].model);assert.equal(calls[0].temperature,calls[1].temperature);assert.equal(calls[0].max_tokens,calls[1].max_tokens);
  assert.notEqual(calls[0].messages[0].content,calls[1].messages[0].content);
+ assert.match(calls[1].messages[0].content,/example_body_conflict/);
+ assert.match(calls[1].messages[0].content,/Present both passages/);
+ assert.doesNotMatch(calls[0].messages[0].content,/Apply only these explicitly matched/);
+ assert.ok(r.plan.strategies.some(x=>x.id==="example_body_conflict"));
+ assert.equal(r.plan.strategies.find(x=>x.id==="example_body_conflict").application_status,"source_discrepancy_needs_review");
  assert.equal(r.runs[0].result.exact_quote_count,1);assert.equal(r.signals.both_result_tokens_present,true);
  assert.ok(r.runs[0].result.metric_scope.includes("not semantic"));
 });
