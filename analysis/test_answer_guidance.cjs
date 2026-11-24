@@ -28,6 +28,13 @@ test("missing version asks a question, without retrieval or model",async()=>{
  assert.equal(r.mode,"plan_only");assert.equal(r.plan.state,"clarification_required");assert.equal(r.model_attempts,0);assert.equal(count,0);assert.ok(r.plan.clarification.some(v=>/version/i.test(v)));
 });
 test("missing product is not inferred from a topic",()=>assert.equal(G.prepare({...input,product:""}).state,"clarification_required"));
+test("plan-only new update question exposes the same reusable version strategy without retrieval",async()=>{
+ const r=await G.run({...input,question:"After upgrading Enterprise Browser, the app no longer opens. What should I check?",product:"enterprise-browser",version:"",source_urls:[],action:"plan"},cfg,()=>assert.fail("No retrieval"));
+ const strategy=r.plan.strategies.find(x=>x.id==="version_boundary");
+ assert.ok(strategy);assert.equal(strategy.application_status,"ask_for_version");
+ assert.equal(strategy.research_status,"candidate_not_validated");
+ assert.equal(r.model_runs_completed,0);
+});
 test("plan only does not use network",async()=>{
  const r=await G.run({...input,action:"plan"},cfg,()=>assert.fail("No network"));
  assert.equal(r.plan.state,"ready_for_source_retrieval");assert.equal(r.model_runs_completed,0);
@@ -65,6 +72,11 @@ test("same official evidence and model settings for both arms",async()=>{
  const calls=f.calls.filter(c=>c.url.endsWith("/chat/completions")).map(c=>JSON.parse(c.opt.body));
  assert.equal(calls.length,2);assert.deepEqual(calls[0].messages[1],calls[1].messages[1]);assert.equal(calls[0].model,calls[1].model);assert.equal(calls[0].temperature,calls[1].temperature);assert.equal(calls[0].max_tokens,calls[1].max_tokens);
  assert.notEqual(calls[0].messages[0].content,calls[1].messages[0].content);
+ assert.match(calls[1].messages[0].content,/example_body_conflict/);
+ assert.match(calls[1].messages[0].content,/Present both passages/);
+ assert.doesNotMatch(calls[0].messages[0].content,/Apply only these explicitly matched/);
+ assert.ok(r.plan.strategies.some(x=>x.id==="example_body_conflict"));
+ assert.equal(r.plan.strategies.find(x=>x.id==="example_body_conflict").application_status,"source_discrepancy_needs_review");
  assert.equal(r.runs[0].result.exact_quote_count,1);assert.equal(r.signals.both_result_tokens_present,true);
  assert.ok(r.runs[0].result.metric_scope.includes("not semantic"));
 });
