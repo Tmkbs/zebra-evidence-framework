@@ -12,7 +12,7 @@ const harness=String.raw`
 (async()=>{
  const $test=id=>document.getElementById(id);
  const ensure=(condition,message)=>{if(!condition)throw Error(message)};
- const click=selector=>{const node=document.querySelector(selector);ensure(node,"Missing "+selector);ensure(!node.disabled,"Disabled "+selector);node.click()};
+ const click=selector=>{const node=document.querySelector(selector);ensure(node,"Missing "+selector);ensure(!node.disabled,"Disabled "+selector);if(typeof node.click==="function")node.click();else node.dispatchEvent(new MouseEvent("click",{bubbles:true,cancelable:true}))};
  const next=()=>document.querySelector(".vision-next").textContent;
  const choose=(field,value)=>click('[data-vision-field="'+field+'"][data-vision-value="'+value+'"]');
  const report=()=>Array.from(document.querySelectorAll("#visionOutput button")).find(b=>b.textContent==="Use as reported context for next answer");
@@ -95,7 +95,7 @@ try{
   if(run.error)throw run.error;
   const dom=run.stdout||"",error=dom.match(/<pre id="vision-smoke-error">([\s\S]*?)<\/pre>/);
   assert.equal(run.status,0,run.stderr?.slice(-1500));
-  assert.match(dom,/<html[^>]*data-vision-smoke="pass"/,error?.[1]||"No browser pass marker: "+dom.slice(-800));
+  assert.ok(/<html[^>]*data-vision-smoke="pass"/.test(dom),error?.[1]||"No browser pass marker: "+dom.slice(-800));
   console.log("PASS Chromium "+label+": interactive map, timed playback, source-linked scenes, report consent, stale-result rejection, no network, and page width");
  }
 }finally{fs.rmSync(dir,{recursive:true,force:true})}
