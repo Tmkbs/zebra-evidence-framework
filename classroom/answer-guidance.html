@@ -64,7 +64,7 @@ button.vision-node[aria-pressed=true]{outline:3px solid #a7d3ca;outline-offset:2
 <div id="teamNotice" class="notice" hidden></div>
 <label for="question">Developer question</label><textarea id="question">Why might the software scan trigger fail to start scanning in DataWedge 6.8?</textarea>
 <div class="grid"><div><label for="product">Software product</label><select id="product"><option value="">Not specified</option><option value="datawedge" selected>DataWedge</option><option value="ehs">Enterprise Home Screen</option><option value="enterprise-browser">Enterprise Browser</option><option value="emdk-for-android">EMDK for Android</option><option value="stagenow">StageNow</option></select></div>
-<div><label for="version">Reported installed version</label><input id="version" value="6.8" placeholder="e.g. 6.8 (leave blank if unknown)"></div></div>
+<div><label for="version">Applicable documentation edition</label><input id="version" value="6.8" placeholder="e.g. 6.8 (confirm against installed version)"></div></div>
 <label for="context">Public configuration / observation (optional)</label><textarea id="context" placeholder="What was tried? What result was observed? Do not enter private ticket or customer details."></textarea>
 <label for="sources">Official source URLs (optional; up to two, one per line)</label><textarea id="sources" class="sources" placeholder="Leave blank for limited DataWedge topic routing">https://techdocs.zebra.com/datawedge/6-8/guide/api/softscantrigger/</textarea>
 <p class="muted">Automatic routing currently covers a few DataWedge topics. Other topics require the relevant version-specific article. It is not a full TechDocs search engine.</p>
@@ -92,8 +92,8 @@ function removeVisualReport(){
 function resetVisualState(){
  removeVisualReport();visualState={};visualFocus="";visualConfirmed=false;visualKey="";
 }
-function invalidate(){
- runEpoch++;last=null;clearStoryboard();resetVisualState();busy(false);teamHandoff=null;$("teamNotice").hidden=true;$("teamNotice").replaceChildren();
+function invalidate({keepTeam=false}={}){
+ runEpoch++;last=null;clearStoryboard();resetVisualState();busy(false);if(!keepTeam){teamHandoff=null;$("teamNotice").hidden=true;$("teamNotice").replaceChildren();}
  $("planBox").hidden=true;$("sourceBox").hidden=true;$("answerBox").hidden=true;$("download").hidden=true;
  $("visionOutput").replaceChildren(text("p","Question or context changed. Choose Offline guidance to rebuild the visual explanation.","vision-empty"));
 }
@@ -291,7 +291,7 @@ $("importFile").addEventListener("change",async()=>{
  }catch(e){$("importStatus").textContent=e.message}
 });
 $("download").addEventListener("click",()=>{if(!last)return;const b=new Blob([JSON.stringify(last,null,2)+"\n"],{type:"application/json"}),url=URL.createObjectURL(b),a=document.createElement("a");a.href=url;a.download="zebra-answer-"+(last.run_id||"plan")+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
-for(const id of ["question","product","version","context","sources"])$(id).addEventListener("input",()=>{if(id==="question")caseId="";invalidate()});
+for(const id of ["question","product","version","context","sources"])$(id).addEventListener("input",()=>{if(id==="question")caseId="";const keepTeam=!!teamHandoff&&$("question").value.trim()===teamHandoff.question&&$("context").value.trim()===teamHandoff.context&&$("product").value===teamHandoff.product;invalidate({keepTeam})});
 function loadTeamReference(){
  if(!location.search)return false;
  const key=ZebraTeamVisual.keyFromSearch(location.search),packet=ZebraTeamVisual.handoff(key);
