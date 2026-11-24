@@ -154,7 +154,7 @@ function buildServer(cfg,request=fetch){
    const html=fs.readFileSync(path.join(UI_ROOT,page));
    res.statusCode=200;
    res.setHeader("Content-Type",page.endsWith(".js")?"application/javascript; charset=utf-8":"text/html; charset=utf-8");
-   res.setHeader("Content-Security-Policy","default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self' https:; img-src 'self' data: https:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'");
+   res.setHeader("Content-Security-Policy","default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self' https:; img-src 'self' data: blob: https:; media-src blob:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'");
    return res.end(html);
   }catch{return json(res,500,{ok:false,error:"Bundled page unavailable"})}
  });
