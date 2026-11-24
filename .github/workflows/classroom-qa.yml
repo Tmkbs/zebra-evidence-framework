@@ -23,6 +23,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Single-site demo navigation (offline)
+        run: node analysis/test_unified_demo.cjs
+
       - name: Run offline demo tests (no dependencies)
         run: npm test
 
@@ -43,5 +46,4 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
-      - name: Single-site demo navigation (offline)
-        run: node analysis/test_unified_demo.cjs
+
