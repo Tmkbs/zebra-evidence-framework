@@ -20,6 +20,6 @@
     "Any output requiring device behavior is labeled NEEDS_DEVICE_TEST.",
     "A before/after answer evaluation freezes prompts, public evidence bytes, model identity and output receipts.",
     "Blind evaluation examples are held out from strategy drafting.",
-    "Neither model uses restricted client sources or silently submits to a public forum."
+    "Use only the approved campus model endpoint and public inputs; no paid external model APIs or public forum submission."
   ]
 }
