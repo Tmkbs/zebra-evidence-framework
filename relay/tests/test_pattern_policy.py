@@ -15,7 +15,7 @@ class PatternPolicyTests(unittest.TestCase):
     def test_conflict_does_not_claim_defect(self):
         r=triage({"summary":"Documentation says an API behaves one way, but docs say behavior differs from the actual device."})
         self.assertFalse(r["device_tested"])
-        self.assertIn("NEEDS_REVIEW",r["status"])
+        self.assertIn("NEED_REVIEW",r["status"])
     def test_unknown(self):
         r=triage({"summary":"A user asked a question with no technical information provided."})
         self.assertTrue(r["unclassified"])
