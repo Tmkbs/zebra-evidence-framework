@@ -277,12 +277,13 @@ function sourceLabel(frame){
 function clipCanvas(doc,map,plan,images){
  const canvas=doc.createElement("canvas");canvas.width=1280;canvas.height=720;
  const ctx=canvas.getContext("2d",{alpha:false});if(!ctx)throw Error("Canvas rendering unavailable");
+ const heading=fitText(ctx,"TECHDOCS / "+plan.title,1030,1,17,12,700);
  const titles=plan.frames.map(f=>fitText(ctx,f.title,1168,1,34,22,700));
  const captions=plan.frames.map(f=>fitText(ctx,f.caption,1168,4,27,20,500));
  function draw(index,fraction){
   const frame=plan.frames[index],caption=captions[index];
   ctx.fillStyle="#f4f8f8";ctx.fillRect(0,0,1280,720);
-  ctx.fillStyle="#176b64";ctx.font="700 17px system-ui, sans-serif";ctx.fillText("TECHDOCS  /  CONTEXTUAL EXPLAINER",54,35);
+  ctx.fillStyle="#176b64";ctx.font="700 "+heading.size+"px system-ui, sans-serif";drawLines(ctx,heading,54,35,20);
   ctx.fillStyle="#17393f";ctx.font="700 "+titles[index].size+"px system-ui, sans-serif";drawLines(ctx,titles[index],54,76,38);
   ctx.fillStyle="#526671";ctx.font="600 19px system-ui, sans-serif";ctx.textAlign="right";ctx.fillText((index+1)+" / "+plan.frames.length,1226,35);ctx.textAlign="left";
   ctx.fillStyle="#ffffff";ctx.fillRect(184,94,912,418);
@@ -352,7 +353,7 @@ async function renderClip(map,{doc,signal,onProgress=()=>{},frameMs}={}){
   }
   cancelled(signal);
   if(recorder.state!=="inactive")recorder.stop();
-  await Promise.race([stopWait,delay(5000).then(()=>{if(recorder.state!=="inactive")throw Error("Video encoder stop timed out")})]);
+  let stopTimer;try{await Promise.race([stopWait,new Promise((_,reject)=>{stopTimer=win.setTimeout(()=>reject(Error("Video encoder stop timed out")),5000)})])}finally{win.clearTimeout(stopTimer)}
   if(recorderError)throw recorderError;cancelled(signal);
   const blob=new win.Blob(chunks,{type:recorder.mimeType.split(";")[0]||"video/webm"});
   if(blob.size<256)throw Error("Browser returned an empty or incomplete video");
@@ -367,7 +368,7 @@ async function renderClip(map,{doc,signal,onProgress=()=>{},frameMs}={}){
 
 function mount(container,{onStep=()=>{}}={}){
  const doc=container.ownerDocument||document;
- let map=null,story=null,index=0,timer=null,playing=false,destroyed=false;
+ let map=null,story=null,index=0,timer=null,playing=false,destroyed=false,videoJob=null,videoURL="",receiptURL="",videoKey="",videoReceipt=null;
  const el=(tag,value="",cls="")=>{const e=doc.createElement(tag);e.textContent=String(value);if(cls)e.className=cls;return e};
  const top=el("div","","story-heading"),scene=el("div","","story-scene"),info=el("div","","story-info"),controls=el("div","","story-controls"),rail=el("div","","story-rail");
  const title=el("strong","Visual walkthrough"),counter=el("span","","muted");
@@ -377,7 +378,55 @@ function mount(container,{onStep=()=>{}}={}){
  prev.dataset.storyAction="prev";play.dataset.storyAction="play";next.dataset.storyAction="next";
  seek.dataset.storySeek="true";
  controls.append(prev,play,next,seek);
- container.replaceChildren(top,scene,controls,rail,info);
+ const videoBox=el("section","","story-video");videoBox.hidden=true;
+ const videoTitle=el("strong","Short explainer video"),videoNote=el("p","","muted");
+ const videoActions=el("div","","story-video-actions"),videoButton=el("button","Create short video"),cancelButton=el("button","Cancel"),videoStatus=el("p","","muted"),videoOutput=el("div","","story-video-output");
+ videoButton.type="button";videoButton.dataset.storyVideo="create";cancelButton.type="button";cancelButton.dataset.storyVideo="cancel";cancelButton.hidden=true;
+ videoStatus.setAttribute("role","status");
+ videoActions.append(videoButton,cancelButton);videoBox.append(videoTitle,videoNote,videoActions,videoStatus,videoOutput);
+ container.replaceChildren(top,scene,controls,rail,info,videoBox);
+ function clearVideo(){
+  if(videoJob){videoJob.abort();videoJob=null}
+  const old=videoOutput.querySelector("video");if(old){old.pause();old.removeAttribute("src")}
+  videoOutput.replaceChildren();
+  const win=doc.defaultView;
+  if(videoURL)win.URL.revokeObjectURL(videoURL);if(receiptURL)win.URL.revokeObjectURL(receiptURL);
+  videoURL="";receiptURL="";videoReceipt=null;videoStatus.textContent="";cancelButton.hidden=true;
+ }
+ function configureVideo(nextMap){
+  const key=JSON.stringify(nextMap);
+  if(key!==videoKey){clearVideo();videoKey=key}
+  let plan;try{plan=videoPlan(nextMap)}catch{plan=null}
+  videoBox.hidden=!plan;if(!plan)return;
+  const canEncode=videoSupport(doc);
+  videoButton.disabled=!canEncode||!!videoJob;
+  videoNote.textContent=canEncode?"Create a "+Math.round(plan.total_duration_ms/1000)+"-second silent, captioned WebM from this explanation. Keep this tab visible during local encoding. No camera, network, or model is used. Review before sharing.":"This browser does not support local WebM encoding. The interactive explanation remains available.";
+ }
+ videoButton.addEventListener("click",async()=>{
+  if(destroyed||!map||videoJob)return;
+  clearVideo();pause();
+  const win=doc.defaultView,job=new win.AbortController(),currentMap=map;
+  videoJob=job;videoButton.disabled=true;cancelButton.hidden=false;videoStatus.textContent="Preparing the current visual explanation…";
+  let progress=-1;
+  try{
+   const result=await renderClip(currentMap,{doc,signal:job.signal,onProgress:f=>{
+    if(videoJob!==job||destroyed)return;
+    const value=Math.min(100,Math.floor(f*20)*5);
+    if(value!==progress){progress=value;videoStatus.textContent="Encoding locally: "+value+"%"}
+   }});
+   if(videoJob!==job||destroyed||job.signal.aborted)return;
+   videoReceipt=result.receipt;
+   videoURL=win.URL.createObjectURL(result.blob);
+   receiptURL=win.URL.createObjectURL(new win.Blob([JSON.stringify(result.receipt,null,2)+"\n"],{type:"application/json"}));
+   const player=el("video");player.controls=true;player.playsInline=true;player.preload="metadata";player.src=videoURL;player.setAttribute("aria-label","Locally generated conceptual explainer");
+   const links=el("div","","story-video-actions"),download=el("a","Download WebM"),receipt=el("a","Download source receipt");
+   download.href=videoURL;download.download="zebra-"+currentMap.kind+".webm";receipt.href=receiptURL;receipt.download="zebra-"+currentMap.kind+"-video-sources.json";
+   links.append(download,receipt);videoOutput.append(player,links);
+   videoStatus.textContent="Video encoded locally ("+Math.ceil(result.blob.size/1024)+" KB). Preview and review before sharing.";
+  }catch(e){if(videoJob===job&&!destroyed)videoStatus.textContent=job.signal.aborted?"Video generation cancelled.":String(e.message||e).slice(0,200)}
+  finally{if(videoJob===job){videoJob=null;cancelButton.hidden=true;videoButton.disabled=!videoSupport(doc)}}
+ });
+ cancelButton.addEventListener("click",()=>{if(videoJob)videoJob.abort()});
  function cancel(){if(timer!==null){clearTimeout(timer);timer=null}}
  function pause(){cancel();playing=false;play.textContent="Play";play.setAttribute("aria-pressed","false")}
  function schedule(){
@@ -432,14 +481,14 @@ function mount(container,{onStep=()=>{}}={}){
   if(index===story.frames.length-1)select(0,false);
   playing=true;play.textContent="Pause";play.setAttribute("aria-pressed","true");schedule();
  });
- const hidden=()=>{if(doc.hidden)pause()};
+ const hidden=()=>{if(doc.hidden){pause();if(videoJob)videoJob.abort()}};
  doc.addEventListener("visibilitychange",hidden);
  return {
   update(nextMap,{focus=""}={}){
    if(destroyed)return;
    const previous=story,previousId=story?.frames[index]?.id;
    const previousState=map?JSON.stringify(map.state):"";
-   map=nextMap;story=build(map);
+   map=nextMap;story=build(map);configureVideo(map);
    const changed=!previous||previous.kind!==story.kind||previousState!==JSON.stringify(map.state);
    if(changed||focus)pause();
    let requested=focus||(!previous||previous.kind!==story.kind?"":changed?map.next.id:previousId);
@@ -447,8 +496,8 @@ function mount(container,{onStep=()=>{}}={}){
    index=found<0?0:found;draw();
    if(playing)schedule();
   },
-  destroy(){destroyed=true;pause();doc.removeEventListener("visibilitychange",hidden);container.replaceChildren()},
-  snapshot(){return story?{story,index,playing}:null}
+  destroy(){destroyed=true;pause();clearVideo();doc.removeEventListener("visibilitychange",hidden);container.replaceChildren()},
+  snapshot(){return story?{story,index,playing,video_receipt:videoReceipt}:null}
  };
 }
 return Object.freeze({build,clampIndex,createSVG,mount,videoPlan,videoSupport,renderClip});
