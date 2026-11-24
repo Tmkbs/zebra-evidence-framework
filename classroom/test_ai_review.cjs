@@ -9,11 +9,13 @@ const aiResponse=JSON.stringify({
  {severity:"high",issue:"Invented supporting quote",source:"proposal",quote:"Unsupported phrase nowhere in source",reasoning:"Not grounded",next_check:"Review citation"}],
  suggested_revision:"Keep the existing removal steps and clarify version scope.",next_checks:["Confirm installed EHS version"],limitations:["No device tests were performed"]
 });
-const oldEnv={AI_API_KEY:process.env.AI_API_KEY,AI_REVIEW_ACCESS_TOKEN:process.env.AI_REVIEW_ACCESS_TOKEN,AI_MODEL:process.env.AI_MODEL};
+const oldEnv={AI_API_KEY:process.env.AI_API_KEY,AI_REVIEW_ACCESS_TOKEN:process.env.AI_REVIEW_ACCESS_TOKEN,AI_MODEL:process.env.AI_MODEL,AI_BASE_URL:process.env.AI_BASE_URL,CAMPUS_QWEN_TOKEN:process.env.CAMPUS_QWEN_TOKEN};
 const originalFetch=global.fetch;
 process.env.AI_API_KEY="MOCK_TEST_ONLY";
 process.env.AI_REVIEW_ACCESS_TOKEN="test-secret";
 process.env.AI_MODEL="mock-model";
+process.env.AI_BASE_URL="https://c3dgx0.cs.northwestern.edu:8080/v1";
+process.env.CAMPUS_QWEN_TOKEN="MOCK_TEST_ONLY";
 let calls=[];
 global.fetch=async function(url,options={}){
  calls.push({url:String(url),method:options.method||"GET"});
@@ -28,6 +30,7 @@ let count=0;
 async function test(name,callback){await callback();count++;console.log("PASS "+name)}
 async function main(){
  await test("route does not expose secrets in health response",async()=>{const res=response();await handler(request("GET"),res);assert.equal(res.statusCode,200);assert.equal(res.data.ai_configured,true);assert.ok(!JSON.stringify(res.data).includes("MOCK_TEST_ONLY"))});
+ await test("external provider is unconfigured before any network call",async()=>{const previous=process.env.AI_BASE_URL,n=calls.length;try{process.env.AI_BASE_URL="https://api.openai.com/v1";const res=response();await handler(request("POST",{case_id:"EHS28"}),res);assert.equal(res.statusCode,503);assert.equal(calls.length,n)}finally{process.env.AI_BASE_URL=previous}});
  await test("wrong origin rejected",async()=>{const res=response();await handler(request("POST",{case_id:"EHS28"},"test-secret","https://evil.invalid"),res);assert.equal(res.statusCode,403)});
  await test("wrong passcode rejected without upstream requests",async()=>{const n=calls.length,res=response();await handler(request("POST",{case_id:"EHS28"},"bad-secret"),res);assert.equal(res.statusCode,401);assert.equal(calls.length,n)});
  await test("real endpoint fetches two public documents and calls the model",async()=>{
