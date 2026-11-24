@@ -19,10 +19,10 @@ button{cursor:pointer;font-weight:650;border:1px solid #b8cecc;border-radius:7px
 <body><header><div><strong>Zebra TechDocs · student prototype</strong><a href="../analysis/zebra-pattern-analysis.html">Pattern research snapshot</a><a href="final-delivery.html">Document-review workflow</a></div></header>
 <main><div class="kicker">Answer-side contribution</div><h1>Ask &amp; Guide</h1>
 <p>Apply evidence-aware safeguards to a new developer question. This is not a second case reader or an automatic documentation editor.</p>
-<div id="environment" class="notice">Checking whether the local campus service is available…</div>
+<div id="environment" class="notice">Offline planning is available. Checking for the optional local campus service…</div>
 <section class="box">
 <h2>1. Ask a question</h2>
-<div class="actions"><button id="loadExample">Load result-code example</button><button id="loadUnknown">Try missing version</button></div>
+<div class="actions"><button id="loadExample">Load result-code example</button><button id="loadUnknown">Try missing version</button><button id="loadPrereq">Try scanning prerequisite</button></div>
 <label for="question">Developer question</label><textarea id="question">Why do the DataWedge result-code instructions mention RECEIVE_RESULT while the sample uses SEND_RESULT? Which should I use?</textarea>
 <div class="grid"><div><label for="product">Software product</label><select id="product"><option value="">Not specified</option><option value="datawedge" selected>DataWedge</option><option value="ehs">Enterprise Home Screen</option><option value="enterprise-browser">Enterprise Browser</option><option value="emdk-for-android">EMDK for Android</option><option value="stagenow">StageNow</option></select></div>
 <div><label for="version">Reported installed version</label><input id="version" value="6.8" placeholder="e.g. 6.8 (leave blank if unknown)"></div></div>
@@ -30,24 +30,30 @@ button{cursor:pointer;font-weight:650;border:1px solid #b8cecc;border-radius:7px
 <label for="sources">Official source URLs (optional; up to two, one per line)</label><textarea id="sources" class="sources" placeholder="Leave blank for limited DataWedge topic routing">https://techdocs.zebra.com/datawedge/6-8/guide/api/resultinfo/</textarea>
 <p class="muted">Automatic routing currently covers a few DataWedge topics. Other topics require the relevant version-specific article. It is not a full TechDocs search engine.</p>
 <details><summary>Import public case handoff</summary><p class="muted">Accepts the team's public case contract, including question and official evidence URLs. Imported text is not treated as verified evidence. Installed version is left blank for confirmation.</p><input id="importFile" type="file" accept=".json,application/json"><p id="importStatus" class="muted"></p></details>
+<details><summary>Import team public case CSV</summary><p class="muted">Question-only intake: never copies a root-cause label or recommended edit into a model question. Case IDs do not prove original-question provenance.</p><div class="actions"><button id="fetchCSV">Load published team CSV</button><input id="csvFile" type="file" accept=".csv,text/csv"></div><p id="csvStatus" class="muted" role="status"></p><label for="csvCase">Select imported public case</label><select id="csvCase" disabled><option value="">No cases loaded</option></select><button id="useCSV" disabled>Use selected question</button><div id="caseOrigin" class="muted"></div></details>
 <label class="check"><input id="consent" type="checkbox">I confirm the question and context contain only public or explicitly approved material. No customer SPRs, credentials or private device data.</label>
-<div class="actions"><button id="plan">Plan only · no model</button><button id="ask" class="primary">Ask campus Qwen</button><button id="compare">Compare baseline / guided</button></div><p id="status" class="muted" role="status" aria-live="polite"></p>
+<div class="actions"><button id="plan">Offline guidance · no model</button><button id="evidence">Fetch official excerpts only</button><button id="ask" class="primary">Ask campus Qwen</button><button id="compare">Compare baseline / guided</button></div><p id="status" class="muted" role="status" aria-live="polite"></p>
 </section>
 <section class="box" id="planBox" hidden><h2>2. Decide what to do</h2><div id="planOutput"></div></section>
-<section class="box" id="sourceBox" hidden><h2>3. Inspect retrieved evidence</h2><div id="sourceOutput"></div></section>
-<section class="box" id="answerBox" hidden><h2>4. Review the answer</h2><div id="answerOutput"></div><button id="download" hidden>Download run receipt (JSON)</button></section>
+<section class="box" id="sourceBox" hidden><h2>3. Inspect source evidence</h2><div id="sourceOutput"></div></section>
+<section class="box" id="answerBox" hidden><h2>4. Review the answer</h2><div id="answerOutput"></div></section><button id="download" hidden>Download result / handoff (JSON)</button>
 <footer>Independent student research prototype. A quoted passage is not a verified technical answer. No device validation, document publication, or measured reduction in support demand is claimed. Campus model only.</footer>
-</main><script>
+</main><script src="guidance-planner.js"></script><script src="guidance-intake.js"></script><script>
 "use strict";
-const $=id=>document.getElementById(id);let access="",last=null,caseId="";
+const $=id=>document.getElementById(id);let access="",last=null,caseId="",csvRows=[];
 const local=location.protocol==="http:"&&["127.0.0.1","localhost"].includes(location.hostname);
 const text=(tag,value,cls)=>{const e=document.createElement(tag);e.textContent=String(value??"");if(cls)e.className=cls;return e};
 function link(url,label){const e=text("a",label||url);try{const u=new URL(url);if(u.protocol==="https:"&&u.hostname==="techdocs.zebra.com"){e.href=u.href;e.target="_blank";e.rel="noopener noreferrer"}}catch{}return e}
 function addList(parent,items){const list=document.createElement("ul");for(const item of items||[])list.append(text("li",item));parent.append(list)}
-function busy(value){for(const id of ["plan","ask","compare","loadExample","loadUnknown"])$(id).disabled=value||!local}
+function busy(value){
+ for(const id of ["plan","loadExample","loadUnknown","loadPrereq"])$(id).disabled=value;
+ for(const id of ["evidence","ask","compare"])$(id).disabled=value||!access;
+ $("fetchCSV").disabled=value;
+}
 async function session(){
- if(!local){$("environment").textContent="This static preview cannot call campus models. Start the existing local campus server and open its Ask & Guide page (http://127.0.0.1:3000/answer-guidance.html).";busy(false);return}
- try{const r=await fetch("/api/session",{cache:"no-store"});const s=await r.json();if(!r.ok||!s.local_session||!s.review_access)throw Error("No local session");access=s.review_access;$("environment").textContent="Local service ready. Configured model: "+s.model+". A live result still requires a reachable Northwestern model endpoint.";busy(false)}catch(e){$("environment").textContent="Local session unavailable. Start npm run campus and reload.";busy(true)}
+ busy(false);
+ if(!local){$("environment").textContent="Offline guidance is active: no server or model is needed for planning and the checked source cards. Live inference requires the authorized local campus server.";return}
+ try{const r=await fetch("/api/session",{cache:"no-store",signal:AbortSignal.timeout(3000)});const x=await r.json();if(!r.ok||!x.local_session||!x.review_access)throw Error("No local session");access=x.review_access;$("environment").textContent="Offline guidance and official-source retrieval are available. Campus Qwen is optional; its configured model is "+x.model+". Actual connectivity is not yet established.";busy(false)}catch(e){$("environment").textContent="Local service unavailable. Offline guidance still works; restart the campus service for live evidence or inference.";busy(false)}
 }
 function drawPlan(p){
  $("planBox").hidden=false;const out=$("planOutput");out.replaceChildren();
@@ -57,6 +63,17 @@ function drawPlan(p){
  const head=text("h3","Candidate response safeguards");out.append(head);
  for(const pol of p.policies||[]){const row=text("div","","step");row.append(text("strong",pol.id.replaceAll("_"," ")),text("p",pol.strategy,"muted"));out.append(row)}
  out.append(text("p","These are provisional safeguards, not confirmed recurring failure causes.","muted"));
+}
+function drawCards(packet){
+ const cards=packet.cards||[];if(!cards.length)return;
+ $("sourceBox").hidden=false;const out=$("sourceOutput");out.replaceChildren();
+ out.append(text("p",packet.notice,"notice"));
+ for(const c of cards){
+  const item=text("section","","step");item.append(text("h3",c.title+" · DataWedge "+c.version),link(c.url,"Open official article"),text("p","Source inspected "+c.checked+"; not fetched in this run.","muted"));
+  const grid=text("div","","grid");
+  for(const x of c.sections){const card=text("div","","evidence");card.append(text("strong",x.section),text("blockquote",x.quote),text("p",x.note,"muted"));grid.append(card)}
+  item.append(grid,text("p",c.next,"notice"));out.append(item)
+ }
 }
 function drawSources(result){
  if(!result.sources)return;
@@ -86,21 +103,53 @@ function drawAnswers(result){
  $("download").hidden=false;
 }
 async function run(action){
- if(!local||!access)return;
- if(action!=="plan"&&!$("consent").checked){$("status").textContent="Confirm public/approved material before sending to the campus model.";return}
+ if(action!=="plan"&&!access)return;
+ if(action!=="plan"&&!$("consent").checked){$("status").textContent="Confirm public/approved material before the network request.";return}
  busy(true);last=null;$("planBox").hidden=true;$("sourceBox").hidden=true;$("answerBox").hidden=true;$("download").hidden=true;
- $("status").textContent=action==="plan"?"Preparing the plan without model calls…":"Retrieving version-pinned official sources and requesting campus inference…";
+ $("status").textContent=action==="plan"?"Preparing offline guidance without network or model…":action==="evidence"?"Fetching official excerpts only. No model call…":"Retrieving version-pinned official sources and requesting campus inference…";
  try{
   const input={action,case_id:caseId,question:$("question").value,product:$("product").value,version:$("version").value,context:$("context").value,source_urls:$("sources").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean),public_only:$("consent").checked};
+  if(action==="plan"){
+   const plan=ZebraGuidance.prepare(input),packet=ZebraIntake.offlineEvidence(plan);
+   last={schema:"zebra-offline-handoff/v1",mode:packet.mode,plan,offline_evidence:packet,model_attempts:0,model_runs_completed:0,device_tested:false,created_at:new Date().toISOString()};
+   drawPlan(plan);drawCards(packet);$("download").hidden=false;
+   $("status").textContent=plan.state==="clarification_required"?"Clarification required. No network or model was used.":packet.cards.length?"Version-matched source cards are ready for inspection. No model was used.":"Guidance plan is ready. No matching cached source; retrieve the official article when connected.";
+   return;
+  }
   const response=await fetch("/api/answer-guidance",{method:"POST",headers:{"Content-Type":"application/json","X-Review-Access":access},body:JSON.stringify(input)});
   const result=await response.json();if(!response.ok||!result.ok)throw Error(result.error||"Guidance request failed");
-  last=result;drawPlan(result.plan);drawSources(result);drawAnswers(result);
-  $("status").textContent=result.mode==="plan_only"?"Plan generated. No model was called.":"Run returned; review evidence and candidate claims below.";
+  last=result;drawPlan(result.plan);drawSources(result);drawAnswers(result);$("download").hidden=false;
+  $("status").textContent=result.mode==="plan_only"?"Clarification required. No model was called.":result.mode==="evidence_only"?"Official excerpts retrieved. No model was called.":result.model_runs_completed?"Model result returned; inspect candidate claims.":"No usable model result returned. Inspect sources or switch to offline guidance.";
  }catch(e){$("status").textContent=String(e.message).slice(0,300)}finally{busy(false)}
 }
-$("plan").addEventListener("click",()=>run("plan"));$("ask").addEventListener("click",()=>run("guided"));$("compare").addEventListener("click",()=>run("compare"));
+$("plan").addEventListener("click",()=>run("plan"));$("evidence").addEventListener("click",()=>run("evidence"));$("ask").addEventListener("click",()=>run("guided"));$("compare").addEventListener("click",()=>run("compare"));
 function example(unknown=false){caseId="";$("question").value=unknown?"I am not receiving a result from DataWedge after requesting a command. What should I check?":"Why do the DataWedge result-code instructions mention RECEIVE_RESULT while the sample uses SEND_RESULT? Which should I use?";$("product").value="datawedge";$("version").value=unknown?"":"6.8";$("context").value="";$("sources").value=unknown?"":"https://techdocs.zebra.com/datawedge/6-8/guide/api/resultinfo/";$("consent").checked=false}
 $("loadExample").addEventListener("click",()=>example(false));$("loadUnknown").addEventListener("click",()=>example(true));
+$("loadPrereq").addEventListener("click",()=>{
+ caseId="";$("question").value="Why might the software scan trigger fail to start scanning in DataWedge 6.8?";$("product").value="datawedge";$("version").value="6.8";$("context").value="";$("sources").value="https://techdocs.zebra.com/datawedge/6-8/guide/api/softscantrigger/";$("consent").checked=false
+});
+function showCSV(csv){
+ const result=ZebraIntake.importCSV(csv);csvRows=result.rows;
+ const sel=$("csvCase");sel.replaceChildren(text("option","Choose a public case"));
+ sel.firstChild.value="";
+ for(let i=0;i<csvRows.length;i++){const row=csvRows[i],o=text("option",row.id+" · "+row.title+(row.question?"":" · original question needed"));o.value=String(i);sel.append(o)}
+ sel.disabled=!csvRows.length;$("useCSV").disabled=true;
+ $("csvStatus").textContent=result.rows.length+" public-ID rows admitted; "+result.skipped_rows+" skipped. "+(result.question_column?"Question column: "+result.question_column+". Origin still needs review.":"No explicit question column; retrieve original question manually.")+" None is declared eligible for blind evaluation.";
+}
+$("csvCase").addEventListener("change",()=>{$("useCSV").disabled=$("csvCase").value===""});
+$("useCSV").addEventListener("click",()=>{
+ const row=csvRows[Number($("csvCase").value)];if(!row||$("csvCase").value==="")return;
+ caseId=row.id;$("question").value=row.question;$("context").value="";$("version").value="";$("sources").value=row.source_urls.join("\n");$("consent").checked=false;
+ const product=row.source_urls.length?new URL(row.source_urls[0]).pathname.split("/")[1]:"";$("product").value=ZebraGuidance.products.includes(product)?product:"";
+ const box=$("caseOrigin");box.replaceChildren(text("p",row.question?"Confirm this is the original user question, not an editorial summary.":"Original question missing. Read the linked report and enter the public question yourself."));
+ if(row.forum_url){const a=text("a","Open source forum report");a.href=row.forum_url;a.target="_blank";a.rel="noopener noreferrer";box.append(a)}
+ $("status").textContent="Loaded "+row.id+"; installed version intentionally unset.";
+});
+$("csvFile").addEventListener("change",async()=>{try{const f=$("csvFile").files?.[0];if(!f)return;if(f.size>700000)throw Error("CSV too large");showCSV(await f.text())}catch(e){$("csvStatus").textContent=e.message}});
+$("fetchCSV").addEventListener("click",async()=>{
+ $("csvStatus").textContent="Loading the published public case export…";
+ try{const r=await fetch(access?"/api/public-cases":"https://zebra-techdocs-practicum.vercel.app/document-reader/zebra-cases.csv",{redirect:"error",signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error("Published CSV unavailable");const raw=access?(await r.json()).csv:await r.text();showCSV(raw)}catch(e){$("csvStatus").textContent="Unable to load the published export in this environment. Import the team's downloaded CSV instead."}
+});
 $("importFile").addEventListener("change",async()=>{
  const file=$("importFile").files?.[0];if(!file)return;try{
   if(file.size>1000000)throw Error("Public case handoff too large");const x=JSON.parse(await file.text());
@@ -110,5 +159,5 @@ $("importFile").addEventListener("change",async()=>{
  }catch(e){$("importStatus").textContent=e.message}
 });
 $("download").addEventListener("click",()=>{if(!last)return;const b=new Blob([JSON.stringify(last,null,2)+"\n"],{type:"application/json"}),url=URL.createObjectURL(b),a=document.createElement("a");a.href=url;a.download="zebra-answer-"+(last.run_id||"plan")+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
-busy(true);session();
+if(window.ZebraGuidance&&window.ZebraIntake){busy(true);session()}else{$("environment").textContent="Required offline modules are missing; open the page from the full repository checkout.";for(const id of ["plan","evidence","ask","compare"])$(id).disabled=true}
 </script></body></html>
