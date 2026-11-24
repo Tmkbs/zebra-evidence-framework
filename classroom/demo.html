@@ -19,7 +19,7 @@
 <label for="question">New developer question</label><textarea id="question" maxlength="1800" required>After an update, my DataWedge scanner no longer sends scan data to the app. What should I check?</textarea>
 <div class="fields"><div><label for="product">Product</label><select id="product"><option value="datawedge">DataWedge</option><option value="ehs">Enterprise Home Screen</option><option value="enterprise-browser">Enterprise Browser</option><option value="emdk-for-android">EMDK for Android</option><option value="stagenow">StageNow</option><option value="">Not specified</option></select></div><div><label for="version">Applicable documentation edition (if known)</label><input id="version" maxlength="24" placeholder="e.g. 15.0" autocomplete="off"></div></div>
 <details><summary>Optional context and official source</summary><label for="context">What has the user already tried?</label><textarea id="context" maxlength="1200" placeholder="Public or approved information only"></textarea><label for="source">Official TechDocs URL</label><input id="source" type="url" maxlength="1200" placeholder="https://techdocs.zebra.com/..."></details>
-<div class="actions"><button class="primary" type="submit">Apply answer guidance</button><button class="secondary" id="reset" type="button">Reset example</button></div><p id="status" role="status" aria-live="polite"></p>
+<div class="actions"><button class="primary" type="submit">Apply answer guidance</button><button class="secondary" id="reset-example" type="button">Reset example</button></div><p id="status" role="status" aria-live="polite"></p>
 </form>
 <div class="result" id="result" hidden aria-live="polite">
 <div class="eyebrow">Answer plan · rule-based, not a model response</div>
@@ -53,6 +53,6 @@ if(window.ZebraPatternDemo&&window.ZebraGuidance){
  $("hits").textContent=data.hits+"/"+data.cases.length;$("support").textContent=data.independent;$("validation").textContent=data.validated;
  $("question-form").addEventListener("submit",e=>{e.preventDefault();render()});
  for(const id of ["question","product","version","context","source"])$(id).addEventListener("input",clear);
- $("reset").addEventListener("click",()=>{$("question-form").reset();clear()});
+ $("reset-example").addEventListener("click",()=>{$("question-form").reset();clear()});
 }else{$("status").textContent="Required local modules are unavailable.";$("question-form").querySelector("button[type=submit]").disabled=true}
 </script></body></html>
