@@ -43,7 +43,10 @@ function openCompanion(){
  const map=api.graph(key);
  record={schema:"zebra-team-companion-result/v1",reader_key:key,source:api.handoff(key),visual_guidance:map,visual_storyboard:story.build(map),self_check:null,model_calls:0,device_tested:false};
  $("title").textContent=item.title;$("scope").textContent="Public forum report · DataWedge "+item.reported_version+" (self-reported) · team article edition "+item.reader_document_edition+" · "+item.release+" review";
- $("reader").href=item.reader_url;$("ask").href="answer-guidance.html?reader="+encodeURIComponent(key);$("archive").href=item.archive_url;
+ $("reader").href=item.reader_url;
+ const local=location.protocol==="file:"||["127.0.0.1","localhost"].includes(location.hostname);
+ const guideBase=local||location.hostname==="tmkbs.github.io"?"answer-guidance.html":"https://tmkbs.github.io/zebra-evidence-framework/classroom/answer-guidance.html";
+ $("ask").href=guideBase+"?reader="+encodeURIComponent(key);$("archive").href=item.archive_url;
  for(const id of ["nav","player","check","boundary","exportRow"])$(id).hidden=false;
  const controller=story.mount($("player"));controller.update(map);
  window.addEventListener("pagehide",()=>controller.destroy(),{once:true});
