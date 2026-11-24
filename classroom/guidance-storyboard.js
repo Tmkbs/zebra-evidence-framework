@@ -242,7 +242,7 @@ function videoSupport(doc){
  const win=doc?.defaultView;
  const canvas=doc?.createElement?.("canvas");
  if(!win?.MediaRecorder||!canvas||typeof canvas.captureStream!=="function"||!win.URL?.createObjectURL||!win.XMLSerializer)return "";
- return ["video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"].find(m=>win.MediaRecorder.isTypeSupported(m))||"";
+ return ["video/webm;codecs=vp8","video/webm;codecs=vp9","video/webm"].find(m=>win.MediaRecorder.isTypeSupported(m))||"";
 }
 function wrapCaption(ctx,value,width){
  const lines=[];let line="";
@@ -272,7 +272,9 @@ function sourceLabel(frame){
  if(kinds.has("retrieved_excerpt"))labels.push("Retrieved official excerpt");
  if(kinds.has("checked_source_card"))labels.push("Checked official source card");
  if(kinds.has("selected_link"))labels.push("Selected source link (not inspected)");
- return labels.length?labels.join(" / "):"Conceptual transition; no additional source claim";
+ const scopes=new Set();
+ for(const e of frame.evidence){try{const u=new URL(e.url),p=u.pathname.split("/").filter(Boolean);if(u.hostname==="techdocs.zebra.com"&&p[0]&&/^\d+(?:-\d+)+$/.test(p[1]||""))scopes.add(p[0]+" "+p[1].replaceAll("-","."))}catch{}}
+ return labels.length?labels.join(" / ")+(scopes.size?" · "+[...scopes].join(", "):""):"Conceptual transition; no additional source claim";
 }
 function clipCanvas(doc,map,plan,images){
  const canvas=doc.createElement("canvas");canvas.width=1280;canvas.height=720;
