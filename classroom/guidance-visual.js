@@ -49,7 +49,7 @@ function make(kind,title,summary,columns,next,nodes,controls=[],state={}){
  const links=[];
  for(let i=1;i<columns.length;i++)for(const from of columns[i-1])for(const to of columns[i])links.push({from,to,relation:"guide_sequence_not_causal_proof"});
  return {schema:"zebra-visual-guide/v1",kind,title,summary,columns,links,nodes,next,controls,state,
-  device_tested:false,model_calls:0,observation_status:"hypothetical_or_unverified",publication_approved:false};
+  device_tested:false,visual_model_calls:0,observation_status:"hypothetical_or_unverified",publication_approved:false};
 }
 function graph(plan,result={},inputState={}){
  if(!plan||plan.schema!=="zebra-answer-plan/v1")throw Error("A prepared guidance plan is required");
@@ -82,17 +82,17 @@ function graph(plan,result={},inputState={}){
   let next;
   const p=state.profile,s=state.scanner;
   if(p==="unknown")next={id:"profile",text:"Inspect the active profile and determine whether Barcode Input is enabled."};
-  else if(p==="disabled")next={id:"profile",text:"The reported disabled input does not satisfy the documented prerequisite. Review the active profile before retrying."};
+  else if(p==="disabled")next={id:"profile",text:"The selected disabled input does not satisfy the documented prerequisite. Review the active profile before retrying."};
   else if(s==="unknown")next={id:"scanner",text:"Check scanner status at the time of the command."};
-  else if(s==="busy")next={id:"scanner",text:"The reported busy state is a documented reason a command may be ignored. Inspect SCANNER_STATUS and verify readiness before retrying."};
-  else next={id:"outcome",text:"Both reported prerequisites are accounted for. Reproduce the command on the target build and inspect its result/logs; success is not established."};
-  const ps=p==="unknown"?"check":p==="disabled"?"blocked":"reported";
-  const ss=p!=="enabled"?"waiting":s==="unknown"?"check":s==="busy"?"blocked":"reported";
+  else if(s==="busy")next={id:"scanner",text:"The selected busy state is a documented reason a command may be ignored. Inspect SCANNER_STATUS and verify readiness before retrying."};
+  else next={id:"outcome",text:"Both selected conditions meet the documented checks. Reproduce the command on the target build and inspect its result/logs; success is not established."};
+  const ps=p==="unknown"?"check":p==="disabled"?"blocked":"selected";
+  const ss=p!=="enabled"?"waiting":s==="unknown"?"check":s==="busy"?"blocked":"selected";
   const nodes=[
    node("command","App command","SOFT_SCAN_TRIGGER","input","Conceptual start: a developer attempts a software scan trigger in DataWedge 6.8."),
-   node("profile","Active profile",p==="unknown"?"Input not checked":p==="enabled"?"Input reported enabled":"Input reported disabled",ps,
+   node("profile","Active profile",p==="unknown"?"Input not checked":p==="enabled"?"Input selected enabled":"Input selected disabled",ps,
     "The selected state is hypothetical or user-reported, never read from hardware. The official article makes Barcode Input a prerequisite.",[scan[0]]),
-   node("scanner","Scanner readiness",p!=="enabled"?"Check profile first":s==="unknown"?"Status not checked":s==="busy"?"Reported busy":"Reported ready",ss,
+   node("scanner","Scanner readiness",p!=="enabled"?"Check profile first":s==="unknown"?"Status not checked":s==="busy"?"Selected busy":"Selected ready",ss,
     "A busy scanner may ignore the trigger. Check the status mechanism in the version-specific article.",[scan[1]]),
    node("outcome","Next diagnostic action","Device result unverified",next.id==="outcome"?"check":"waiting",
     next.id==="outcome"?next.text:"Resolve the highlighted prerequisite before concluding anything about the device.")
@@ -142,7 +142,7 @@ function render(container,map,{focus="",confirmed=false,reported=false,onFocus=(
   for(const id of map.columns[i]){
    const n=nodes.get(id),b=el("button","","vision-node vision-"+n.status+(id===map.next.id?" vision-current":""));
    b.type="button";b.dataset.visionNode=id;b.setAttribute("aria-pressed",String(id===selected.id));
-   b.append(el("span",n.status==="reported"?"SELF-REPORTED":n.status==="source"?"SOURCE TEXT":n.status==="waiting"?"PENDING":n.status==="blocked"?"CHECK BLOCKED":n.status==="check"?"CHECK NEEDED":"QUESTION","vision-node-status"),el("strong",n.title),el("span",n.caption,"vision-node-caption"));
+   b.append(el("span",n.status==="reported"?"REPORTED SCOPE":n.status==="selected"?(reported?"SELF-REPORTED":"SCENARIO INPUT"):n.status==="source"?"SOURCE TEXT":n.status==="waiting"?"PENDING":n.status==="blocked"?"CHECK BLOCKED":n.status==="check"?"CHECK NEEDED":"QUESTION","vision-node-status"),el("strong",n.title),el("span",n.caption,"vision-node-caption"));
    b.addEventListener("click",()=>onFocus(id));col.append(b)
   }
   diagram.append(col);
