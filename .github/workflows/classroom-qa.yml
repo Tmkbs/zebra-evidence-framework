@@ -25,3 +25,6 @@ jobs:
           node-version: '22'
       - name: Run offline demo tests (no dependencies)
         run: npm test
+
+      - name: Interactive vision in actual Chromium (offline)
+        run: npm run test:vision:browser
