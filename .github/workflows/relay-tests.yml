@@ -1,0 +1,28 @@
+name: Relay Safety Checks
+on:
+  push:
+    branches:
+      - feat/qwen-gpt-relay-pattern-20261123
+    paths:
+      - 'relay/**'
+      - '.github/workflows/relay-tests.yml'
+  pull_request:
+    paths:
+      - 'relay/**'
+      - '.github/workflows/relay-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Relay tests, no API calls
+        run: |
+          python -m unittest discover -s relay/tests -v
+          python relay/agent_relay.py --validate-only
