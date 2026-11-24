@@ -10,6 +10,7 @@ const fs=require("node:fs");
 const path=require("node:path");
 const crypto=require("node:crypto");
 const review=require("./api/review.js");
+const guidance=require("./analysis/answer-guidance.cjs");
 
 const DEFAULT_API="http://c3dgx0.cs.northwestern.edu:8000/v1";
 const DEFAULT_MODEL="nvidia/Qwen3.8-Flash-Next-FP4-Local";
@@ -22,6 +23,9 @@ const PAGES=Object.freeze({
  "/classroom/index.html":"index.html",
  "/final-delivery.html":"final-delivery.html",
  "/classroom/final-delivery.html":"final-delivery.html",
+ "/answer-guidance.html":"answer-guidance.html",
+ "/classroom/answer-guidance.html":"answer-guidance.html",
+ "/analysis/zebra-pattern-analysis.html":"../analysis/zebra-pattern-analysis.html",
  "/evidence-framework-sandbox.html":"evidence-framework-sandbox.html",
  "/classroom/evidence-framework-sandbox.html":"evidence-framework-sandbox.html",
  "/course.html":"course.html",
@@ -32,16 +36,16 @@ function configure(env=process.env){
  if(!Number.isInteger(port)||port<1024||port>65535)throw Error("Invalid local port");
  const base=String(env.AI_BASE_URL||DEFAULT_API).replace(/\/+$/,"");
  let u;try{u=new URL(base)}catch{throw Error("Invalid AI_BASE_URL")}
- if(!["http:","https:"].includes(u.protocol)||u.username||u.password||u.search||u.hash||!u.pathname.endsWith("/v1"))throw Error("AI_BASE_URL must end with /v1 and have no credentials");
+ if(!["http:","https:"].includes(u.protocol)||u.username||u.password||u.search||u.hash||u.pathname.replace(/\/+$/,"")!=="/v1")throw Error("AI_BASE_URL must end with /v1 and have no credentials");
  const campus=u.hostname==="c3dgx0.cs.northwestern.edu";
- if(u.protocol==="http:"&&!campus)throw Error("Plain HTTP is only allowed for the configured Northwestern campus host");
- if(!campus&&!env.AI_API_KEY)throw Error("Set AI_API_KEY for a non-campus provider");
+ if(!campus)throw Error("Only the approved Northwestern campus model host is allowed");
+ if(u.protocol==="http:"&&env.CAMPUS_QWEN_TOKEN&&env.CAMPUS_QWEN_TOKEN!=="token-is-ignored")throw Error("Real campus authentication tokens require HTTPS");
  // Harper's local vLLM server ignores the sample Bearer value.
  env.AI_BASE_URL=base;
  env.AI_MODEL=env.AI_MODEL||DEFAULT_MODEL;
  if(campus){
   env.AI_ALLOW_HTTP="true";
-  env.AI_API_KEY=env.AI_API_KEY||"token-is-ignored";
+  env.AI_API_KEY="token-is-ignored";
  }
  env.AI_REVIEW_ACCESS_TOKEN=env.AI_REVIEW_ACCESS_TOKEN||crypto.randomBytes(24).toString("hex");
  const origins=["http://127.0.0.1:"+port,"http://localhost:"+port];
@@ -60,7 +64,7 @@ function allowHost(req,port){
 }
 async function campusStatus(cfg,request=fetch){
  try{
-  const res=await request(cfg.base+"/models",{headers:{Accept:"application/json"},signal:AbortSignal.timeout(6000)});
+  const res=await request(cfg.base+"/models",{redirect:"error",headers:{Accept:"application/json"},signal:AbortSignal.timeout(6000)});
   if(!res.ok)return{connected:false,model:cfg.model,error:"HTTP "+res.status+" from model-list route"};
   const payload=await res.json();
   const models=(Array.isArray(payload?.data)?payload.data:[]).map(x=>x?.id).filter(x=>typeof x==="string").slice(0,60);
@@ -114,6 +118,17 @@ function buildServer(cfg,request=fetch){
    if(!sameOriginRequest(req,cfg))return json(res,403,{ok:false,error:"Same-origin local review only"});
    return json(res,200,await campusStatus(cfg,request));
   }
+  if(route==="/api/answer-guidance"){
+   if(req.method!=="POST")return json(res,405,{ok:false,error:"POST required"});
+   if(!sameOriginRequest(req,cfg))return json(res,403,{ok:false,error:"Same-origin local guidance only"});
+   const supplied=Buffer.from(String(req.headers["x-review-access"]||"")),expected=Buffer.from(String(cfg.passcode||""));
+   if(!expected.length||supplied.length!==expected.length||!crypto.timingSafeEqual(supplied,expected))
+    return json(res,401,{ok:false,error:"Local session required"});
+   let input;
+   try{input=JSON.parse(await readBody(req,12000))}catch{return json(res,400,{ok:false,error:"Invalid JSON or request too large"})}
+   try{return json(res,200,await guidance.run(input,cfg,request))}
+   catch(e){return json(res,422,{ok:false,error:String(e.message).slice(0,300),model_calls_confirmed:false})}
+  }
   if(route==="/api/review"){
    if(req.method==="POST"){
     try{req.body=JSON.parse(await readBody(req))}catch{return json(res,400,{ok:false,error:"Invalid JSON or request too large"})}
@@ -138,6 +153,7 @@ function start(){
  server.listen(cfg.port,"127.0.0.1",()=>{
   console.log("Zebra final AI review: http://127.0.0.1:"+cfg.port+"/final-delivery.html");
   console.log("Classroom evidence demo: http://127.0.0.1:"+cfg.port+"/");
+  console.log("New-question answer guidance: http://127.0.0.1:"+cfg.port+"/answer-guidance.html");
   console.log("Campus status check: http://127.0.0.1:"+cfg.port+"/api/campus-status");
   console.log("Configured model: "+cfg.model);
   console.log("Session review access code (enter under AI connection): "+cfg.passcode);

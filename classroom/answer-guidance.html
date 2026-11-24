@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer"><title>Zebra • Ask &amp; Guide</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#182e3a;background:#f3f5f6;line-height:1.5;font-size:15px}*{box-sizing:border-box}body{margin:0}
+header{background:#fff;border-bottom:1px solid #dce3e7}header div,main{max-width:1080px;margin:auto;padding:20px 24px}header div{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+a{color:#076969;text-underline-offset:3px}h1{font-size:32px;line-height:1.13;letter-spacing:-.03em;margin:14px 0 10px}h2{font-size:19px;margin:0 0 12px}h3{font-size:15px;margin:12px 0 7px}
+p{margin:8px 0}.muted{color:#526671;font-size:13px}.kicker{text-transform:uppercase;font-size:11px;letter-spacing:.1em;font-weight:700;color:#176d68}
+.box{background:white;border:1px solid #dbe2e5;border-radius:12px;padding:20px;margin:16px 0}.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+label{display:block;font-size:13px;font-weight:650;margin:11px 0 6px}textarea,input,select,button{font:inherit}textarea,input:not([type=checkbox]):not([type=file]),select{width:100%;padding:10px;border:1px solid #b8c9cc;border-radius:6px;background:#fff;color:#182e3a}textarea{min-height:88px;resize:vertical}textarea.sources{min-height:65px;font-size:13px}
+button{cursor:pointer;font-weight:650;border:1px solid #b8cecc;border-radius:7px;color:#0d5551;background:#fff;padding:10px 14px}button.primary{color:white;background:#08776c;border-color:#08776c}button:disabled{cursor:default;opacity:.5}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0 8px}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #8dc9bf;outline-offset:2px}
+.notice{background:#edf4f4;padding:12px 14px;border-left:4px solid #428c87;margin:12px 0;border-radius:5px}.warning{background:#fff4e3;border-color:#c28a35}.pill{font-size:12px;font-weight:650;border:1px solid #b8cfce;border-radius:12px;padding:3px 9px;display:inline-block}
+.evidence{background:#f7f9fa;border-left:3px solid #a6b6bd;padding:12px;margin:10px 0;overflow-wrap:anywhere}blockquote{margin:7px 0 0;font-family:ui-monospace,Consolas,monospace;font-size:13px;white-space:pre-wrap}ul{padding-left:20px}li{margin:6px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;max-height:360px;overflow:auto}
+.step{padding:10px 0;border-bottom:1px solid #e0e6e8}.step:last-child{border-bottom:0}.check{display:flex;gap:8px;align-items:flex-start;font-size:13px;font-weight:400;margin-top:12px}.check input{margin-top:5px}
+#status{min-height:22px}details{margin-top:12px}summary{cursor:pointer;font-weight:650}footer{margin-top:24px;font-size:12px;color:#536873}
+@media(max-width:660px){header div,main{padding:16px}.grid{grid-template-columns:1fr}.box{padding:16px}h1{font-size:27px}}
+</style></head>
+<body><header><div><strong>Zebra TechDocs · student prototype</strong><a href="../analysis/zebra-pattern-analysis.html">Pattern research snapshot</a><a href="final-delivery.html">Document-review workflow</a></div></header>
+<main><div class="kicker">Answer-side contribution</div><h1>Ask &amp; Guide</h1>
+<p>Apply evidence-aware safeguards to a new developer question. This is not a second case reader or an automatic documentation editor.</p>
+<div id="environment" class="notice">Checking whether the local campus service is available…</div>
+<section class="box">
+<h2>1. Ask a question</h2>
+<div class="actions"><button id="loadExample">Load result-code example</button><button id="loadUnknown">Try missing version</button></div>
+<label for="question">Developer question</label><textarea id="question">Why do the DataWedge result-code instructions mention RECEIVE_RESULT while the sample uses SEND_RESULT? Which should I use?</textarea>
+<div class="grid"><div><label for="product">Software product</label><select id="product"><option value="">Not specified</option><option value="datawedge" selected>DataWedge</option><option value="ehs">Enterprise Home Screen</option><option value="enterprise-browser">Enterprise Browser</option><option value="emdk-for-android">EMDK for Android</option><option value="stagenow">StageNow</option></select></div>
+<div><label for="version">Reported installed version</label><input id="version" value="6.8" placeholder="e.g. 6.8 (leave blank if unknown)"></div></div>
+<label for="context">Public configuration / observation (optional)</label><textarea id="context" placeholder="What was tried? What result was observed? Do not enter private ticket or customer details."></textarea>
+<label for="sources">Official source URLs (optional; up to two, one per line)</label><textarea id="sources" class="sources" placeholder="Leave blank for limited DataWedge topic routing">https://techdocs.zebra.com/datawedge/6-8/guide/api/resultinfo/</textarea>
+<p class="muted">Automatic routing currently covers a few DataWedge topics. Other topics require the relevant version-specific article. It is not a full TechDocs search engine.</p>
+<details><summary>Import public case handoff</summary><p class="muted">Accepts the team's public case contract, including question and official evidence URLs. Imported text is not treated as verified evidence. Installed version is left blank for confirmation.</p><input id="importFile" type="file" accept=".json,application/json"><p id="importStatus" class="muted"></p></details>
+<label class="check"><input id="consent" type="checkbox">I confirm the question and context contain only public or explicitly approved material. No customer SPRs, credentials or private device data.</label>
+<div class="actions"><button id="plan">Plan only · no model</button><button id="ask" class="primary">Ask campus Qwen</button><button id="compare">Compare baseline / guided</button></div><p id="status" class="muted" role="status" aria-live="polite"></p>
+</section>
+<section class="box" id="planBox" hidden><h2>2. Decide what to do</h2><div id="planOutput"></div></section>
+<section class="box" id="sourceBox" hidden><h2>3. Inspect retrieved evidence</h2><div id="sourceOutput"></div></section>
+<section class="box" id="answerBox" hidden><h2>4. Review the answer</h2><div id="answerOutput"></div><button id="download" hidden>Download run receipt (JSON)</button></section>
+<footer>Independent student research prototype. A quoted passage is not a verified technical answer. No device validation, document publication, or measured reduction in support demand is claimed. Campus model only.</footer>
+</main><script>
+"use strict";
+const $=id=>document.getElementById(id);let access="",last=null,caseId="";
+const local=location.protocol==="http:"&&["127.0.0.1","localhost"].includes(location.hostname);
+const text=(tag,value,cls)=>{const e=document.createElement(tag);e.textContent=String(value??"");if(cls)e.className=cls;return e};
+function link(url,label){const e=text("a",label||url);try{const u=new URL(url);if(u.protocol==="https:"&&u.hostname==="techdocs.zebra.com"){e.href=u.href;e.target="_blank";e.rel="noopener noreferrer"}}catch{}return e}
+function addList(parent,items){const list=document.createElement("ul");for(const item of items||[])list.append(text("li",item));parent.append(list)}
+function busy(value){for(const id of ["plan","ask","compare","loadExample","loadUnknown"])$(id).disabled=value||!local}
+async function session(){
+ if(!local){$("environment").textContent="This static preview cannot call campus models. Start the existing local campus server and open its Ask & Guide page (http://127.0.0.1:3000/answer-guidance.html).";busy(false);return}
+ try{const r=await fetch("/api/session",{cache:"no-store"});const s=await r.json();if(!r.ok||!s.local_session||!s.review_access)throw Error("No local session");access=s.review_access;$("environment").textContent="Local service ready. Configured model: "+s.model+". A live result still requires a reachable Northwestern model endpoint.";busy(false)}catch(e){$("environment").textContent="Local session unavailable. Start npm run campus and reload.";busy(true)}
+}
+function drawPlan(p){
+ $("planBox").hidden=false;const out=$("planOutput");out.replaceChildren();
+ out.append(text("p",p.state==="clarification_required"?"Ask for missing context before answering.":"Version-specific source route selected; installed version is not independently verified.","pill"));
+ if(p.clarification?.length)addList(out,p.clarification);
+ for(const u of p.source_urls||[]){const row=text("div","","step");row.append(link(u));out.append(row)}
+ const head=text("h3","Candidate response safeguards");out.append(head);
+ for(const pol of p.policies||[]){const row=text("div","","step");row.append(text("strong",pol.id.replaceAll("_"," ")),text("p",pol.strategy,"muted"));out.append(row)}
+ out.append(text("p","These are provisional safeguards, not confirmed recurring failure causes.","muted"));
+}
+function drawSources(result){
+ if(!result.sources)return;
+ $("sourceBox").hidden=false;const out=$("sourceOutput");out.replaceChildren();
+ for(const s of result.sources){const item=text("div","","step");item.append(text("strong",s.id+" · retrieved official excerpt"),text("div",s.retrieved_at,"muted"),link(s.url));const detail=document.createElement("details");detail.append(text("summary","Read the frozen excerpt"),text("pre",s.text));item.append(detail);out.append(item)}
+ const sig=result.signals;
+ if(sig?.hits?.length){out.append(text("h3","Source vocabulary check"));const g=text("div","","grid");for(const hit of sig.hits){const card=text("div","","evidence");card.append(text("strong",hit.token),text("p",hit.evidence_id,"muted"),text("blockquote",hit.context),link(hit.url,"Read official source"));g.append(card)}out.append(g,text("p",sig.interpretation,"muted"))}
+ out.append(text("p","Evidence fingerprint: "+result.evidence_sha256,"muted"))
+}
+function drawAnswers(result){
+ if(!result.runs)return;
+ $("answerBox").hidden=false;const out=$("answerOutput");out.replaceChildren();
+ out.append(text("p",result.model_runs_completed+" of "+result.model_attempts+" model runs returned usable JSON. "+(result.runs.length===2?(result.pair_valid?"Same reported model; paired inputs frozen.":"Pair incomplete or model identity unconfirmed."):"One guided answer."),"notice"));
+ const g=text("div","",result.runs.length===2?"grid":"");
+ for(const run of result.runs){
+  const item=text("section","","box");item.append(text("h3",run.mode==="baseline"?"Baseline answer":"Guided answer"));
+  if(!run.completed){item.append(text("p",run.error,"warning notice"));g.append(item);continue}
+  const v=run.result;
+  item.append(text("p",v.model_reported_status.replaceAll("_"," ")+" · independent review required","pill"),text("p",v.exact_quote_count+"/"+v.claim_count+" claims have an exact excerpt match (not accuracy).","muted"));
+  if(!v.quote_checked_claims.length)item.append(text("p","No mechanically quote-checked claim to display."));
+  for(const c of v.quote_checked_claims){const box=text("div","","evidence");box.append(text("p",c.claim),text("blockquote",c.quote),link(c.url,c.evidence_id+" · source"));item.append(box)}
+  if(v.clarification.length){item.append(text("h3","Model asks"));addList(item,v.clarification)}
+  if(v.next_checks.length){item.append(text("h3","Suggested next checks"));addList(item,v.next_checks)}
+  if(v.rejected_claims.length){const d=document.createElement("details");d.append(text("summary",v.rejected_claims.length+" rejected / ungrounded claim(s)"),text("pre",JSON.stringify(v.rejected_claims,null,2)));item.append(d)}
+  item.append(text("p",v.metric_scope,"muted"));g.append(item)
+ }out.append(g);
+ $("download").hidden=false;
+}
+async function run(action){
+ if(!local||!access)return;
+ if(action!=="plan"&&!$("consent").checked){$("status").textContent="Confirm public/approved material before sending to the campus model.";return}
+ busy(true);last=null;$("planBox").hidden=true;$("sourceBox").hidden=true;$("answerBox").hidden=true;$("download").hidden=true;
+ $("status").textContent=action==="plan"?"Preparing the plan without model calls…":"Retrieving version-pinned official sources and requesting campus inference…";
+ try{
+  const input={action,case_id:caseId,question:$("question").value,product:$("product").value,version:$("version").value,context:$("context").value,source_urls:$("sources").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean),public_only:$("consent").checked};
+  const response=await fetch("/api/answer-guidance",{method:"POST",headers:{"Content-Type":"application/json","X-Review-Access":access},body:JSON.stringify(input)});
+  const result=await response.json();if(!response.ok||!result.ok)throw Error(result.error||"Guidance request failed");
+  last=result;drawPlan(result.plan);drawSources(result);drawAnswers(result);
+  $("status").textContent=result.mode==="plan_only"?"Plan generated. No model was called.":"Run returned; review evidence and candidate claims below.";
+ }catch(e){$("status").textContent=String(e.message).slice(0,300)}finally{busy(false)}
+}
+$("plan").addEventListener("click",()=>run("plan"));$("ask").addEventListener("click",()=>run("guided"));$("compare").addEventListener("click",()=>run("compare"));
+function example(unknown=false){caseId="";$("question").value=unknown?"I am not receiving a result from DataWedge after requesting a command. What should I check?":"Why do the DataWedge result-code instructions mention RECEIVE_RESULT while the sample uses SEND_RESULT? Which should I use?";$("product").value="datawedge";$("version").value=unknown?"":"6.8";$("context").value="";$("sources").value=unknown?"":"https://techdocs.zebra.com/datawedge/6-8/guide/api/resultinfo/";$("consent").checked=false}
+$("loadExample").addEventListener("click",()=>example(false));$("loadUnknown").addEventListener("click",()=>example(true));
+$("importFile").addEventListener("change",async()=>{
+ const file=$("importFile").files?.[0];if(!file)return;try{
+  if(file.size>1000000)throw Error("Public case handoff too large");const x=JSON.parse(await file.text());
+  if(x.inputOrigin!=="public-developer-forum"||typeof x.question!=="string"||typeof x.id!=="string"||!/^ZF-[0-9a-f]{16}$/i.test(x.id))throw Error("Expected a public developer forum ZF case");
+  const urls=(Array.isArray(x.evidence)?x.evidence:[]).filter(e=>e?.kind==="official"&&typeof e.url==="string").map(e=>e.url).filter(url=>{try{const u=new URL(url);return u.protocol==="https:"&&u.hostname==="techdocs.zebra.com"&&!u.username&&!u.password&&!u.port&&!u.search}catch{return false}});
+  const product=urls.length?new URL(urls[0]).pathname.split("/")[1]:"";caseId=x.id;$("question").value=x.question.slice(0,1800);$("product").value=["datawedge","ehs","enterprise-browser","emdk-for-android","stagenow"].includes(product)?product:"";$("version").value="";$("context").value="";$("sources").value=[...new Set(urls)].slice(0,2).join("\n");$("consent").checked=false;$("importStatus").textContent="Loaded "+caseId+". Confirm installed version and compatible source URLs before running.";
+ }catch(e){$("importStatus").textContent=e.message}
+});
+$("download").addEventListener("click",()=>{if(!last)return;const b=new Blob([JSON.stringify(last,null,2)+"\n"],{type:"application/json"}),url=URL.createObjectURL(b),a=document.createElement("a");a.href=url;a.download="zebra-answer-"+(last.run_id||"plan")+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+busy(true);session();
+</script></body></html>

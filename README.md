@@ -1,5 +1,9 @@
 # Zebra Evidence Framework — research workbench and classroom demo
 
+## New-question answer guidance (campus-only)
+
+[Integration and evaluation handoff](analysis/ANSWER_GUIDANCE_HANDOFF.md). The [Ask & Guide page](classroom/answer-guidance.html) adds a new-question workflow rather than a second documentation editor: clarification, version-pinned public evidence, candidate safeguards, and optional same-evidence baseline/guided comparison. The public page is a preview; open `http://127.0.0.1:3000/answer-guidance.html` from the existing authorized campus runner. No external paid-model API calls or automatic publication. This does not change the historical [pattern snapshot](analysis/zebra-pattern-analysis.html).
+
 ## Run the real Northwestern model (local/VPN, no API key needed)
 
 The working UI and AI review server now run together using the campus Qwen Chat Completions API. **This is a real inference path, not a simulated model response.** It must be started on a computer with Northwestern VPN or eduroam; the public GitHub Pages deployment cannot reach the campus-only HTTP service.
