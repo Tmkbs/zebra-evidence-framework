@@ -12,26 +12,31 @@
 <body>
 <header><div class="wrap"><div class="eyebrow">Zebra Technologies · Northwestern Forge</div><h1>From support cases to better AI answers</h1><p class="muted">Interactive Tech Docs with Conversation and Video · answer-side research prototype</p></div></header>
 <main class="wrap" id="main">
-<section class="card" aria-labelledby="research"><div class="eyebrow">01 · Learn from previous cases</div><h2 id="research">Do different questions share a common problem?</h2><p>Instead of repairing one document at a time, we look for repeated issues that could inform how the assistant handles future questions.</p>
+<section class="card" aria-labelledby="evidence-heading"><div class="eyebrow">01 · Evidence framework</div><h2 id="evidence-heading">What can we actually trust?</h2><p>Before learning a pattern or answering a question, we separate official documentation, reported observations, and unverified conclusions.</p>
+<div class="flow" aria-label="Research evidence snapshot"><div><strong>7</strong>Evidence records</div><span aria-hidden="true">→</span><div><strong>6</strong>Official-source records</div><span aria-hidden="true">+</span><div><strong>1</strong>Public forum report</div></div>
+<div class="note"><b>Evidence checks:</b> 2 source records were reused across cases; 1 forum report has no established installed version. Repeated citations are not independent confirmation. These are counts from the existing three-case snapshot, not a new audit.</div>
+<h3>Example: the same official document uses two different names</h3><p class="muted">DataWedge 6.8 · Intent Result Codes · previously checked source excerpts</p><div class="pair"><div><h3>Overview</h3><p><code>RECEIVE_RESULT</code></p><p class="muted">The explanatory text names this parameter.</p></div><div><h3>Function Prototype</h3><p><code>SEND_RESULT</code></p><p class="muted">The example code uses a different name.</p></div></div>
+<p><b>Our answer rule:</b> show the conflicting evidence and do not guess which parameter works on a real device.</p><p class="muted"><a href="https://techdocs.zebra.com/datawedge/6-8/guide/api/resultinfo/" target="_blank" rel="noopener noreferrer">Read the official source ↗</a> · <a href="../analysis/zebra-pattern-analysis.html" target="_blank" rel="noopener noreferrer">Full evidence and pattern audit ↗</a> · <a href="final-delivery.html" target="_blank" rel="noopener noreferrer">Original evidence-review workflow ↗</a></p></section>
+<section class="card" aria-labelledby="research"><div class="eyebrow">02 · Pattern recognition</div><h2 id="research">Do different questions share a common problem?</h2><p>Instead of repairing one document at a time, we look for repeated issues that could inform how the assistant handles future questions.</p>
 <div class="cases" id="cases"></div>
 <div class="flow" aria-label="Version boundary candidate"><div><strong id="hits">—</strong>Cases mentioning a version boundary</div><span aria-hidden="true">→</span><div><strong id="support">—</strong>Independent supporting case after evidence checks</div><span aria-hidden="true">→</span><div><strong id="validation">—</strong>Validated recurring pattern</div></div>
 <div class="note"><b>Candidate: check the applicable version before giving technical advice.</b> The current evidence does not establish a global pattern. Use this as a provisional answer safeguard, not a proven finding.</div>
 <p class="muted">Based on the existing three-case research snapshot, not the team's entire public case collection. <a href="../analysis/zebra-pattern-analysis.html" target="_blank" rel="noopener noreferrer">Research evidence and counting method ↗</a></p>
 </section>
-<section class="card" aria-labelledby="apply"><div class="eyebrow">02 · Apply a candidate to a new question</div><h2 id="apply">What should the assistant ask next?</h2><p>Try a new, hypothetical developer question. The offline planner applies the same provisional safeguards used by our campus-model answer pipeline.</p>
+<section class="card" aria-labelledby="apply"><div class="eyebrow">03 · Answer guidance</div><h2 id="apply">What should the assistant ask next?</h2><p>Try a new, hypothetical developer question. The offline planner applies the same provisional safeguards used by our campus-model answer pipeline.</p>
 <form id="question-form">
 <label for="question">New developer question</label><textarea id="question" maxlength="1800" required>After an update, my DataWedge scanner no longer sends scan data to the app. What should I check?</textarea>
 <div class="fields"><div><label for="product">Product</label><select id="product"><option value="datawedge">DataWedge</option><option value="ehs">Enterprise Home Screen</option><option value="enterprise-browser">Enterprise Browser</option><option value="emdk-for-android">EMDK for Android</option><option value="stagenow">StageNow</option><option value="">Not specified</option></select></div><div><label for="version">Applicable documentation edition (if known)</label><input id="version" maxlength="24" placeholder="e.g. 15.0" autocomplete="off"></div></div>
 <details><summary>Optional context and official source</summary><label for="context">What has the user already tried?</label><textarea id="context" maxlength="1200" placeholder="Public or approved information only"></textarea><label for="source">Official TechDocs URL</label><input id="source" type="url" maxlength="1200" placeholder="https://techdocs.zebra.com/..."></details>
-<div class="actions"><button class="primary" type="submit">Apply answer guidance</button><button class="secondary" id="reset-example" type="button">Reset example</button></div><p id="status" role="status" aria-live="polite"></p>
+<div class="actions"><button class="primary" type="submit">Apply answer guidance</button><button class="secondary" id="reset-example" type="button">Reset example</button><button class="secondary" id="evidence-example" type="button">Try a source-backed question</button></div><p id="status" role="status" aria-live="polite"></p>
 </form>
 <div class="result" id="result" hidden aria-live="polite">
 <div class="eyebrow">Answer plan · rule-based, not a model response</div>
 <div class="pair"><div><h3>Original input</h3><p id="original"></p><p class="muted">Question only; no extra answer safeguard shown.</p></div><div><h3 id="next-title">Guided next step</h3><p class="response" id="next"></p><p class="muted" id="next-note"></p></div></div>
-<details><summary>Instructions prepared for the assistant</summary><ul id="rules"></ul><div id="source-result"></div></details>
+<h3 style="margin-top:14px">Evidence for this answer</h3><div id="answer-evidence" class="muted"></div><details><summary>Instructions prepared for the assistant</summary><ul id="rules"></ul><div id="source-result"></div></details>
 </div>
 </section>
-<details class="card" id="video-example"><summary>Optional bonus · Watch a narrated explanation</summary>
+<details class="card" id="video-example"><summary>04 · Optional bonus · Watch a narrated explanation</summary>
 <p><b>What does DataWedge do?</b> A short introduction to how a profile captures, optionally formats, and delivers data.</p>
 <p class="muted">33 seconds · English narration · DataWedge 15.0</p>
 <video id="narrated-video" controls playsinline preload="none" poster="media/datawedge-profiles-poster.svg" aria-label="Narrated DataWedge Profiles concept explainer"><source src="media/datawedge-profiles.mp4" type="video/mp4"><track kind="captions" src="media/datawedge-profiles.vtt" srclang="en" label="English"><p><a href="media/datawedge-profiles.mp4">Open the narrated video</a></p></video>
@@ -42,7 +47,7 @@
 </main><script src="guidance-planner.js"></script><script src="pattern-demo.js"></script><script src="guidance-intake.js"></script><script src="guidance-visual.js"></script><script src="guidance-storyboard.js"></script><script>
 "use strict";
 const $=id=>document.getElementById(id);
-function clear(){ $("result").hidden=true;$("status").textContent="";$("rules").replaceChildren();$("source-result").replaceChildren(); }
+function clear(){ $("result").hidden=true;$("status").textContent="";$("rules").replaceChildren();$("source-result").replaceChildren(); $("answer-evidence").replaceChildren(); }
 function render(){
  clear();
  try{
@@ -50,6 +55,18 @@ function render(){
   $("original").textContent=x.plan.question;$("next-title").textContent=x.title;$("next").textContent=x.next;$("next-note").textContent=x.note;
   for(const p of x.plan.policies){const li=document.createElement("li");li.textContent=p.strategy;$("rules").append(li)}
   for(const url of x.plan.source_urls){const a=document.createElement("a");a.href=url;a.textContent="Selected official source (not retrieved in this demo) ↗";a.target="_blank";a.rel="noopener noreferrer";const p=document.createElement("p");p.append(a);$("source-result").append(p)}
+  const evidence=ZebraIntake.offlineEvidence(x.plan);
+  const target=$("answer-evidence");
+  if(!evidence.cards.length){
+   target.textContent=x.plan.clarification.length?"No applicable evidence can be established yet. Clarify the missing information before giving technical advice.":"A source URL was selected, but its content has not been checked in this run.";
+  }else{
+   for(const card of evidence.cards){
+    const heading=document.createElement("p");heading.textContent=card.title+" · Edition "+card.version+" · previously checked "+card.checked;target.append(heading);
+    for(const item of card.sections){const quote=document.createElement("blockquote");quote.style.margin="6px 0";quote.style.padding="7px 10px";quote.style.borderLeft="2px solid #8cbab6";quote.textContent=item.section+": “"+item.quote+"”";target.append(quote)}
+    const a=document.createElement("a");a.href=card.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent="Read official source ↗";target.append(a);
+    const next=document.createElement("p");next.textContent=card.next+" Not a live model answer or a verified device fix.";target.append(next);
+   }
+  }
   $("result").hidden=false;
  }catch(e){$("status").textContent=String(e.message||e)}
 }
@@ -65,6 +82,7 @@ if(window.ZebraPatternDemo&&window.ZebraGuidance){
  $("question-form").addEventListener("submit",e=>{e.preventDefault();render()});
  for(const id of ["question","product","version","context","source"])$(id).addEventListener("input",clear);
  $("reset-example").addEventListener("click",()=>{$("question-form").reset();clear()});
+ $("evidence-example").addEventListener("click",()=>{$("question-form").reset();$("question").value="Why might the software scan trigger fail to start scanning in DataWedge 6.8?";$("product").value="datawedge";$("version").value="6.8";render()});
 }else{$("status").textContent="Required local modules are unavailable.";$("question-form").querySelector("button[type=submit]").disabled=true}
 let bonusController=null;
 $("video-example").addEventListener("toggle",()=>{
