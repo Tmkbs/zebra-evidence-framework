@@ -30,7 +30,7 @@ function clampIndex(story,index){
 function createSVG(doc,map,story,index,onSelect=()=>{}){
  const c=themes,frame=story.frames[clampIndex(story,index)],by=new Map(map.nodes.map(n=>[n.id,n]));
  const element=(tag,attrs={},value)=>{const n=doc.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,String(v));if(value!==undefined)n.textContent=String(value);return n};
- const svg=element("svg",{viewBox:"0 0 640 292",role:"group","aria-label":story.title+" — "+frame.title,xmlns:NS});
+ const svg=element("svg",{viewBox:"0 0 640 292",role:"group","aria-label":story.title+" — "+frame.title});
  svg.append(element("title",{},story.title),element("desc",{},"Conceptual visual explanation. Select an illustrated component to inspect its source and explanation. No live device operation."));
  const rect=(p,x,y,w,h,fill=c.paper,stroke=c.line,rx=12,sw=1.5)=>{const v=element("rect",{x,y,width:w,height:h,rx,fill,stroke,"stroke-width":sw});p.append(v);return v};
  const line=(p,x1,y1,x2,y2,stroke=c.line,sw=2,dash="")=>{const v=element("line",{x1,y1,x2,y2,stroke,"stroke-width":sw,"stroke-linecap":"round",...(dash?{"stroke-dasharray":dash}:{})});p.append(v);return v};
