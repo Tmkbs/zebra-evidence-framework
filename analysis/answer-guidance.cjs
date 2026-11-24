@@ -6,94 +6,8 @@
 const crypto=require("node:crypto");
 const {extractPage}=require("../api/review.js")._internals;
 const CAMPUS="c3dgx0.cs.northwestern.edu";
-const PRODUCTS=new Set(["datawedge","ehs","enterprise-browser","emdk-for-android","stagenow"]);
-const POLICIES=Object.freeze({
- version_boundary:"Use the selected documentation edition. Treat the installed version as user-reported, not independently established. Do not transfer behavior from another edition.",
- missing_context:"Ask a focused question for missing device, OS, runtime, configuration or observed error. Do not fill in missing facts.",
- missing_prerequisite:"Identify applicable prerequisites from the exact source. Distinguish enabling a profile or permission from executing the command.",
- example_body_conflict:"When source prose and a code example appear to disagree, show both with their evidence. Do not silently choose one or recommend an unverified fix.",
- naming_inconsistency:"Preserve the exact API parameter spelling in the source; separate identifiers that merely look similar.",
- unverified_device_claim:"Distinguish documented behavior from a reported observation. Do not claim successful device operation, an established defect, or a repair without a reproducible device check."
-});
-const ROUTES=[
- {re:/\b(?:soft[_ ]?scan[_ ]?trigger|start[_ ]?scanning|stop[_ ]?scanning|software scan trigger)\b/i,paths:["softscantrigger/"]},
- {re:/\b(?:send_result|receive_result|command_identifier|result_info|result codes?|command result|result intent)\b/i,paths:["resultinfo/"]},
- {re:/\b(?:set[_ ]?config|plugin_config|set configuration|nested bundle)\b/i,paths:["setconfig/"]},
- {re:/\b(?:intent output|broadcast receiver|intent filter)\b/i,paths:["../output/intent/"]}
-];
+const {prepare,officialURL,routeSources}=require("../classroom/guidance-planner.js");
 const hash=s=>crypto.createHash("sha256").update(s).digest("hex");
-function clean(value,max,name,required=false){
- if(value==null)value="";
- if(typeof value!=="string")throw Error(name+" must be text");
- const v=value.trim();
- if(v.length>max||required&&!v)throw Error("Invalid "+name);
- return v;
-}
-function edition(value){
- const v=clean(value,24,"edition");
- if(!v)return "";
- if(!/^\d{1,3}\.\d{1,3}(?:\.\d{1,3})?$/.test(v))throw Error("Use a numeric documentation edition, e.g. 6.8 or 15.0");
- return v.split(".").map(x=>String(Number(x))).join(".");
-}
-function officialURL(raw,product,version){
- if(typeof raw!=="string"||raw.length>1200)throw Error("Invalid source URL");
- const u=new URL(raw);
- if(u.protocol!=="https:"||u.hostname!=="techdocs.zebra.com"||u.port||u.username||u.password||u.search||!/^\/[a-zA-Z0-9._/-]+$/.test(u.pathname)||/\/\.\.?(?:\/|$)/.test(u.pathname))
-  throw Error("Only HTTPS official TechDocs sources are accepted");
- const segments=u.pathname.split("/").filter(Boolean);
- if(segments[0]!==product||segments[1]!==version.replace(/\./g,"-"))
-  throw Error("Source must match the selected product and documentation edition exactly");
- if(u.hash&&!/^#[A-Za-z0-9_.:-]{1,100}$/.test(u.hash))throw Error("Invalid section anchor");
- return u.href;
-}
-function routeSources(question,product,version){
- if(product!=="datawedge")return [];
- const urls=[];
- for(const r of ROUTES)if(r.re.test(question))for(const p of r.paths){
-  const url=new URL(p,"https://techdocs.zebra.com/datawedge/"+version.replace(/\./g,"-")+"/guide/api/").href;
-  if(!urls.includes(url))urls.push(url);
- }
- return urls.slice(0,2);
-}
-function policySelection(q,context){
- const s=q+" "+context;
- const ids=["version_boundary","unverified_device_claim"];
- if(!context||/\b(does not work|not working|unknown|failed|no result|missing|cannot)\b/i.test(s))ids.push("missing_context");
- if(/\b(permission|licen[cs]e|profile|config|setup|enable|trigger|receiver|prerequisite|manifest)\b/i.test(s))ids.push("missing_prerequisite");
- if(/\b(example|sample|prose|documentation says|conflict|contradict|different|send_result|receive_result|parameter)\b/i.test(s))
-  ids.push("example_body_conflict","naming_inconsistency");
- return [...new Set(ids)];
-}
-function prepare(input){
- if(!input||typeof input!=="object"||Array.isArray(input))throw Error("Expected a JSON object");
- const question=clean(input.question,1800,"question",true);
- if(question.length<12)throw Error("Enter a substantive technical question");
- const product=clean(input.product,40,"product");
- if(product&&!PRODUCTS.has(product))throw Error("Unsupported product selection");
- const version=edition(input.version);
- const context=clean(input.context,1200,"context");
- const caseId=clean(input.case_id,100,"case ID");
- if(caseId&&!/^[A-Za-z0-9_-]+$/.test(caseId))throw Error("Invalid case ID");
- const action=input.action||"plan";
- if(!["plan","guided","compare"].includes(action))throw Error("Unknown action");
- const supplied=input.source_urls||[];
- if(!Array.isArray(supplied)||supplied.length>2)throw Error("Supply at most two official document URLs");
- const questions=[];
- if(!product)questions.push("Which Zebra software product are you using?");
- if(!version)questions.push("What exact software version or build is installed?");
- const policies=policySelection(question,context);
- let sources=[];
- if(product&&version){
-  sources=supplied.length?supplied.map(s=>officialURL(s,product,version)):routeSources(question,product,version);
-  sources=[...new Set(sources)];
-  if(!sources.length)questions.push("Provide the applicable version-specific TechDocs article URL for this task.");
- }
- return {schema:"zebra-answer-plan/v1",case_id:caseId,question,product,version,context,action,
-  state:questions.length?"clarification_required":"ready_for_source_retrieval",
-  clarification:questions,policies:policies.map(id=>({id,strategy:POLICIES[id],status:"provisional_answer_safeguard"})),
-  source_urls:sources,source_selection:supplied.length?"user_selected":"limited_topic_router",
-  installed_version_verified:false,global_pattern_validated:false};
-}
 function campusBase(cfg){
  const u=new URL(cfg.base);
  if(u.hostname!==CAMPUS||!["http:","https:"].includes(u.protocol)||u.username||u.password||u.search||u.hash||u.pathname.replace(/\/+$/,"")!=="/v1")
@@ -200,7 +114,7 @@ async function run(input,cfg,request=fetch){
  if(plan.action==="plan"||plan.state!=="ready_for_source_retrieval")
   return {ok:true,mode:"plan_only",plan,model_attempts:0,model_runs_completed:0,device_tested:false};
  if(input.public_only!==true)throw Error("Confirm that the question and context contain only public, approved material");
- campusBase(cfg);
+ if(plan.action!=="evidence")campusBase(cfg);
  const sources=[];
  for(const url of plan.source_urls){
   const source=await retrieve(url,plan,request);
@@ -209,6 +123,7 @@ async function run(input,cfg,request=fetch){
  const signals=observations(sources);
  const evidence_sha256=hash(JSON.stringify(sources.map(s=>({id:s.id,url:s.url,text:s.text}))));
  const frozen_input_sha256=hash(JSON.stringify({question:plan.question,context:plan.context,product:plan.product,version:plan.version,evidence_sha256}));
+ if(plan.action==="evidence")return {ok:true,mode:"evidence_only",plan,sources,signals,evidence_sha256,frozen_input_sha256,model_attempts:0,model_runs_completed:0,device_tested:false,publication_approved:false,quality_improvement_measured:false,note:"Official excerpts retrieved without model inference. Source inspection is not a verified technical answer."};
  const runs=[];
  const modes=plan.action==="compare"?["baseline","guided"]:["guided"];
  // Equal source bytes, model, temperature and output budget. The only
