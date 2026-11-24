@@ -36,3 +36,15 @@ If the team owns a deployable shared backend and obtains approval, it can mount 
 On the campus-connected machine, execute a fresh question (not the known DW68 example) with its original official source and export the result. Select a genuinely held-out public forum report with a version-compatible source, then run a paired comparison without giving the expected answer to either model. Independently check applicability, technical correctness, useful next action, and appropriate abstention. Report raw results and unresolved cases. Do not change the pattern snapshot's defensible count based on these answer runs.
 
 No live Qwen call or device validation is claimed by this PR's offline tests. The next real run is the milestone, not another static dashboard.
+
+## Offline continuation during campus network outage (Nov 24)
+
+The same Ask & Guide page is now usable from GitHub Pages or the local checkout without campus inference. **Offline guidance** runs the identical deterministic planning function used by the server. It asks for missing product/version context and displays a candidate source route. For the two inspected DataWedge 6.8 articles, it presents short, edition-matched, previously checked source snippets and conditional next checks. These are source cards, not a live AI answer or a full article snapshot. Other topics have no cached excerpts unless explicitly added with source review.
+
+If the public Internet is reachable but the campus model is not, run the existing local server and select **Fetch official excerpts only**. This retrieves, hashes and displays official evidence without contacting any model endpoint. The result can be exported as a receipt. An offline receipt is not a scored model run.
+
+The public team CSV can be loaded on demand from the existing published endpoint or imported as a file. Intake admits unique ZF-format rows but does not infer origin or installed version from identifiers or document links. Only an explicit original/question column may populate the question field. A recommendation, root-cause breakdown or title cannot substitute for the question. Missing original questions stay missing. The operator must inspect the forum source and confirm the text; all admitted records begin with zero evaluation eligibility. This is an intake bridge, not a claim to have independently evaluated the 57 public cases. The current execution environment could not retrieve the published CSV; tests use synthetic rows matching the known export schema.
+
+### Qwen next step after connection recovery
+
+Use the existing shared planner and evidence-only path. Recover a real public question through the team's CSV or original forum, confirm its provenance and reported installed version, freeze the applicable official evidence, and perform the campus-only paired run. Independently review the resulting claims and classify applicability, semantic correctness, useful next action, and appropriate abstention. Do not convert offline or synthetic receipts into live evaluation metrics. Do not extend the document editor or claim a new recurring global cause based on these source cards.
