@@ -1,0 +1,40 @@
+{
+  "source": "https://techdocs.zebra.com/datawedge/15-0/guide/profiles/",
+  "edition": "15.0",
+  "kind": "authored_concept_explainer",
+  "narration": "offline_eSpeak_en_us",
+  "audio_codec": "aac",
+  "video_codec": "h264",
+  "duration_seconds": 32.956553,
+  "bytes": 432878,
+  "audio_peak_db": -2.1,
+  "decoded_audio_and_video": true,
+  "model_calls": 0,
+  "device_tested": false,
+  "scenes": [
+    {
+      "title": "What is a profile?",
+      "narration": "A DataWedge profile defines how data is captured, optionally formatted, and delivered to an associated application.",
+      "start_seconds": 0,
+      "duration_seconds": 8.933
+    },
+    {
+      "title": "1. Input",
+      "narration": "Input controls how data is acquired. For example, a barcode scan provides the data to be processed.",
+      "start_seconds": 8.933,
+      "duration_seconds": 8.533
+    },
+    {
+      "title": "2. Process",
+      "narration": "Processing can format the captured data if needed. This stage is optional.",
+      "start_seconds": 17.467,
+      "duration_seconds": 6.467
+    },
+    {
+      "title": "3. Output",
+      "narration": "Output controls how the data reaches the associated app. A profile connects these stages from capture to delivery.",
+      "start_seconds": 23.933,
+      "duration_seconds": 9.0
+    }
+  ]
+}

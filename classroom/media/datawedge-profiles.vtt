@@ -1,0 +1,13 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:08.933
+A DataWedge profile defines how data is captured, optionally formatted, and delivered to an associated application.
+
+00:00:08.933 --> 00:00:17.466
+Input controls how data is acquired. For example, a barcode scan provides the data to be processed.
+
+00:00:17.467 --> 00:00:23.934
+Processing can format the captured data if needed. This stage is optional.
+
+00:00:23.933 --> 00:00:32.933
+Output controls how the data reaches the associated app. A profile connects these stages from capture to delivery.
