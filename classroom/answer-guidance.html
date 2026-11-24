@@ -49,7 +49,7 @@ button.vision-node[aria-pressed=true]{outline:3px solid #a7d3ca;outline-offset:2
 
 .media-panel{border:1px solid #d9e5e5;background:#fff;border-radius:10px;padding:13px;margin:0 0 15px}.media-panel h3{margin:4px 0 6px}.media-assets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}.media-asset{display:flex;flex-direction:column;gap:5px;padding:12px;background:#f5f9f8;border-radius:8px;border:1px solid #e0e9e8;min-width:0}.media-asset a{font-size:13px}.media-asset p{margin:0}.media-check{border-top:1px solid #e1e8e8;padding-top:11px}.media-check .actions{margin:8px 0}.media-check button[aria-pressed=true]{background:#e1f2eb;border-color:#8cbfb1;color:#08796d}.media-check p{margin:5px 0}@media(max-width:700px){.media-assets{grid-template-columns:1fr}}
 </style></head>
-<body><header><div><strong>Zebra TechDocs · student prototype</strong><a href="../analysis/zebra-pattern-analysis.html">Pattern research snapshot</a><a href="final-delivery.html">Document-review workflow</a></div></header>
+<body><header><div><strong>Zebra TechDocs · student prototype</strong><a href="../analysis/zebra-pattern-analysis.html">Pattern research snapshot</a><a href="final-delivery.html">Document-review workflow</a><a href="visual-companion.html?reader=dw62-intent-receiver">Team reader visual companion</a></div></header>
 <main><div class="kicker">Answer-side contribution</div><h1>Ask &amp; Guide</h1>
 <p>Ask a technical question, learn a concept through a contextual visual explanation, or explore a diagnostic step. Official media is selected only when relevant.</p>
 <div id="environment" class="notice">Offline planning is available. Checking for the optional local campus service…</div>
@@ -61,6 +61,7 @@ button.vision-node[aria-pressed=true]{outline:3px solid #a7d3ca;outline-offset:2
 </section>
 <section class="box">
 <h2>Ask a different question</h2>
+<div id="teamNotice" class="notice" hidden></div>
 <label for="question">Developer question</label><textarea id="question">Why might the software scan trigger fail to start scanning in DataWedge 6.8?</textarea>
 <div class="grid"><div><label for="product">Software product</label><select id="product"><option value="">Not specified</option><option value="datawedge" selected>DataWedge</option><option value="ehs">Enterprise Home Screen</option><option value="enterprise-browser">Enterprise Browser</option><option value="emdk-for-android">EMDK for Android</option><option value="stagenow">StageNow</option></select></div>
 <div><label for="version">Reported installed version</label><input id="version" value="6.8" placeholder="e.g. 6.8 (leave blank if unknown)"></div></div>
@@ -76,10 +77,10 @@ button.vision-node[aria-pressed=true]{outline:3px solid #a7d3ca;outline-offset:2
 <section class="box" id="sourceBox" hidden><h2>Source evidence</h2><div id="sourceOutput"></div></section>
 <section class="box" id="answerBox" hidden><h2>Model answer review</h2><div id="answerOutput"></div></section><button id="download" hidden>Download result / handoff (JSON)</button>
 <footer>Independent student research prototype. A quoted passage is not a verified technical answer. No device validation, document publication, or measured reduction in support demand is claimed. Campus model only.</footer>
-</main><script src="guidance-planner.js"></script><script src="guidance-intake.js"></script><script src="guidance-visual.js"></script><script src="guidance-storyboard.js"></script><script>
+</main><script src="guidance-planner.js"></script><script src="guidance-intake.js"></script><script src="guidance-visual.js"></script><script src="guidance-storyboard.js"></script><script src="guidance-team-bridge.js"></script><script>
 "use strict";
 const $=id=>document.getElementById(id);let access="",last=null,caseId="",csvRows=[];
-let visualState={},visualFocus="",visualConfirmed=false,visualApplied="",visualKey="",runEpoch=0,storyController=null;
+let visualState={},visualFocus="",visualConfirmed=false,visualApplied="",visualKey="",runEpoch=0,storyController=null,teamHandoff=null;
 function clearStoryboard(){if(storyController)storyController.destroy();storyController=null;$("storyOutput").hidden=true;$("mediaOutput").hidden=true;$("mediaOutput").replaceChildren();}
 function removeVisualReport(){
  if(visualApplied){
@@ -92,7 +93,7 @@ function resetVisualState(){
  removeVisualReport();visualState={};visualFocus="";visualConfirmed=false;visualKey="";
 }
 function invalidate(){
- runEpoch++;last=null;clearStoryboard();resetVisualState();busy(false);
+ runEpoch++;last=null;clearStoryboard();resetVisualState();busy(false);teamHandoff=null;$("teamNotice").hidden=true;$("teamNotice").replaceChildren();
  $("planBox").hidden=true;$("sourceBox").hidden=true;$("answerBox").hidden=true;$("download").hidden=true;
  $("visionOutput").replaceChildren(text("p","Question or context changed. Choose Offline guidance to rebuild the visual explanation.","vision-empty"));
 }
@@ -236,13 +237,14 @@ async function run(action){
   if(action==="plan"){
    const plan=ZebraGuidance.prepare(input),packet=ZebraIntake.offlineEvidence(plan);
    last={schema:"zebra-offline-handoff/v1",mode:packet.mode,plan,offline_evidence:packet,model_attempts:0,model_runs_completed:0,device_tested:false,created_at:new Date().toISOString()};
+   if(teamHandoff&&plan.question===teamHandoff.question&&plan.context===teamHandoff.context)last.team_reader_reference=teamHandoff;
    drawPlan(plan);drawCards(packet);drawVision(last);$("download").hidden=false;
    $("status").textContent=plan.state==="clarification_required"?"Clarification required. No network or model was used.":packet.cards.length?"Version-matched source cards are ready for inspection. No model was used.":"Guidance plan is ready. No matching cached source; retrieve the official article when connected.";
    return;
   }
   const response=await fetch("/api/answer-guidance",{method:"POST",headers:{"Content-Type":"application/json","X-Review-Access":access},body:JSON.stringify(input)});
   const result=await response.json();if(epoch!==runEpoch)return;if(!response.ok||!result.ok)throw Error(result.error||"Guidance request failed");
-  last=result;drawPlan(result.plan);drawSources(result);drawAnswers(result);drawVision(result);$("download").hidden=false;
+  last=result;if(teamHandoff&&result.plan.question===teamHandoff.question&&result.plan.context===teamHandoff.context)last.team_reader_reference=teamHandoff;drawPlan(result.plan);drawSources(result);drawAnswers(result);drawVision(result);$("download").hidden=false;
   $("status").textContent=result.mode==="plan_only"?"Clarification required. No model was called.":result.mode==="evidence_only"?"Official excerpts retrieved. No model was called.":result.model_runs_completed?"Model result returned; inspect candidate claims.":"No usable model result returned. Inspect sources or switch to offline guidance.";
  }catch(e){if(epoch===runEpoch){$("status").textContent=String(e.message).slice(0,300);$("visionOutput").replaceChildren(text("p","No current visual result. Try Offline guidance or correct the input.","vision-empty"))}}finally{if(epoch===runEpoch)busy(false)}
 }
@@ -290,5 +292,16 @@ $("importFile").addEventListener("change",async()=>{
 });
 $("download").addEventListener("click",()=>{if(!last)return;const b=new Blob([JSON.stringify(last,null,2)+"\n"],{type:"application/json"}),url=URL.createObjectURL(b),a=document.createElement("a");a.href=url;a.download="zebra-answer-"+(last.run_id||"plan")+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
 for(const id of ["question","product","version","context","sources"])$(id).addEventListener("input",()=>{if(id==="question")caseId="";invalidate()});
-if(window.ZebraGuidance&&window.ZebraIntake&&window.ZebraVisual&&window.ZebraStoryboard){busy(false);session();run("plan")}else{$("environment").textContent="Required offline modules are missing; open the page from the full repository checkout.";for(const id of ["plan","evidence","ask","compare"])$(id).disabled=true}
+function loadTeamReference(){
+ if(!location.search)return false;
+ const key=ZebraTeamVisual.keyFromSearch(location.search),packet=ZebraTeamVisual.handoff(key);
+ if(!packet){$("teamNotice").hidden=false;$("teamNotice").textContent="No reviewed team reader reference matches this link. Enter a question yourself.";return true}
+ invalidate();caseId="";teamHandoff=packet;
+ $("question").value=packet.question;$("product").value=packet.product;$("version").value="";$("sources").value="";$("context").value=packet.context;$("consent").checked=false;
+ const notice=$("teamNotice");notice.hidden=false;
+ notice.append(text("strong","Historical public report · not your device"),text("p","Reported installed version: "+packet.reported_version+". Team document edition: "+packet.reader_document_edition+". Confirm the applicable documentation edition and source; neither has been automatically established for this answer run."));
+ const a=text("a","Return to contextual visual companion");a.href="visual-companion.html?reader="+encodeURIComponent(key);notice.append(a);
+ return false;
+}
+if(window.ZebraGuidance&&window.ZebraIntake&&window.ZebraVisual&&window.ZebraStoryboard&&window.ZebraTeamVisual){busy(false);session();if(!loadTeamReference())run("plan")}else{$("environment").textContent="Required offline modules are missing; open the page from the full repository checkout.";for(const id of ["plan","evidence","ask","compare"])$(id).disabled=true}
 </script></body></html>
