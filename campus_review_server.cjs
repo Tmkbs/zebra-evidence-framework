@@ -29,6 +29,8 @@ const PAGES=Object.freeze({
  "/classroom/guidance-planner.js":"guidance-planner.js",
  "/guidance-intake.js":"guidance-intake.js",
  "/classroom/guidance-intake.js":"guidance-intake.js",
+ "/guidance-visual.js":"guidance-visual.js",
+ "/classroom/guidance-visual.js":"guidance-visual.js",
  "/analysis/zebra-pattern-analysis.html":"../analysis/zebra-pattern-analysis.html",
  "/evidence-framework-sandbox.html":"evidence-framework-sandbox.html",
  "/classroom/evidence-framework-sandbox.html":"evidence-framework-sandbox.html",
