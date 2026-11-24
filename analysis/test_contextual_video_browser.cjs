@@ -40,7 +40,7 @@ async function main(){
  async function evaluate(expression){const r=await send("Runtime.evaluate",{expression,awaitPromise:true,returnByValue:true,userGesture:true});if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description||r.exceptionDetails.text);return r.result?.value}
  async function navigate(name,query="",ready="document.readyState==='complete'"){
   await send("Page.navigate",{url:pathToFileURL(path.join(dir,name)).href+query});
-  await until(()=>evaluate("location.pathname.endsWith("+JSON.stringify("/"+name)+")&&("+ready+")"));
+  await until(async()=>{try{return await evaluate("location.pathname.endsWith("+JSON.stringify("/"+name)+")&&("+ready+")")}catch{return false}});
  }
  await send("Page.enable");await send("Runtime.enable");
  await navigate("visual-companion.html","?reader=dw62-intent-receiver","typeof record!=='undefined'&&!!record");
