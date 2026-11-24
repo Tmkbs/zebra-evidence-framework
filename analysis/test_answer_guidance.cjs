@@ -28,6 +28,13 @@ test("missing version asks a question, without retrieval or model",async()=>{
  assert.equal(r.mode,"plan_only");assert.equal(r.plan.state,"clarification_required");assert.equal(r.model_attempts,0);assert.equal(count,0);assert.ok(r.plan.clarification.some(v=>/version/i.test(v)));
 });
 test("missing product is not inferred from a topic",()=>assert.equal(G.prepare({...input,product:""}).state,"clarification_required"));
+test("plan-only new update question exposes the same reusable version strategy without retrieval",async()=>{
+ const r=await G.run({...input,question:"After upgrading Enterprise Browser, the app no longer opens. What should I check?",product:"enterprise-browser",version:"",source_urls:[],action:"plan"},cfg,()=>assert.fail("No retrieval"));
+ const strategy=r.plan.strategies.find(x=>x.id==="version_boundary");
+ assert.ok(strategy);assert.equal(strategy.application_status,"ask_for_version");
+ assert.equal(strategy.research_status,"candidate_not_validated");
+ assert.equal(r.model_runs_completed,0);
+});
 test("plan only does not use network",async()=>{
  const r=await G.run({...input,action:"plan"},cfg,()=>assert.fail("No network"));
  assert.equal(r.plan.state,"ready_for_source_retrieval");assert.equal(r.model_runs_completed,0);
