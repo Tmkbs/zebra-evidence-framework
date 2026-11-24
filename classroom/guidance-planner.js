@@ -64,10 +64,14 @@ function routeSources(question,product,version){
 }
 function policySelection(q,context){
  const s=q+" "+context;
- const ids=["version_boundary","unverified_device_claim"];
- if(!context||/\b(does not work|not working|unknown|failed|no result|missing|cannot)\b/i.test(s))ids.push("missing_context");
- if(/\b(permission|licen[cs]e|profile|config|setup|enable|trigger|receiver|prerequisite|manifest)\b/i.test(s))ids.push("missing_prerequisite");
- if(/\b(example|sample|prose|documentation says|conflict|contradict|different|send_result|receive_result|parameter)\b/i.test(s))
+ const ids=[];
+ const versionSensitive=/\b(after (?:a |the )?update|after updating|since (?:the )?update|after (?:an )?upgrade|after upgrading|upgrade(?:d)?|version(?:s)?|compatib(?:ility|le)|deprecated|across releases|between releases|changed in (?:version )?\d)\b/i.test(s);
+ const failure=/\b(fail(?:ed|ure|s|ing)?|error|not working|does not work|doesn't work|no longer|not received|cannot|can't|won't|stopped|not responding|does not start|won't start|problem|issue)\b/i.test(s);
+ const device=/\b(device|scanner|scan|barcode|app|application|profile|trigger|broadcast|receiver|runtime|android|firmware)\b/i.test(s);
+ if(versionSensitive)ids.push("version_boundary");
+ if(failure&&device&&!context.trim())ids.push("missing_context");
+ if(failure&&device)ids.push("unverified_device_claim");
+ if(/\b(RECEIVE_RESULT)\b/i.test(s)&&/\b(SEND_RESULT)\b/i.test(s))
   ids.push("example_body_conflict","naming_inconsistency");
  return [...new Set(ids)];
 }
