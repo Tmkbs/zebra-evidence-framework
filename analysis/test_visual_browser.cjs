@@ -9,7 +9,7 @@ const source=path.join(__dirname,"../classroom");
 const browser=process.env.BROWSER_EXECUTABLE||"google-chrome";
 const harness=String.raw`
 <script>
-(()=>{
+(async()=>{
  const $test=id=>document.getElementById(id);
  const ensure=(condition,message)=>{if(!condition)throw Error(message)};
  const click=selector=>{const node=document.querySelector(selector);ensure(node,"Missing "+selector);ensure(!node.disabled,"Disabled "+selector);node.click()};
@@ -28,6 +28,8 @@ const harness=String.raw`
   click('[data-story-hotspot="scanner"]');
   ensure(scene()==="Scanner readiness","SVG hotspot did not select scanner");
   click('[data-story-action="play"]');ensure(play().textContent==="Pause","Play did not start");
+  await new Promise(resolve=>setTimeout(resolve,6200));
+  ensure(scene()==="Next diagnostic action","Timed playback failed to advance");
   click('[data-story-action="play"]');ensure(play().textContent==="Play","Pause failed");
   const seek=document.querySelector("[data-story-seek]");seek.value="3";seek.dispatchEvent(new Event("input",{bubbles:true}));
   ensure(scene()==="Next diagnostic action","Timeline seek failed");
@@ -89,11 +91,11 @@ try{
   .replace("</body>",harness+"</body>");
  const page=path.join(dir,"smoke.html");fs.writeFileSync(page,html);
  for(const [label,size] of [["desktop","1280,1000"],["narrow","500,950"]]){
-  const run=spawnSync(browser,["--headless","--no-sandbox","--disable-dev-shm-usage","--disable-background-networking","--no-first-run","--disable-gpu","--allow-file-access-from-files","--virtual-time-budget=3000","--window-size="+size,"--user-data-dir="+path.join(dir,label),"--dump-dom",pathToFileURL(page).href],{encoding:"utf8",timeout:45000,maxBuffer:4000000});
+  const run=spawnSync(browser,["--headless","--no-sandbox","--disable-dev-shm-usage","--disable-background-networking","--no-first-run","--disable-gpu","--allow-file-access-from-files","--virtual-time-budget=11000","--window-size="+size,"--user-data-dir="+path.join(dir,label),"--dump-dom",pathToFileURL(page).href],{encoding:"utf8",timeout:45000,maxBuffer:4000000});
   if(run.error)throw run.error;
   const dom=run.stdout||"",error=dom.match(/<pre id="vision-smoke-error">([\s\S]*?)<\/pre>/);
   assert.equal(run.status,0,run.stderr?.slice(-1500));
   assert.match(dom,/<html[^>]*data-vision-smoke="pass"/,error?.[1]||"No browser pass marker: "+dom.slice(-800));
-  console.log("PASS Chromium "+label+": interactive map, controls, quote inspector, report consent, stale-result rejection, no network, and page width");
+  console.log("PASS Chromium "+label+": interactive map, timed playback, source-linked scenes, report consent, stale-result rejection, no network, and page width");
  }
 }finally{fs.rmSync(dir,{recursive:true,force:true})}
