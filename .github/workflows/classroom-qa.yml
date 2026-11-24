@@ -42,3 +42,6 @@ jobs:
           path: qa-output/contextual-video/
           retention-days: 7
           if-no-files-found: error
+
+      - name: Single-site demo navigation (offline)
+        run: node analysis/test_unified_demo.cjs
