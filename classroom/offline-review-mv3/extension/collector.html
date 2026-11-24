@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assemble a Zebra offline collection</title><link rel="stylesheet" href="collector.css"><script type="module" src="collector.js"></script></head>
+<body><main>
+<h1>Assemble a Zebra offline collection</h1>
+<p>Select up to 12 locally saved collection pages linked from one exact Zebra root. Nothing is fetched. Files are reviewed here in memory and cleared when this page closes.</p>
+<form id="selection">
+<label for="root">Exact root page URL</label><input id="root" type="text" inputmode="url" maxlength="2000" required placeholder="https://techdocs.zebra.com/...">
+<label for="files">Local collection JSON files</label><input id="files" type="file" accept=".json,application/json" multiple required>
+<div><button type="submit">Load for review</button> <button type="button" id="clear">Discard selection</button></div>
+</form>
+<p id="status" role="status" aria-live="polite"></p>
+<section id="review" hidden>
+<h2>Coverage</h2><div id="coverage"></div>
+<h2>Exact captured text and link metadata</h2><div id="pages"></div>
+<label><input id="approved" type="checkbox"> I reviewed the full selection for private content and accept the listed omissions.</label>
+<button id="export" type="button" disabled>Save offline ZIP</button>
+<button id="export-csv" type="button" disabled>Save coverage CSV (metadata only)</button>
+</section>
+</main></body></html>

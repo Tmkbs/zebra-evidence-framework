@@ -44,3 +44,18 @@ Progress: automated tests use synthetic structured snapshots. They exercise
 actual local CLI execution and error behavior. Browser capture, automatic
 classroom import, verified public redistribution, real model execution, and
 publication have not been tested or performed by this bridge.
+
+### Named section snapshots
+
+The second argument can also be the popup's **partial section capture JSON**.
+Do not remove the outer section metadata. The intake accepts only a versioned
+public TechDocs source, a matching unique opening heading, a defined capture
+boundary and separately selected forum input. The boundary is bound to a separate envelope digest and to the
+run ID; the existing flat capture digest is unchanged. A captured heading in
+a quotation is not treated as proof that the document crossed into a new
+section. A recorded capture limit and choosing one
+section are distinguished, and the excerpt is never treated as a full article.
+
+This step remains local and requires the user to select the two files. It
+does not validate browsing provenance, run a model, approve a change, or
+authorize an archive or publication. No browser permissions are added.

@@ -1,0 +1,45 @@
+import assert from 'node:assert/strict';
+import {writeFile,readFile} from 'node:fs/promises';
+import {createCaptureMirrorSession} from './extension/session.js';
+import {mirrorZip} from './extension/zip.js';
+const origin='https://techdocs.zebra.com/datawedge/15-0/guide/api/';
+const root=origin+'softscantrigger/';
+const capture={schema_version:'zebra-doc-capture/v1',source_url:root,source_kind:'techdocs',
+  captured_at:'2026-11-19T12:00:00.000Z',title:'Snapshot 😃',truncated:false,
+  blocks:[{kind:'heading',level:2,anchor:'demo',text:'Demo heading'},{kind:'paragraph',text:'<script>literal article text</script>'}]};
+let calls=0;
+const chrome={tabs:{query:async()=>[{id:42,url:root}]},scripting:{executeScript:async opts=>{
+  calls++;
+  assert.deepEqual(opts.target,{tabId:42,frameIds:[0]});
+  assert.equal(opts.world,'ISOLATED');
+  assert.equal(opts.args[2].includeSameOriginLinks,true);
+  return [{frameId:0,result:{capture,link_discovery:'candidate_scan_limit',discovered_links:[{target_url:root+'#demo',label:'Same section'},{target_url:origin+'getversioninfo/',label:'Not captured'}]}}];
+}}};
+const session=createCaptureMirrorSession(chrome,{roots:[root]});
+const selected=await session.selectActive();
+await assert.rejects(session.capture({expected:selected}),/Confirm/);
+assert.equal(calls,0);
+const {links,token}=await session.capture({expected:selected,approved:true});
+assert.equal(calls,1);
+assert.equal(links.length,2);
+links[0].target_url='https://example.org/modified';
+assert.throws(()=>session.stage({token}),/approve/);
+session.stage({token,approved:true});
+const {files,manifest}=session.build({approved:true});
+assert.equal(manifest.captured_pages,1);
+assert.equal(manifest.pages[0].link_discovery,'candidate_scan_limit');
+assert.match(files.get('pages/001.html'),/examining 160 candidates/);
+assert.equal(manifest.missing[0].source_url,origin+'getversioninfo/');
+assert.match(files.get('pages/001.html'),/href="001.html#demo"/);
+assert.match(files.get('site.css'),/p,li,blockquote,td,th\{white-space:pre-wrap/);
+assert.match(files.get('pages/001.html'),/&lt;script&gt;/);
+assert.throws(()=>mirrorZip(new Map([...files,['../unsafe','test']])),/Unsafe/);
+assert.throws(()=>mirrorZip(new Map([...files,['pages/022.html\n','test']])),/Unsafe/);
+const zip=mirrorZip(files);
+assert.equal(zip.type,'application/zip');
+await writeFile(process.argv[2],new Uint8Array(await zip.arrayBuffer()));
+const m=JSON.parse(await readFile(new URL('./extension/manifest.json',import.meta.url),'utf8'));
+assert.deepEqual(m.permissions,['activeTab','scripting']);
+assert.equal(m.host_permissions,undefined);
+assert.equal(m.background,undefined);
+console.log('Capture gate, ephemeral mirror integration, approved links, and static ZIP passed.');

@@ -85,3 +85,56 @@ test('local CLI reads independent local captures, emits machine-readable error w
  assert.equal(err.release,'NOT_AUTHORIZED');
  assert.equal(err.model_execution,'NOT_RUN');
 });
+
+function scoped(boundary='next_heading'){
+ const capture={...fixture('techdocs'),truncated:true,
+   blocks:[...fixture('techdocs').blocks,{kind:'heading',text:'Child section',anchor:'child',level:3},{kind:'paragraph',text:'Child paragraph.'}]};
+ return {capture,section_scope:{schema_version:'zebra-section-scope/v1',heading_anchor:'section-one',boundary,whole_article:false}};
+}
+test('named excerpt stays partial, changes run identity and is never approved',()=>{
+ const forum=fixture(), techdocs=scoped(), a=intake({forum,techdocs}), b=intake({forum,techdocs:scoped('capture_limit')});
+ assert.deepEqual(a.capture_binding.captures[1].section_scope,techdocs.section_scope);
+ assert.notEqual(a.run_id,b.run_id);
+ assert.equal(a.capture_binding.captures[1].sha256,intake({forum,techdocs:techdocs.capture}).capture_binding.captures[1].sha256);
+ assert.notEqual(a.capture_binding.captures[1].section_envelope_sha256,b.capture_binding.captures[1].section_envelope_sha256);
+ assert.notEqual(a.run_id,intake({forum,techdocs:techdocs.capture}).run_id);
+ assert.ok(a.unknowns.some(x=>x.startsWith('Only the selected')));
+ assert.ok(!a.unknowns.some(x=>x.startsWith('Capture truncated')));
+ assert.ok(b.unknowns.some(x=>x.startsWith('Capture truncated')));
+ assert.equal(a.downstream_adapter.apply_allowed,false);
+ assert.equal(a.downstream_adapter.export_to_handoff_allowed,false);
+ assert.equal(a.release.publication,false);
+ assert.equal(a.capture_binding.model_execution,'NOT_RUN');
+});
+test('partial intake rejects scope drift, flattened whole-article flags and ambiguous sections',()=>{
+ const forum=fixture();
+ const mutations=[
+  x=>{x.capture.truncated=false},
+  x=>{x.capture.source_url='https://techdocs.zebra.com/datawedge/latest/guide/'},
+  x=>{x.section_scope.boundary='whole_document'},
+  x=>{x.section_scope.heading_anchor='child'},
+  x=>{x.section_scope.whole_article=true},
+  x=>{x.section_scope.reviewed=true},
+  x=>{delete x.capture.blocks[0].level},
+  x=>{x.capture.blocks[2].anchor='section-one'},
+  x=>{x.extra='foreign metadata'},
+ ];
+ for(const mutate of mutations){
+  const x=scoped();mutate(x);assert.throws(()=>intake({forum,techdocs:x}),{code:'CAPTURE_SECTION'});
+ }
+ assert.throws(()=>intake({forum:scoped(),techdocs:fixture('techdocs')}),{code:'CAPTURE_SECTION'});
+});
+test('extension section JSON is routed unchanged into the CLI doc slot only',t=>{
+ const dir=fs.mkdtempSync(path.join(tmpdir(),'zebra-scope-intake-'));
+ t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
+ const f=path.join(dir,'forum.json'), d=path.join(dir,'zebra-partial-section-capture.json');
+ fs.writeFileSync(f,JSON.stringify(fixture()));fs.writeFileSync(d,JSON.stringify(scoped()));
+ assert.throws(()=>loadCapture(d),{code:'CAPTURE_SECTION'});
+ assert.deepEqual(loadCapture(d,{allowSection:true}),scoped());
+ const p=spawnSync(process.execPath,[require.resolve('./capture-intake.cjs'),f,d,'ZF-EXAMPLE'],{encoding:'utf8'});
+ assert.equal(p.status,0);
+ const result=JSON.parse(p.stdout);
+ assert.equal(result.capture_binding.captures[1].section_scope.heading_anchor,'section-one');
+ assert.equal(result.case.question,null);
+ assert.equal(result.proposed_revision,null);
+});
