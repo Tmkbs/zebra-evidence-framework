@@ -44,8 +44,17 @@ function officialURL(raw,product,version){
  if(u.hash&&!/^#[A-Za-z0-9_.:-]{1,100}$/.test(u.hash))throw Error("Invalid section anchor");
  return u.href;
 }
+function explanationIntent(question,product){
+ if(product!=="datawedge")return "technical_question";
+ const q=question.trim();
+ // Specific commands, reported failures, and capability/compatibility tests
+ // must not be displaced by a generic introductory lesson.
+ if(ROUTES.some(r=>r.re.test(q))||/\b(fail(?:ed|ure|s)?|error|not working|doesn.t work|does not work|cannot|can.t|doesn.t support|does not support|not supported|compatib\w*|which version|why won.t|why doesn.t|bug)\b/i.test(q))return "technical_question";
+ return /\b(?:datawedge|profiles?)\b/i.test(q)&&/\b(?:what (?:is|are|does|do)|how (?:does|do)|explain|overview|introduction|learn about|understand)\b/i.test(q)&&!/\b(?:can i|can it|can datawedge|support(?:ed|s)?)\b/i.test(q)?"concept_overview":"technical_question";
+}
 function routeSources(question,product,version){
  if(product!=="datawedge")return [];
+ if(version==="15.0"&&explanationIntent(question,product)==="concept_overview")return ["https://techdocs.zebra.com/datawedge/15-0/guide/profiles/"];
  const urls=[];
  for(const r of ROUTES)if(r.re.test(question))for(const p of r.paths){
   const url=new URL(p,"https://techdocs.zebra.com/datawedge/"+version.replace(/\./g,"-")+"/guide/api/").href;
@@ -89,9 +98,9 @@ function prepare(input){
  return {schema:"zebra-answer-plan/v1",case_id:caseId,question,product,version,context,action,
   state:questions.length?"clarification_required":"ready_for_source_retrieval",
   clarification:questions,policies:policies.map(id=>({id,strategy:POLICIES[id],status:"provisional_answer_safeguard"})),
-  source_urls:sources,source_selection:supplied.length?"user_selected":"limited_topic_router",
+  explanation_intent:explanationIntent(question,product),source_urls:sources,source_selection:supplied.length?"user_selected":"limited_topic_router",
   installed_version_verified:false,global_pattern_validated:false};
 }
 
-return Object.freeze({prepare,officialURL,routeSources,policySelection,edition,clean,products:[...PRODUCTS]});
+return Object.freeze({prepare,officialURL,routeSources,policySelection,explanationIntent,edition,clean,products:[...PRODUCTS]});
 });
