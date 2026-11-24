@@ -19,7 +19,7 @@ function build(map){
   const n=by.get(id);
   return {id,index,title:n.title,caption:n.detail,status:n.status,evidence:(n.evidence||[]).map(e=>({...e})),duration_ms:6000};
  });
- const scene=map.kind==="scan_prerequisite"?"diagnostic":map.kind==="result_discrepancy"?"comparison":map.kind==="configuration_hierarchy"?"containment":map.kind==="profile_learning"?"data_path":"scope";
+ const scene=map.kind==="scan_prerequisite"?"diagnostic":map.kind==="result_discrepancy"?"comparison":map.kind==="configuration_hierarchy"?"containment":map.kind==="profile_learning"?"data_path":map.kind==="reported_path_comparison"?"reported_paths":"scope";
  return {schema:"zebra-visual-storyboard/v1",kind:map.kind,scene,title:map.title,frames,
   next_check:map.next,representation:"authored_conceptual_illustration",video_file:false,model_generated:false,device_tested:false,
   total_duration_ms:frames.reduce((n,f)=>n+f.duration_ms,0)};
@@ -132,6 +132,36 @@ function createSVG(doc,map,story,index,onSelect=()=>{}){
   const boundary=group("boundary");
   rect(boundary,26,239,588,37,active("boundary")?c.wash:c.white,stroke("boundary"),8,active("boundary")?3:1.5);
   text(boundary,320,263,"Structure only · validate actual parameter values and device behavior",12,c.ink,650,"middle");
+ }else if(story.scene==="reported_paths"){
+  // Two reported paths. The gap is an observation boundary, not an inferred
+  // failed component. Both paths are conceptual, not captured device traces.
+  const report=group("report");
+  rect(report,18,40,604,34,fill("report"),stroke("report"),9,active("report")?3:1.5);
+  text(report,320,62,"Public report · TC700K / DataWedge 6.2.23",14,c.ink,700,"middle");
+  const test=group("test"),scan=group("scan");
+  rect(test,18,89,604,70,fill("test"),stroke("test"),11,active("test")?3:1.5);
+  rect(test,32,102,111,43,c.white,c.line,7);
+  text(test,87,128,"ADB test",15,c.ink,750,"middle");
+  line(test,153,124,412,124,c.teal,3);
+  path(test,"M404 117 L416 124 L404 131",c.teal,3);
+  text(test,285,114,"Test broadcast",12,c.muted,600,"middle");
+  rect(test,430,102,177,43,c.wash,c.teal,7);
+  text(test,518,120,"Xamarin receiver",13,c.ink,700,"middle");
+  text(test,518,136,"Reported received",11,c.teal,700,"middle");
+  rect(scan,18,171,604,70,fill("scan"),stroke("scan"),11,active("scan")?3:1.5);
+  rect(scan,32,184,111,43,c.white,c.line,7);
+  text(scan,87,201,"DataWedge",14,c.ink,750,"middle");
+  text(scan,87,215,"Profile",11,c.muted,600,"middle");
+  line(scan,153,206,412,206,c.amber,2.5,"5 5");
+  text(scan,282,195,"Configured scan-delivery path",11,c.muted,600,"middle");
+  circle(scan,282,206,9,c.amberWash,c.amber);
+  text(scan,282,210,"?",12,c.amber,750,"middle");
+  rect(scan,430,184,177,43,c.amberWash,c.amber,7);
+  text(scan,518,202,"Xamarin receiver",13,c.ink,700,"middle");
+  text(scan,518,218,"Reported not received",11,c.amber,700,"middle");
+  const boundary=group("boundary");
+  rect(boundary,18,251,604,29,fill("boundary"),stroke("boundary"),7,active("boundary")?3:1.5);
+  text(boundary,320,270,"Separate the observations · root cause remains unresolved",12,c.ink,650,"middle");
  }else if(story.scene==="data_path"){
   // Concrete profile concept: capture -> optional formatting -> deliver -> app.
   // The illustrated data is a conceptual placeholder, not device output.
@@ -229,9 +259,16 @@ function mount(container,{onStep=()=>{}}={}){
     const item=el("div","","story-evidence");
     item.append(el("strong",e.section||"Selected source"));
     if(e.quote)item.append(el("blockquote",e.quote));
-    const meta=e.origin==="retrieved_excerpt"?"Retrieved excerpt":e.origin==="checked_source_card"?"Checked source card · "+e.checked:"Selected article · not inspected in this view";
+    const meta=e.origin==="public_forum_report"?"Archived public forum self-report · not independently reproduced":e.origin==="team_release_note"?"Team release note · secondary summary, not official evidence":e.origin==="retrieved_excerpt"?"Retrieved excerpt":e.origin==="checked_source_card"?"Checked source card · "+e.checked:"Selected article · not inspected in this view";
     item.append(el("span",meta,"muted"));
-    try{const u=new URL(e.url);if(u.protocol==="https:"&&u.hostname==="techdocs.zebra.com"&&!u.username&&!u.password){const a=el("a","Official source ↗");a.href=u.href;a.target="_blank";a.rel="noopener noreferrer";item.append(a)}}catch{}
+    try{
+     const u=new URL(e.url);
+     const safe=u.protocol==="https:"&&!u.username&&!u.password&&!u.port;
+     const forum=e.origin==="public_forum_report"&&u.hostname==="developer.zebra.com"&&u.pathname.startsWith("/content/")&&!u.search;
+     const release=e.origin==="team_release_note"&&u.hostname==="github.com"&&/^\/1235357\/zebra-public-site-archive\/blob\/[a-f0-9]{40}\/README\.md$/.test(u.pathname)&&!u.search;
+     if(safe&&(u.hostname==="techdocs.zebra.com"||forum||release)){const a=el("a",forum?"Original forum report ↗":release?"Team release note ↗":"Official source ↗");a.href=u.href;a.target="_blank";a.rel="noopener noreferrer";item.append(a)}
+     if(forum&&typeof e.archive_url==="string"){const v=new URL(e.archive_url);if(v.protocol==="https:"&&v.hostname==="github.com"&&!v.username&&!v.password&&!v.port&&!v.search&&/^\/1235357\/zebra-public-site-archive\/blob\/[a-f0-9]{40}\/Zebra_Forum_Backup_2026-10-26\//.test(v.pathname)){const a=el("a","Pinned archived source ↗");a.href=v.href;a.target="_blank";a.rel="noopener noreferrer";item.append(a)}}
+    }catch{}
     source.append(item)
    }
    info.append(source)
