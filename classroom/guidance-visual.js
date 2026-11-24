@@ -12,6 +12,7 @@
 const SCAN="https://techdocs.zebra.com/datawedge/6-8/guide/api/softscantrigger/";
 const RESULT="https://techdocs.zebra.com/datawedge/6-8/guide/api/resultinfo/";
 const CONFIG="https://techdocs.zebra.com/datawedge/15-0/guide/api/setconfig/";
+const PROFILE="https://techdocs.zebra.com/datawedge/15-0/guide/profiles/";
 const SCAN_PROFILE="Functional only when Barcode Input is enabled in the active Profile.";
 const SCAN_BUSY="commands might be ignored if the scanner is busy";
 const RESULT_PROSE="intent extras RECEIVE_RESULT and COMMAND_IDENTIFIER";
@@ -77,12 +78,25 @@ function graph(plan,result={},inputState={}){
   {section:"MAIN BUNDLE",quote:"A bundle array (nested within the main bundle)"},
   {section:"PLUGIN_CONFIG BUNDLE",quote:"A parameter list bundle nested within the PLUGIN_CONFIG bundle"}
  ],"15.0"):null;
+ const profile=plan.explanation_intent==="concept_overview"?chooseEvidence(plan,result,PROFILE,[
+  {section:"Input",quote:"how the data is acquired (input)"},
+  {section:"Process",quote:"processed for data formatting (if needed)"},
+  {section:"Output",quote:"delivered to the app (output)"}
+ ],"15.0"):null;
  // Two independently applicable maps are not merged into an invented
  // dependency. Ask for a single focus if both topics were selected.
  if(scan&&codes){
   return make("scope_required","Choose a focus","Two supported topics match. Split them into separate questions instead of joining unrelated evidence.",
    [["question"],["scope"],["next"]],{id:"scope",text:"Choose either scan-trigger prerequisites or result-code naming."},
    [genericStart,node("scope","Two topics","Narrow the request","check","Separate the scan trigger from result-code naming before using a visual template."),node("next","Inspect the selected source","Pending scope","waiting","No combined device behavior is inferred.")]);
+ }
+ if(profile&&!scan&&!codes&&!config){
+  return make("profile_learning","How DataWedge Profiles work","Learn the data path before diagnosing a problem or assuming a particular capability.",
+   [["input"],["process"],["output"],["application"]],{id:"application",text:"Identify which stage your task concerns. For a specific feature, check the device, build and the matching plugin documentation."},
+   [node("input","Input","Capture","source","Input plugins define how data is acquired from a configured source.",[profile[0]]),
+    node("process","Process","Optional formatting","source","Processing plugins can format the acquired data if needed; formatting is not mandatory.",[profile[1]]),
+    node("output","Output","Deliver data","source","The output configuration determines how data reaches the associated application.",[profile[2]]),
+    node("application","Associated app","Use the delivered data","check","This explains the profile's documented role, not every supported device feature or a validated integration.",[profile[2]])]);
  }
  if(config){
   return make("configuration_hierarchy","SET_CONFIG — nested bundle structure","Inspect the containment relationships in DataWedge 15.0. This is a structural explanation, not executable configuration or a claim that a device accepted it.",
