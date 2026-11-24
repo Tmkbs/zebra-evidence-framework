@@ -1,0 +1,233 @@
+/* Portable, source-linked visual walkthrough. All scenes are authored
+ * conceptual illustrations driven by the existing verified guidance map.
+ * No device screen capture, model, remote media, speech API, or network.
+ */
+(function(root,factory){
+ const api=factory();
+ if(typeof module==="object"&&module.exports)module.exports=api;
+ else root.ZebraStoryboard=api;
+})(typeof globalThis!=="undefined"?globalThis:this,function(){
+"use strict";
+const NS="http://www.w3.org/2000/svg";
+const themes={ink:"#17393f",muted:"#536e78",line:"#adc1c5",teal:"#08796d",wash:"#e9f5f1",paper:"#f4f7f8",amber:"#a46a21",amberWash:"#fff0d9",white:"#ffffff"};
+function build(map){
+ if(!map||map.schema!=="zebra-visual-guide/v1"||!Array.isArray(map.nodes)||!Array.isArray(map.columns))throw Error("Expected a visual guidance map");
+ const by=new Map(map.nodes.map(n=>[n.id,n]));
+ const ids=map.columns.flat();
+ if(!ids.length||ids.length>12||new Set(ids).size!==ids.length||ids.some(id=>!by.has(id)))throw Error("Invalid storyboard node sequence");
+ const frames=ids.map((id,index)=>{
+  const n=by.get(id);
+  return {id,index,title:n.title,caption:n.detail,status:n.status,evidence:(n.evidence||[]).map(e=>({...e})),duration_ms:6000};
+ });
+ const scene=map.kind==="scan_prerequisite"?"diagnostic":map.kind==="result_discrepancy"?"comparison":map.kind==="configuration_hierarchy"?"containment":"scope";
+ return {schema:"zebra-visual-storyboard/v1",kind:map.kind,scene,title:map.title,frames,
+  next_check:map.next,representation:"authored_conceptual_illustration",video_file:false,model_generated:false,device_tested:false,
+  total_duration_ms:frames.reduce((n,f)=>n+f.duration_ms,0)};
+}
+function clampIndex(story,index){
+ return Math.min(story.frames.length-1,Math.max(0,Number.isFinite(index)?Math.trunc(index):0));
+}
+function createSVG(doc,map,story,index,onSelect=()=>{}){
+ const c=themes,frame=story.frames[clampIndex(story,index)],by=new Map(map.nodes.map(n=>[n.id,n]));
+ const element=(tag,attrs={},value)=>{const n=doc.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,String(v));if(value!==undefined)n.textContent=String(value);return n};
+ const svg=element("svg",{viewBox:"0 0 640 292",role:"group","aria-label":story.title+" — "+frame.title,xmlns:NS});
+ svg.append(element("title",{},story.title),element("desc",{},"Conceptual visual explanation. Select an illustrated component to inspect its source and explanation. No live device operation."));
+ const rect=(p,x,y,w,h,fill=c.paper,stroke=c.line,rx=12,sw=1.5)=>{const v=element("rect",{x,y,width:w,height:h,rx,fill,stroke,"stroke-width":sw});p.append(v);return v};
+ const line=(p,x1,y1,x2,y2,stroke=c.line,sw=2,dash="")=>{const v=element("line",{x1,y1,x2,y2,stroke,"stroke-width":sw,"stroke-linecap":"round",...(dash?{"stroke-dasharray":dash}:{})});p.append(v);return v};
+ const path=(p,d,stroke=c.ink,sw=2.5,fill="none")=>{const v=element("path",{d,stroke,"stroke-width":sw,fill,"stroke-linecap":"round","stroke-linejoin":"round"});p.append(v);return v};
+ const circle=(p,cx,cy,r,fill,stroke="none")=>{const v=element("circle",{cx,cy,r,fill,stroke,"stroke-width":1.5});p.append(v);return v};
+ const text=(p,x,y,value,size=16,fill=c.ink,weight=600,anchor="start",family="system-ui, sans-serif")=>p.append(element("text",{x,y,"font-size":size,fill,"font-weight":weight,"text-anchor":anchor,"font-family":family},value));
+ const group=(id,label=by.get(id)?.title||id)=>{
+  const g=element("g",{tabindex:"0",role:"button","aria-label":label,"aria-pressed":String(frame.id===id),"data-story-hotspot":id});
+  const activate=()=>onSelect(id);
+  g.addEventListener("click",activate);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();activate()}});
+  svg.append(g);return g;
+ };
+ const active=id=>frame.id===id;
+ const stroke=id=>active(id)?c.teal:c.line;
+ const fill=id=>active(id)?c.wash:c.white;
+ const mono="ui-monospace, Consolas, monospace";
+ function arrow(x1,y,x2,color=c.line){
+  line(svg,x1,y,x2-7,y,color,2.5);
+  path(svg,"M"+(x2-13)+" "+(y-5)+" L"+(x2-6)+" "+y+" L"+(x2-13)+" "+(y+5),color,2.5);
+ }
+ rect(svg,1,1,638,290,c.paper,"#dce5e7",16,1);
+ text(svg,20,25,"CONCEPTUAL VIEW",10,c.muted,750);
+ if(story.scene==="diagnostic"){
+  const g=group("command");
+  rect(g,20,54,123,148,fill("command"),stroke("command"),14,active("command")?3:1.5);
+  rect(g,57,69,48,71,c.white,c.ink,7,2);
+  line(g,68,80,94,80,c.line,2);line(g,68,88,94,88,c.line,2);
+  path(g,"M70 105 L92 105 L81 118 Z",c.teal,2,c.wash);
+  circle(g,81,131,2.7,c.ink);
+  text(g,81,161,"App",16,c.ink,700,"middle");
+  text(g,81,180,"Trigger",13,c.muted,600,"middle");
+  arrow(145,128,168,map.next.id==="profile"?c.teal:c.line);
+  const profile=group("profile"),ps=map.state.profile;
+  rect(profile,170,54,134,148,ps==="disabled"?c.amberWash:fill("profile"),active("profile")?c.teal:ps==="disabled"?c.amber:stroke("profile"),14,active("profile")?3:1.5);
+  rect(profile,188,72,98,66,c.white,c.line,7);
+  line(profile,200,85,266,85,c.line,2);line(profile,200,96,237,96,c.line,2);
+  rect(profile,207,109,60,18,ps==="enabled"?c.teal:ps==="disabled"?c.amber:"#a3b5bb","none",9);
+  circle(profile,ps==="enabled"?257:217,118,7,c.white);
+  text(profile,237,161,"Barcode Input",14,c.ink,700,"middle");
+  text(profile,237,180,ps==="unknown"?"Not checked":ps==="enabled"?"Enabled":"Disabled",12,ps==="disabled"?c.amber:c.muted,650,"middle");
+  arrow(306,128,330,map.next.id==="scanner"?c.teal:c.line);
+  const scanner=group("scanner"),ss=map.state.scanner,waiting=ps!=="enabled";
+  rect(scanner,332,54,134,148,!waiting&&ss==="busy"?c.amberWash:fill("scanner"),active("scanner")?c.teal:!waiting&&ss==="busy"?c.amber:stroke("scanner"),14,active("scanner")?3:1.5);
+  rect(scanner,361,77,76,37,c.white,c.ink,8,2);
+  path(scanner,"M371 114 L378 139 L398 139 L406 114",c.ink,2,c.white);
+  for(let k=0;k<7;k++)line(scanner,369+k*9,84,369+k*9,106,k%2?c.ink:c.teal,k%3===0?3:1.3);
+  text(scanner,399,161,"Scanner",15,c.ink,700,"middle");
+  text(scanner,399,180,waiting?"Check profile first":ss==="unknown"?"Not checked":ss==="ready"?"Ready":"Busy",12,!waiting&&ss==="busy"?c.amber:c.muted,650,"middle");
+  arrow(468,128,492,map.next.id==="outcome"?c.teal:c.line);
+  const out=group("outcome");
+  rect(out,494,54,126,148,fill("outcome"),stroke("outcome"),14,active("outcome")?3:1.5);
+  rect(out,534,73,46,64,c.white,c.ink,5,2);
+  path(out,"M543 87 L550 94 L560 82",c.teal,2.5);line(out,544,105,570,105,c.line,2);line(out,544,116,568,116,c.line,2);line(out,544,127,562,127,c.line,2);
+  text(out,557,161,"Check logs",15,c.ink,700,"middle");
+  text(out,557,180,"Not verified",12,c.muted,600,"middle");
+  rect(svg,20,222,600,46,c.white,"#dce5e7",8,1);
+  circle(svg,39,245,5,c.teal);
+  text(svg,53,250,"Next check: "+(by.get(map.next.id)?.title||"Inspect evidence"),15,c.ink,650);
+ }else if(story.scene==="comparison"){
+  const q=group("question");
+  rect(q,20,40,600,40,fill("question"),stroke("question"),9,active("question")?3:1.5);
+  text(q,320,65,"One question · same documentation edition",16,c.ink,700,"middle");
+  const left=group("overview");
+  rect(left,20,98,282,110,fill("overview"),stroke("overview"),12,active("overview")?3:1.5);
+  path(left,"M35 116 L47 112 L59 116 L59 135 L47 131 L35 135 Z M47 112 L47 131",c.teal,2);
+  text(left,69,128,"Overview",15,c.ink,700);
+  line(left,36,142,286,142,c.line,1);
+  rect(left,36,154,250,36,c.white,c.line,6,1);
+  text(left,161,178,"RECEIVE_RESULT",18,c.teal,750,"middle",mono);
+  const right=group("prototype");
+  rect(right,338,98,282,110,fill("prototype"),stroke("prototype"),12,active("prototype")?3:1.5);
+  path(right,"M352 119 L347 125 L352 131 M367 119 L372 125 L367 131 M363 115 L356 135",c.teal,2);
+  text(right,382,128,"Function prototype",15,c.ink,700);
+  line(right,354,142,604,142,c.line,1);
+  rect(right,354,154,250,36,c.white,c.line,6,1);
+  text(right,479,178,"SEND_RESULT",18,c.teal,750,"middle",mono);
+  line(svg,161,208,161,222,c.line,2);line(svg,479,208,479,222,c.line,2);line(svg,161,222,479,222,c.line,2);line(svg,320,222,320,234,c.line,2);
+  const boundary=group("boundary");
+  rect(boundary,140,234,360,42,active("boundary")?c.wash:c.amberWash,active("boundary")?c.teal:c.amber,9,active("boundary")?3:1.5);
+  text(boundary,320,260,"?  Resolve with applicable evidence",15,c.ink,700,"middle");
+ }else if(story.scene==="containment"){
+  const main=group("main");
+  rect(main,26,43,588,184,fill("main"),stroke("main"),16,active("main")?3:1.5);
+  text(main,42,66,"SET_CONFIG",19,c.ink,750,"start",mono);
+  text(main,596,65,"Main bundle",12,c.muted,600,"end");
+  const plugin=group("plugin");
+  rect(plugin,55,79,365,132,fill("plugin"),stroke("plugin"),12,active("plugin")?3:1.5);
+  text(plugin,71,102,"PLUGIN_CONFIG",18,c.ink,750,"start",mono);
+  text(plugin,404,102,"One plugin",11,c.muted,600,"end");
+  const params=group("params");
+  rect(params,85,117,305,76,active("params")?c.wash:c.white,stroke("params"),9,active("params")?3:1.5);
+  text(params,100,145,"PARAM_LIST",17,c.teal,750,"start",mono);
+  line(params,101,161,283,161,c.line,2);line(params,101,172,241,172,c.line,2);
+  text(params,376,177,"Settings",11,c.muted,600,"end");
+  rect(svg,436,79,160,132,c.paper,c.line,12,1.5);
+  text(svg,516,105,"Another plugin",13,c.ink,650,"middle");
+  rect(svg,449,120,134,73,c.white,c.line,8,1);
+  text(svg,516,150,"Its own",13,c.muted,600,"middle");text(svg,516,169,"PARAM_LIST",13,c.teal,700,"middle",mono);
+  const boundary=group("boundary");
+  rect(boundary,26,239,588,37,active("boundary")?c.wash:c.white,stroke("boundary"),8,active("boundary")?3:1.5);
+  text(boundary,320,263,"Structure only · validate actual parameter values and device behavior",12,c.ink,650,"middle");
+ }else{
+  // Generic fallback depicts the explanation sequence, not product mechanics.
+  const n=story.frames.length,w=Math.min(180,Math.floor((600-(n-1)*15)/n));
+  const start=(640-(w*n+15*(n-1)))/2;
+  for(let k=0;k<n;k++){
+   const f=story.frames[k],x=start+k*(w+15),g=group(f.id);
+   rect(g,x,75,w,122,fill(f.id),stroke(f.id),12,active(f.id)?3:1.5);
+   circle(g,x+w/2,112,17,active(f.id)?c.teal:c.line);
+   text(g,x+w/2,118,k+1,16,c.white,750,"middle");
+   const words=f.title.split(/\s+/);let rows=[""];
+   for(const word of words){if((rows.at(-1)+" "+word).trim().length>16&&rows.at(-1))rows.push(word);else rows[rows.length-1]=(rows.at(-1)+" "+word).trim()}
+   rows.slice(0,3).forEach((r,i)=>text(g,x+w/2,150+i*16,r.slice(0,21),13,c.ink,650,"middle"));
+   if(k<n-1)arrow(x+w+2,136,x+w+14,c.line);
+  }
+  text(svg,320,235,"Clarify scope and inspect sources before giving detailed advice.",14,c.muted,600,"middle");
+ }
+ return svg;
+}
+function mount(container,{onStep=()=>{}}={}){
+ const doc=container.ownerDocument||document;
+ let map=null,story=null,index=0,timer=null,playing=false,destroyed=false;
+ const el=(tag,value="",cls="")=>{const e=doc.createElement(tag);e.textContent=String(value);if(cls)e.className=cls;return e};
+ const top=el("div","","story-heading"),scene=el("div","","story-scene"),info=el("div","","story-info"),controls=el("div","","story-controls"),rail=el("div","","story-rail");
+ const title=el("strong","Visual walkthrough"),counter=el("span","","muted");
+ top.append(title,counter);
+ const prev=el("button","Previous"),play=el("button","Play"),next=el("button","Next"),seek=el("input");seek.type="range";seek.min="0";seek.step="1";seek.setAttribute("aria-label","Walkthrough step");
+ for(const [b,label] of [[prev,"Previous scene"],[play,"Play or pause walkthrough"],[next,"Next scene"]]){b.type="button";b.setAttribute("aria-label",label)}
+ prev.dataset.storyAction="prev";play.dataset.storyAction="play";next.dataset.storyAction="next";
+ seek.dataset.storySeek="true";
+ controls.append(prev,play,next,seek);
+ container.replaceChildren(top,scene,controls,rail,info);
+ function cancel(){if(timer!==null){clearTimeout(timer);timer=null}}
+ function pause(){cancel();playing=false;play.textContent="Play";play.setAttribute("aria-pressed","false")}
+ function schedule(){
+  cancel();if(!playing||!story||destroyed)return;
+  timer=setTimeout(()=>{timer=null;if(index>=story.frames.length-1){pause();return}select(index+1,false);schedule()},story.frames[index].duration_ms);
+ }
+ function select(value,manual=true,focusTarget=""){
+  if(!story||destroyed)return;
+  if(manual)pause();
+  index=clampIndex(story,value);draw();
+  if(focusTarget){const found=scene.querySelector('[data-story-hotspot="'+focusTarget+'"]');found?.focus({preventScroll:true})}
+  onStep(story.frames[index],index);
+ }
+ function draw(){
+  if(!story)return;
+  const f=story.frames[index];
+  counter.textContent="Step "+(index+1)+" / "+story.frames.length+" · "+Math.round(story.total_duration_ms/1000)+"s walkthrough";
+  scene.replaceChildren(createSVG(doc,map,story,index,id=>{const n=story.frames.findIndex(x=>x.id===id);if(n>=0)select(n,true,id)}));
+  seek.max=String(story.frames.length-1);seek.value=String(index);seek.setAttribute("aria-valuetext",f.title);prev.disabled=index===0;next.disabled=index===story.frames.length-1;
+  rail.replaceChildren();
+  for(const item of story.frames){
+   const b=el("button",String(item.index+1)+". "+item.title,"story-step");b.type="button";b.dataset.storyStep=String(item.index);b.setAttribute("aria-pressed",String(item.index===index));
+   b.addEventListener("click",()=>{select(item.index);rail.querySelector('[data-story-step="'+item.index+'"]')?.focus({preventScroll:true})});rail.append(b)
+  }
+  info.replaceChildren(el("div","SCENE "+(index+1),"vision-kicker"),el("h3",f.title),el("p",f.caption));
+  if(f.evidence.length){
+   const source=el("div","","story-source");
+   for(const e of f.evidence){
+    const item=el("div","","story-evidence");
+    item.append(el("strong",e.section||"Selected source"));
+    if(e.quote)item.append(el("blockquote",e.quote));
+    const meta=e.origin==="retrieved_excerpt"?"Retrieved excerpt":e.origin==="checked_source_card"?"Checked source card · "+e.checked:"Selected article · not inspected in this view";
+    item.append(el("span",meta,"muted"));
+    try{const u=new URL(e.url);if(u.protocol==="https:"&&u.hostname==="techdocs.zebra.com"&&!u.username&&!u.password){const a=el("a","Official source ↗");a.href=u.href;a.target="_blank";a.rel="noopener noreferrer";item.append(a)}}catch{}
+    source.append(item)
+   }
+   info.append(source)
+  }
+  info.append(el("p","Conceptual visual walkthrough — not a recording of actual device behavior.","vision-foot"));
+ }
+ prev.addEventListener("click",()=>select(index-1));next.addEventListener("click",()=>select(index+1));
+ seek.addEventListener("input",()=>select(Number(seek.value)));
+ play.addEventListener("click",()=>{
+  if(!story)return;if(playing){pause();return}
+  if(index===story.frames.length-1)select(0,false);
+  playing=true;play.textContent="Pause";play.setAttribute("aria-pressed","true");schedule();
+ });
+ const hidden=()=>{if(doc.hidden)pause()};
+ doc.addEventListener("visibilitychange",hidden);
+ return {
+  update(nextMap,{focus=""}={}){
+   if(destroyed)return;
+   const previous=story,previousId=story?.frames[index]?.id;
+   const previousState=map?JSON.stringify(map.state):"";
+   map=nextMap;story=build(map);
+   const changed=!previous||previous.kind!==story.kind||previousState!==JSON.stringify(map.state);
+   if(changed||focus)pause();
+   let requested=focus||(!previous||previous.kind!==story.kind?"":changed?map.next.id:previousId);
+   const found=story.frames.findIndex(f=>f.id===requested);
+   index=found<0?0:found;draw();
+   if(playing)schedule();
+  },
+  destroy(){destroyed=true;pause();doc.removeEventListener("visibilitychange",hidden);container.replaceChildren()},
+  snapshot(){return story?{story,index,playing}:null}
+ };
+}
+return Object.freeze({build,clampIndex,createSVG,mount});
+});
