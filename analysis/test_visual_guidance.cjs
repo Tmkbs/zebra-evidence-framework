@@ -96,3 +96,58 @@ test("browser module matches server-side pure logic and page scripts parse",()=>
  assert.match(html,/id="visionBox"/);assert.match(html,/src="guidance-visual.js"/);
  for(const m of html.matchAll(/<script>([\s\S]*?)<\/script>/g))new vm.Script(m[1]);
 });
+
+const S=require("../classroom/guidance-storyboard.js");
+const config="https://techdocs.zebra.com/datawedge/15-0/guide/api/setconfig/";
+const configInput={question:"How should PARAM_LIST and PLUGIN_CONFIG be nested in DataWedge 15.0 SET_CONFIG?",product:"datawedge",version:"15.0",context:"",source_urls:[config]};
+test("configuration hierarchy is edition pinned and only supported by matching official evidence",()=>{
+ const plan=P.prepare(configInput),g=V.graph(plan);
+ assert.equal(g.kind,"configuration_hierarchy");
+ assert.deepEqual(g.columns.flat(),["main","plugin","params","boundary"]);
+ assert.equal(g.controls.length,0);assert.equal(g.device_tested,false);
+ assert.ok(g.nodes.find(n=>n.id==="params").evidence.every(e=>e.url===config));
+ assert.match(g.nodes.find(n=>n.id==="params").evidence[0].quote,/parameter list bundle nested/);
+ assert.equal(V.graph(P.prepare({...configInput,version:"6.8",source_urls:[]})).kind,"source_route");
+ assert.equal(V.graph(plan,{sources:[{url:config,text:"Only the main bundle is described here."}]}).kind,"source_route");
+});
+test("three explanation scenes are distinct and all retain source provenance",()=>{
+ const comparison=P.prepare({...base,question:"Why do RECEIVE_RESULT and SEND_RESULT differ in result codes?",source_urls:[codes]});
+ const graphs=[V.graph(p),V.graph(comparison),V.graph(P.prepare(configInput))];
+ assert.deepEqual(graphs.map(g=>S.build(g).scene),["diagnostic","comparison","containment"]);
+ for(const g of graphs){
+  const story=S.build(g);
+  assert.deepEqual(story.frames.map(f=>f.id),g.columns.flat());
+  assert.equal(story.total_duration_ms,story.frames.length*6000);
+  assert.equal(story.video_file,false);assert.equal(story.model_generated,false);assert.equal(story.device_tested,false);
+  for(const f of story.frames)assert.deepEqual(f.evidence,g.nodes.find(n=>n.id===f.id).evidence);
+ }
+});
+test("storyboard exposes a neutral scope fallback for missing context",()=>{
+ const g=V.graph(P.prepare({...base,version:""})),story=S.build(g);
+ assert.equal(story.scene,"scope");
+ assert.equal(story.frames.some(f=>f.evidence.some(e=>e.quote)),false);
+ assert.equal(story.model_generated,false);
+});
+test("portable storyboard does not mutate the visual map and can be serialized",()=>{
+ const g=V.graph(p),before=JSON.stringify(g),story=S.build(g);
+ assert.equal(JSON.stringify(g),before);
+ assert.deepEqual(JSON.parse(JSON.stringify(story)),story);
+ assert.equal(story.representation,"authored_conceptual_illustration");
+});
+test("storyboard rejects missing, duplicated or invalid nodes",()=>{
+ const g=V.graph(p);
+ assert.throws(()=>S.build({}));
+ assert.throws(()=>S.build({...g,columns:[["not-a-node"]]}));
+ assert.throws(()=>S.build({...g,columns:[["command"],["command"]]}));
+});
+test("seek index is bounded and invalid input cannot access nonexistent frames",()=>{
+ const story=S.build(V.graph(p));
+ for(const [input,want] of [[-20,0],[100,3],[2.7,2],[NaN,0],[Infinity,0]])assert.equal(S.clampIndex(story,input),want);
+});
+test("browser storyboard contract equals the Node contract",()=>{
+ const context=vm.createContext({URL});
+ vm.runInContext(fs.readFileSync(path.join(__dirname,"../classroom/guidance-storyboard.js"),"utf8"),context);
+ const g=V.graph(P.prepare(configInput));
+ const actual=vm.runInContext("ZebraStoryboard.build("+JSON.stringify(g)+")",context);
+ assert.deepEqual(JSON.parse(JSON.stringify(actual)),S.build(g));
+});
