@@ -67,7 +67,20 @@ const harness=String.raw`
   click('[data-story-hotspot="params"]');ensure(document.querySelector(".story-info").textContent.includes("parameter list bundle nested"),"Config quote missing");
   ensure(last.plan.version==="15.0","Config scenario edition wrong");
   ensure(last.visual_guidance.controls.length===0,"Invented config controls");
+  click("#loadConcept");ensure(last.visual_guidance.kind==="profile_learning","Product concept missing");
+  ensure(last.visual_storyboard.scene==="data_path","Concept visual does not match explanation intent");
+  ensure(!$test("mediaOutput").hidden,"Relevant official media not displayed");
+  ensure(last.contextual_media.assets.length===2,"Expected official diagram and video");
+  ensure(document.querySelector('#mediaOutput a[href="https://www.youtube.com/watch?v=LCaPhWxk4y0"]'),"Officially listed video missing");
+  ensure(!$test("mediaOutput").querySelector("iframe,video,img"),"External media automatically loaded");
+  click('[data-story-hotspot="process"]');ensure(scene()==="Process","Process visual not selectable");
+  ensure(document.querySelector(".story-info").textContent.includes("if needed"),"Optional formatting evidence missing");
+  click('[data-learn-choice="output"]');ensure(last.learning_checkpoint.correct===false,"Wrong understanding answer not recorded");
+  click('[data-learn-choice="process"]');ensure(last.learning_checkpoint.correct===true,"Correct understanding answer not recorded");
+  ensure(last.learning_checkpoint.scope==="single_optional_self_check_not_learning_outcome","Learning check incorrectly labeled as evaluation");
+  ensure($test("context").value==="","Learning answer leaked into model context");
   click("#loadUnknown");ensure(last.visual_guidance.kind==="scope_required","Missing version not blocked");
+  ensure($test("mediaOutput").hidden,"Old media remained after missing version");
   ensure(!document.querySelector(".vision-quote"),"Out-of-scope source shown");
   click("#loadPrereq");ensure(last.visual_guidance.kind==="scan_prerequisite","Preset did not rebuild visual");
   const flow=document.querySelector(".vision-flow");
@@ -96,6 +109,6 @@ try{
   const dom=run.stdout||"",error=dom.match(/<pre id="vision-smoke-error">([\s\S]*?)<\/pre>/);
   assert.equal(run.status,0,run.stderr?.slice(-1500));
   assert.ok(/<html[^>]*data-vision-smoke="pass"/.test(dom),error?.[1]||"No browser pass marker: "+dom.slice(-800));
-  console.log("PASS Chromium "+label+": interactive map, timed playback, source-linked scenes, report consent, stale-result rejection, no network, and page width");
+  console.log("PASS Chromium "+label+": interactive map, timed playback, source-linked scenes, contextual media, self-check, report consent, stale-result rejection, no network, and page width");
  }
 }finally{fs.rmSync(dir,{recursive:true,force:true})}
