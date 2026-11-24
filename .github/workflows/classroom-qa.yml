@@ -31,3 +31,14 @@ jobs:
 
       - name: Team reader visual companion (offline)
         run: node analysis/test_team_visual_browser.cjs
+
+      - name: Encode and decode a contextual short video (offline)
+        run: node analysis/test_contextual_video_browser.cjs
+
+      - name: Retain the verified public explainer and source receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: contextual-video-preview
+          path: qa-output/contextual-video/
+          retention-days: 7
+          if-no-files-found: error
