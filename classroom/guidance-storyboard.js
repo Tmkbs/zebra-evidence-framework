@@ -19,7 +19,7 @@ function build(map){
   const n=by.get(id);
   return {id,index,title:n.title,caption:n.detail,status:n.status,evidence:(n.evidence||[]).map(e=>({...e})),duration_ms:6000};
  });
- const scene=map.kind==="scan_prerequisite"?"diagnostic":map.kind==="result_discrepancy"?"comparison":map.kind==="configuration_hierarchy"?"containment":"scope";
+ const scene=map.kind==="scan_prerequisite"?"diagnostic":map.kind==="result_discrepancy"?"comparison":map.kind==="configuration_hierarchy"?"containment":map.kind==="profile_learning"?"data_path":"scope";
  return {schema:"zebra-visual-storyboard/v1",kind:map.kind,scene,title:map.title,frames,
   next_check:map.next,representation:"authored_conceptual_illustration",video_file:false,model_generated:false,device_tested:false,
   total_duration_ms:frames.reduce((n,f)=>n+f.duration_ms,0)};
@@ -132,6 +132,41 @@ function createSVG(doc,map,story,index,onSelect=()=>{}){
   const boundary=group("boundary");
   rect(boundary,26,239,588,37,active("boundary")?c.wash:c.white,stroke("boundary"),8,active("boundary")?3:1.5);
   text(boundary,320,263,"Structure only · validate actual parameter values and device behavior",12,c.ink,650,"middle");
+ }else if(story.scene==="data_path"){
+  // Concrete profile concept: capture -> optional formatting -> deliver -> app.
+  // The illustrated data is a conceptual placeholder, not device output.
+  const ids=["input","process","output","application"],names=["Capture","Format","Deliver","Use in app"],notes=["Input plugin","Optional process","Output plugin","Associated app"];
+  for(let k=0;k<ids.length;k++){
+   const id=ids[k],x=20+153*k,g=group(id);
+   rect(g,x,61,141,152,fill(id),stroke(id),12,active(id)?3:1.5);
+   if(k===0){
+    rect(g,x+28,79,85,63,c.white,c.ink,7,1.8);
+    for(let j=0;j<10;j++)line(g,x+40+j*6,89,x+40+j*6,124,c.ink,j%3===0?3:1.3);
+    text(g,x+70,135,"DATA",10,c.muted,650,"middle",mono);
+   }else if(k===1){
+    rect(g,x+21,80,99,64,c.white,c.line,7,1.5);
+    line(g,x+34,96,x+104,96,c.teal,2);
+    line(g,x+34,112,x+92,112,c.line,2);
+    line(g,x+34,128,x+101,128,c.line,2);
+    circle(g,x+64,96,5,c.white,c.teal);circle(g,x+81,112,5,c.white,c.teal);circle(g,x+48,128,5,c.white,c.teal);
+   }else if(k===2){
+    rect(g,x+19,82,103,58,c.white,c.ink,7,1.6);
+    rect(g,x+30,95,26,29,c.wash,c.teal,4,1.5);
+    path(g,"M"+(x+61)+" 110 H"+(x+102)+" M"+(x+96)+" 104 L"+(x+103)+" 110 L"+(x+96)+" 116",c.teal,2.6);
+   }else{
+    rect(g,x+45,76,51,71,c.white,c.ink,6,1.8);
+    rect(g,x+52,91,37,35,c.wash,c.line,4,1);
+    line(g,x+58,101,x+83,101,c.teal,2);
+    line(g,x+58,110,x+81,110,c.line,2);
+    line(g,x+58,118,x+74,118,c.line,2);
+    circle(g,x+71,137,2.5,c.ink);
+   }
+   text(g,x+70,171,names[k],16,c.ink,750,"middle");
+   text(g,x+70,191,notes[k],11,c.muted,600,"middle");
+   if(k<3)arrow(x+141,126,x+154,c.line);
+  }
+  rect(svg,20,229,600,43,c.white,c.line,8,1);
+  text(svg,320,255,"A profile controls the data path. Specific feature support depends on the device and build.",12,c.ink,600,"middle");
  }else{
   // Generic fallback depicts the explanation sequence, not product mechanics.
   const n=story.frames.length,w=Math.min(180,Math.floor((600-(n-1)*15)/n));
