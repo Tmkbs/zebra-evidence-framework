@@ -3,15 +3,15 @@
 // Run only on Northwestern VPN / eduroam: npm run campus:check
 const base=String(process.env.AI_BASE_URL||"http://c3dgx0.cs.northwestern.edu:8000/v1").replace(/\/+$/,"");
 const model=String(process.env.AI_MODEL||"nvidia/Qwen3.8-Flash-Next-FP4-Local");
-const key=String(process.env.AI_API_KEY||"token-is-ignored");
+const key=String(process.env.CAMPUS_QWEN_TOKEN||"token-is-ignored");
 async function main(){
  const u=new URL(base);
- if(!["https:","http:"].includes(u.protocol)||!u.pathname.endsWith("/v1")||u.username||u.password)throw Error("Invalid /v1 endpoint");
- if(u.protocol==="http:"&&u.hostname!=="c3dgx0.cs.northwestern.edu")throw Error("Plain HTTP allowed only for Northwestern's campus model host");
+ if(!["https:","http:"].includes(u.protocol)||u.hostname!=="c3dgx0.cs.northwestern.edu"||u.pathname!=="/v1"||u.username||u.password||u.search||u.hash)throw Error("Only the approved Northwestern campus /v1 endpoint is allowed");
+ if(u.protocol==="http:"&&key!=="token-is-ignored")throw Error("Real campus authentication tokens require HTTPS");
  console.log("Checking campus model: "+model);
  let answer;
  try{
-  answer=await fetch(base+"/chat/completions",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+key},body:JSON.stringify({model,messages:[{role:"system",content:"Respond with the single word READY."},{role:"user",content:"Connection probe: reply READY."}],temperature:0,max_tokens:64,stream:false}),signal:AbortSignal.timeout(25000)});
+  answer=await fetch(base+"/chat/completions",{method:"POST",redirect:"error",headers:{"Content-Type":"application/json",Authorization:"Bearer "+key},body:JSON.stringify({model,messages:[{role:"system",content:"Respond with the single word READY."},{role:"user",content:"Connection probe: reply READY."}],temperature:0,max_tokens:64,stream:false}),signal:AbortSignal.timeout(25000)});
  }catch(e){
   throw Error("Model network request failed. Verify VPN/eduroam and the active 8000/8080 port. Cause: "+String(e.cause?.code||e.message));
  }
