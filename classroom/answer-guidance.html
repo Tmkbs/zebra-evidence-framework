@@ -41,6 +41,11 @@ button.vision-node[aria-pressed=true]{outline:3px solid #a7d3ca;outline-offset:2
 .story-rail{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}.story-step{font-size:11px;padding:5px 8px;background:white;border-color:#d6e2e2}.story-step[aria-pressed=true]{background:#e5f3ee;color:#08796d;border-color:#8cbfb1}
 .story-info{background:#fff;border-radius:9px;padding:12px}.story-info h3{margin:4px 0}.story-info p{margin:5px 0}.story-source{display:grid;gap:6px;margin-top:8px}.story-evidence{padding:8px 10px;border-left:2px solid #8cbab6;background:#f6faf9;overflow-wrap:anywhere}.story-evidence blockquote{margin:5px 0;font-size:13px}.story-evidence span,.story-evidence a{font-size:11px;display:inline-block;margin:3px 12px 0 0}.story-info .vision-foot{margin-top:8px}
 @media(max-width:700px){.story-player{padding:9px}.story-step{font-size:10px}.story-info{padding:10px}.story-scene svg{min-height:155px}}
+
+@media(min-width:901px){
+ .story-player:not([hidden]){display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);grid-template-areas:"heading heading" "scene info" "controls info" "rail info";gap:8px 14px;align-items:start}
+ .story-heading{grid-area:heading;padding-bottom:1px}.story-scene{grid-area:scene}.story-controls{grid-area:controls;margin:0}.story-rail{grid-area:rail;margin:0}.story-info{grid-area:info;align-self:stretch}
+}
 </style></head>
 <body><header><div><strong>Zebra TechDocs · student prototype</strong><a href="../analysis/zebra-pattern-analysis.html">Pattern research snapshot</a><a href="final-delivery.html">Document-review workflow</a></div></header>
 <main><div class="kicker">Answer-side contribution</div><h1>Ask &amp; Guide</h1>
