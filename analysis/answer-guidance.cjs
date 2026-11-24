@@ -6,7 +6,7 @@
 const crypto=require("node:crypto");
 const {extractPage}=require("../api/review.js")._internals;
 const CAMPUS="c3dgx0.cs.northwestern.edu";
-const {prepare,officialURL,routeSources}=require("../classroom/guidance-planner.js");
+const {prepare,officialURL,routeSources,clean}=require("../classroom/guidance-planner.js");
 const hash=s=>crypto.createHash("sha256").update(s).digest("hex");
 function campusBase(cfg){
  const u=new URL(cfg.base);
