@@ -11,8 +11,8 @@ async function main(){
  assert.equal(env.AI_ALLOW_HTTP,"true");
  assert.ok(cfg.passcode.length>=32);
  assert.ok(!env.AI_API_KEY||env.AI_API_KEY==="token-is-ignored");
- assert.throws(()=>configure({AI_BASE_URL:"http://example.com/v1"}),/Plain HTTP/);
- assert.throws(()=>configure({AI_BASE_URL:"https://example.com/v1"}),/AI_API_KEY/);
+ assert.throws(()=>configure({AI_BASE_URL:"http://example.com/v1"}),/campus model host/);
+ assert.throws(()=>configure({AI_BASE_URL:"https://example.com/v1"}),/campus model host/);
  assert.equal(allowHost({headers:{host:"evil.example:3000"}},3000),false);
  assert.equal(allowHost({headers:{host:"localhost:3000"}},3000),true);
  const mockFetch=async url=>{
