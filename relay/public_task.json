@@ -1,0 +1,25 @@
+{
+  "title": "Grounded strategy suggestions for repeated Zebra developer questions",
+  "goal": "Recommend a minimal, testable cross-case pattern taxonomy and one evidence-aware answer policy. Keep documentation revisions and model answer quality as separate evaluation targets. Start from publicly published software/documentation cases; do not use private SPR source records. Suggest tests and criteria; do not report performance gains without held-out model runs.",
+  "constraints": [
+    "Preserve the current published application behavior and the team's documented case-to-TechDocs source trail.",
+    "Proposed patterns are provisional until multiple cases and a human reviewer support each grouping.",
+    "Never infer that documentation is missing merely because retrieval failed.",
+    "Do not present a pattern flag as a confirmed defect or as a device test.",
+    "Require version/product applicability and evidence links for any suggested AI response.",
+    "Keep diagram/video guidance optional and source-grounded; no fabricated demonstration.",
+    "Output a narrowly scoped patch proposal, test plan, and limitations; do not edit code automatically."
+  ],
+  "public_references": [
+    "https://github.com/Tmkbs/zebra-evidence-framework",
+    "https://github.com/1235357/zebra-public-site-archive",
+    "https://zebra-techdocs-practicum.vercel.app/document-reader/methods.html"
+  ],
+  "acceptance_checks": [
+    "A proposed pattern has an explicit definition and an example of a disconfirming case.",
+    "Any output requiring device behavior is labeled NEEDS_DEVICE_TEST.",
+    "A before/after answer evaluation freezes prompts, public evidence bytes, model identity and output receipts.",
+    "Blind evaluation examples are held out from strategy drafting.",
+    "Neither model uses restricted client sources or silently submits to a public forum."
+  ]
+}
