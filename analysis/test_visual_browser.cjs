@@ -18,6 +18,21 @@ const harness=String.raw`
  const report=()=>Array.from(document.querySelectorAll("#visionOutput button")).find(b=>b.textContent==="Use as reported context for next answer");
  try{
   ensure(last.visual_guidance.kind==="scan_prerequisite","Initial scan visual missing");
+  const scene=()=>document.querySelector(".story-info h3").textContent;
+  const play=()=>document.querySelector('[data-story-action="play"]');
+  ensure(last.visual_storyboard.scene==="diagnostic","Diagnostic storyboard not exported");
+  ensure(last.visual_storyboard.frames.length===4,"Unexpected initial storyboard frame count");
+  ensure(!!document.querySelector(".story-scene svg"),"SVG illustration missing");
+  click('[data-story-action="next"]');
+  ensure(scene()==="Active profile","Next step did not open profile");
+  click('[data-story-hotspot="scanner"]');
+  ensure(scene()==="Scanner readiness","SVG hotspot did not select scanner");
+  click('[data-story-action="play"]');ensure(play().textContent==="Pause","Play did not start");
+  click('[data-story-action="play"]');ensure(play().textContent==="Play","Pause failed");
+  const seek=document.querySelector("[data-story-seek]");seek.value="3";seek.dispatchEvent(new Event("input",{bubbles:true}));
+  ensure(scene()==="Next diagnostic action","Timeline seek failed");
+  click('[data-story-action="prev"]');ensure(scene()==="Scanner readiness","Previous step failed");
+
   ensure(next().includes("Inspect the active profile"),"Initial gate is not profile");
   choose("profile","enabled");ensure(next().includes("Check scanner status"),"Profile selection did not advance gate");
   choose("scanner","busy");ensure(next().includes("busy state"),"Busy branch absent");
@@ -41,6 +56,15 @@ const harness=String.raw`
   click('[data-vision-node="prototype"]');
   ensure(document.querySelector(".vision-inspector").textContent.includes("SEND_RESULT"),"Prototype quote not shown");
   ensure(next().includes("Do not choose"),"Unresolved result-code decision lost");
+
+  ensure(last.visual_storyboard.scene==="comparison","Comparison illustration missing");
+  click('[data-story-hotspot="overview"]');ensure(document.querySelector(".story-info").textContent.includes("RECEIVE_RESULT"),"Storyboard provenance missing for overview");
+  click('[data-story-hotspot="prototype"]');ensure(document.querySelector(".story-info").textContent.includes("SEND_RESULT"),"Storyboard provenance missing for prototype");
+  click("#loadConfig");ensure(last.visual_guidance.kind==="configuration_hierarchy","Config visual missing");
+  ensure(last.visual_storyboard.scene==="containment","Config containment story missing");
+  click('[data-story-hotspot="params"]');ensure(document.querySelector(".story-info").textContent.includes("parameter list bundle nested"),"Config quote missing");
+  ensure(last.plan.version==="15.0","Config scenario edition wrong");
+  ensure(last.visual_guidance.controls.length===0,"Invented config controls");
   click("#loadUnknown");ensure(last.visual_guidance.kind==="scope_required","Missing version not blocked");
   ensure(!document.querySelector(".vision-quote"),"Out-of-scope source shown");
   click("#loadPrereq");ensure(last.visual_guidance.kind==="scan_prerequisite","Preset did not rebuild visual");
@@ -48,7 +72,7 @@ const harness=String.raw`
   ensure(flow.getBoundingClientRect().height>60,"Graph not visible");
   ensure(document.documentElement.scrollWidth<=window.innerWidth+3,"Horizontal page overflow");
   $test("version").value="15.0";$test("version").dispatchEvent(new Event("input",{bubbles:true}));
-  ensure(last===null&&$test("download").hidden,"Stale receipt remains exportable");
+  ensure(last===null&&$test("download").hidden&&$test("storyOutput").hidden,"Stale receipt or illustration remains visible");
   ensure(window.__visionFetches===0,"Offline UI attempted network fetch");
   document.documentElement.dataset.visionSmoke="pass";
  }catch(e){
@@ -59,7 +83,7 @@ const harness=String.raw`
 </script>
 `;
 try{
- for(const file of ["guidance-planner.js","guidance-intake.js","guidance-visual.js"])fs.copyFileSync(path.join(source,file),path.join(dir,file));
+ for(const file of ["guidance-planner.js","guidance-intake.js","guidance-visual.js","guidance-storyboard.js"])fs.copyFileSync(path.join(source,file),path.join(dir,file));
  const html=fs.readFileSync(path.join(source,"answer-guidance.html"),"utf8")
   .replace('<script src="guidance-planner.js">','<script>window.__visionFetches=0;window.fetch=()=>{window.__visionFetches++;throw Error("Unexpected network fetch")};</script><script src="guidance-planner.js">')
   .replace("</body>",harness+"</body>");
