@@ -67,8 +67,11 @@ class RelayTests(unittest.TestCase):
             with patch.object(relay,"invoke",side_effect=AssertionError("Unexpected API call")):
                 self.assertEqual(0,relay.main(["--task",str(path),"--validate-only"]))
     def test_reject_oversized(self):
-        with self.assertRaises(ValueError):
-            relay.read_json("/does/not/exist",0)
+        with tempfile.TemporaryDirectory() as d:
+            path=Path(d)/"oversized.json"
+            path.write_bytes(b"x"*200)
+            with self.assertRaises(ValueError):
+                relay.read_json(path,10)
 
 if __name__=="__main__":
     unittest.main()
