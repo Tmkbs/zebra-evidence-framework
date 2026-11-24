@@ -198,7 +198,7 @@ async function infer(cfg,messages,sources,request){
 async function run(input,cfg,request=fetch){
  const plan=prepare(input);
  if(plan.action==="plan"||plan.state!=="ready_for_source_retrieval")
-  return {ok:true,mode:"plan_only",plan,model_calls:0,device_tested:false};
+  return {ok:true,mode:"plan_only",plan,model_attempts:0,model_runs_completed:0,device_tested:false};
  if(input.public_only!==true)throw Error("Confirm that the question and context contain only public, approved material");
  campusBase(cfg);
  const sources=[];
@@ -216,11 +216,12 @@ async function run(input,cfg,request=fetch){
  // or document-revision text enter either arm.
  for(const mode of modes){
   const messages=prompt(plan,sources,mode,signals);
-  runs.push({mode,...await infer(cfg,messages,sources,request)});
+  try{runs.push({mode,completed:true,...await infer(cfg,messages,sources,request)})}
+  catch(e){runs.push({mode,completed:false,prompt_sha256:hash(JSON.stringify(messages)),error:String(e.message).slice(0,240)})}
  }
- const pair_valid=runs.length===2&&runs.every(r=>r.model_identity_reported)&&runs[0].model===runs[1].model;
+ const pair_valid=runs.length===2&&runs.every(r=>r.completed&&r.model_identity_reported)&&runs[0].model===runs[1].model;
  return {ok:true,mode:plan.action==="compare"?"live_paired_answer":"live_guided_answer",plan,sources,signals,runs,
-  model_calls:runs.length,run_id:crypto.randomUUID(),evidence_sha256,frozen_input_sha256,
+  model_attempts:runs.length,model_runs_completed:runs.filter(r=>r.completed).length,run_id:crypto.randomUUID(),evidence_sha256,frozen_input_sha256,
   settings:{temperature:0,max_tokens:1800},pair_valid,device_tested:false,publication_approved:false,
   quality_improvement_measured:false,note:"Independent review required. A successful API call or exact quote check is not proof of correctness. This is new-question guidance, not document editing."};
 }
