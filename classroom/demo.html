@@ -4,6 +4,9 @@
 <style>
 :root{font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;color:#203c46;background:#f5f7f7}*{box-sizing:border-box}body{margin:0}a{color:#086d66;text-underline-offset:3px}button,input,textarea,select{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #92cabe;outline-offset:3px}header{background:#fff;border-bottom:1px solid #d9e4e4}.wrap{max-width:1020px;margin:auto;padding:20px 24px}.eyebrow{font-size:11px;letter-spacing:.11em;font-weight:750;color:#397570;text-transform:uppercase}h1{font-size:29px;line-height:1.18;letter-spacing:-.025em;margin:6px 0 8px}h2{font-size:22px;letter-spacing:-.02em;margin:0 0 8px}h3{font-size:17px;margin:0 0 7px}p{margin:6px 0}.muted{font-size:13px;color:#57717a}.card{background:white;border:1px solid #d8e4e5;border-radius:13px;padding:21px;margin:0 0 16px}.lead{font-size:17px;max-width:800px}.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.case{border:1px solid #d6e2e2;border-radius:9px;padding:13px;min-width:0}.case strong{display:block;line-height:1.3;margin:5px 0 8px}.case .tag{display:inline-block;font-size:12px;color:#15594e;background:#eaf3ef;border-radius:5px;padding:3px 6px}.case .tag.neutral{color:#5c6e76;background:#edf1f2}.flow{display:grid;grid-template-columns:1fr 20px 1fr 20px 1fr;align-items:center;gap:6px;margin:16px 0}.flow>div{border:1px solid #c7ddda;border-radius:8px;padding:12px;background:#eef6f3;min-width:0}.flow>span{text-align:center;color:#658780;font-size:19px}.flow strong{display:block;font-size:20px;color:#17695e}.note{border-left:3px solid #9ebbb5;padding:8px 12px;background:#eef4f3;margin:12px 0}.primary{border:0;border-radius:8px;padding:10px 16px;color:#fff;background:#126d64;font-weight:650}.secondary{background:#fff;border:1px solid #b8ceca;border-radius:8px;padding:9px 13px;color:#245b55;font-weight:650}.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}label{display:block;font-weight:600;font-size:13px;margin:10px 0 4px}input,select,textarea{width:100%;color:#203c46;border:1px solid #c8d7da;border-radius:7px;background:white;padding:9px}textarea{min-height:76px;resize:vertical}.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.result{margin-top:17px;border-top:1px solid #d9e4e4;padding-top:15px}.result[hidden]{display:none}.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.pair>div{border:1px solid #d6e3e3;border-radius:9px;padding:14px;min-width:0;overflow-wrap:anywhere}.pair>div:last-child{border-color:#a3c9be;background:#f2f8f5}.response{font-size:16px;font-weight:600}ul{padding-left:20px;margin:8px 0}li{margin:6px 0}summary{cursor:pointer;color:#416b68;font-weight:600}details{margin-top:13px}footer{font-size:12px;color:#59727a;padding:4px 0 24px}#status{min-height:20px;color:#8a5721;font-size:13px}
 @media(max-width:650px){.wrap{padding:14px 12px}h1{font-size:24px}.card{padding:15px}.cases,.fields,.pair{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.flow>span{transform:rotate(90deg);height:20px;line-height:20px}.case{padding:10px}}
+
+#video-example{margin:0 0 16px}#video-example>summary{font-size:17px;color:#245b55}#video-example>p{margin:12px 0}.story-player{padding:12px;border:1px solid #d8e4e5;border-radius:10px;background:#f5f8f8}.story-player:empty{display:none}.story-heading{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;padding-bottom:8px}.story-scene{background:#fff;border-radius:8px;overflow:hidden}.story-scene svg{display:block;width:100%;height:auto;max-height:300px}.story-scene g[role=button]{cursor:pointer}.story-controls,.story-rail,.story-video-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:8px 0}.story-player button{border:1px solid #b8ceca;background:white;color:#245b55;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:600}.story-player button[aria-pressed=true]{background:#e5f3ee;border-color:#8cbfb1}.story-player button[data-story-action=play],.story-player button[data-story-video=create]{background:#126d64;color:white}.story-player button:disabled{opacity:.5;cursor:default}.story-controls input[type=range]{flex:1;width:auto;min-width:80px;padding:0;accent-color:#126d64}.story-info{padding:10px;border-radius:7px;background:white}.story-info .vision-kicker{font-size:11px;color:#397570;text-transform:uppercase}.story-evidence{background:#f5f8f8;border-left:2px solid #8cbab6;padding:8px;margin-top:7px;overflow-wrap:anywhere}.story-evidence blockquote{margin:5px 0;font-size:13px}.story-evidence span,.story-evidence a{font-size:12px;margin-right:8px}.vision-foot{font-size:12px;color:#57717a}.story-video{border-top:1px solid #d8e4e5;margin-top:12px;padding-top:10px}.story-video-output video{display:block;width:100%;max-width:780px;height:auto;border-radius:8px;margin:8px 0}.story-video-output a{overflow-wrap:anywhere}
+
 </style></head>
 <body>
 <header><div class="wrap"><div class="eyebrow">Zebra Technologies · Northwestern Forge</div><h1>From support cases to better AI answers</h1><p class="muted">Interactive Tech Docs with Conversation and Video · answer-side research prototype</p></div></header>
@@ -27,8 +30,9 @@
 <details><summary>Instructions prepared for the assistant</summary><ul id="rules"></ul><div id="source-result"></div></details>
 </div>
 </section>
+<details class="card" id="video-example"><summary>Optional bonus · Explain with a short video</summary><p><b>Example: How does DataWedge process scan data?</b> Some questions are easier to understand with a visual explanation. This is a separate, source-backed concept example, not an answer generated for the question above.</p><div id="optional-player" class="story-player"></div><p id="video-message" class="muted" role="status"></p><p class="muted">Use Play for an immediate walkthrough, or Create short video for a silent, captioned video. No AI video model is used. <a href="https://techdocs.zebra.com/datawedge/15-0/guide/profiles/" target="_blank" rel="noopener noreferrer">Official documentation ↗</a></p></details>
 <footer>Student prototype. Candidate patterns come from a small, team-authored research snapshot. The public demo prepares an answer plan; no live model, device diagnosis or measured improvement is claimed. <details><summary>Additional project materials</summary><a href="visual-companion.html?reader=dw62-intent-receiver">Optional contextual diagram and video prototype</a> · <a href="answer-guidance.html">Full research interface</a> · <a href="https://zebra-techdocs-practicum.vercel.app/document-reader/project-shift.html#main" target="_blank" rel="noopener noreferrer">Team Project Shift</a></details></footer>
-</main><script src="guidance-planner.js"></script><script src="pattern-demo.js"></script><script>
+</main><script src="guidance-planner.js"></script><script src="pattern-demo.js"></script><script src="guidance-intake.js"></script><script src="guidance-visual.js"></script><script src="guidance-storyboard.js"></script><script>
 "use strict";
 const $=id=>document.getElementById(id);
 function clear(){ $("result").hidden=true;$("status").textContent="";$("rules").replaceChildren();$("source-result").replaceChildren(); }
@@ -55,4 +59,21 @@ if(window.ZebraPatternDemo&&window.ZebraGuidance){
  for(const id of ["question","product","version","context","source"])$(id).addEventListener("input",clear);
  $("reset-example").addEventListener("click",()=>{$("question-form").reset();clear()});
 }else{$("status").textContent="Required local modules are unavailable.";$("question-form").querySelector("button[type=submit]").disabled=true}
+let bonusController=null;
+$("video-example").addEventListener("toggle",()=>{
+ if(!$("video-example").open){
+  if(bonusController){bonusController.destroy();bonusController=null}
+  $("video-message").textContent="";
+  return;
+ }
+ if(bonusController)return;
+ try{
+  const plan=ZebraGuidance.prepare({question:"How do DataWedge profiles handle input, processing and output?",product:"datawedge",version:"15.0",context:"",source_urls:[],action:"plan"});
+  const evidence=ZebraIntake.offlineEvidence(plan);
+  const map=ZebraVisual.graph(plan,evidence);
+  if(map.kind!=="profile_learning")throw Error("The checked concept explanation is unavailable.");
+  bonusController=ZebraStoryboard.mount($("optional-player"));
+  bonusController.update(map);
+ }catch(e){$("video-message").textContent=String(e.message||e)}
+});
 </script></body></html>
