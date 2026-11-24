@@ -151,3 +151,54 @@ test("browser storyboard contract equals the Node contract",()=>{
  const actual=vm.runInContext("ZebraStoryboard.build("+JSON.stringify(g)+")",context);
  assert.deepEqual(JSON.parse(JSON.stringify(actual)),S.build(g));
 });
+
+const profileURL="https://techdocs.zebra.com/datawedge/15-0/guide/profiles/";
+const profileInput={question:"What is DataWedge, and how do its profiles handle input, processing and output?",product:"datawedge",version:"15.0",context:"",source_urls:[]};
+test("concept query routes to edition-matched Profiles article and data path",()=>{
+ const plan=P.prepare(profileInput),g=V.graph(plan);
+ assert.equal(plan.explanation_intent,"concept_overview");assert.deepEqual(plan.source_urls,[profileURL]);
+ assert.equal(g.kind,"profile_learning");assert.deepEqual(g.columns.flat(),["input","process","output","application"]);
+ assert.match(g.nodes.find(n=>n.id==="process").evidence[0].quote,/if needed/);
+ assert.equal(g.device_tested,false);assert.equal(S.build(g).scene,"data_path");
+});
+test("media selection offers official diagram and listed video but does not claim playback verification",()=>{
+ const p=P.prepare(profileInput),g=V.graph(p),m=I.contextualMedia(p,g);
+ assert.equal(m.selection,"official_media_and_interactive_concept");assert.equal(m.auto_load,false);
+ assert.equal(m.video_playback_verified,false);assert.equal(m.model_calls,0);
+ assert.deepEqual(m.assets.map(a=>a.kind),["diagram","video"]);
+ assert.ok(m.assets.every(a=>a.source_url===profileURL&&a.edition==="15.0"));
+ assert.equal(m.assets[1].url,"https://www.youtube.com/watch?v=LCaPhWxk4y0");
+ assert.equal(m.assets[1].timecode_verified,false);
+});
+test("specific API and failure questions are not redirected to a generic overview",()=>{
+ const questions=[
+  "How does DataWedge SET_CONFIG handle nested bundles?",
+  "How do DataWedge profiles work when scanning fails?",
+  "What does DataWedge support on this particular device?",
+  "Why does the DataWedge scanner not work?"
+ ];
+ for(const question of questions){
+  const p=P.prepare({...profileInput,question,source_urls:[profileURL]});
+  assert.equal(p.explanation_intent,"technical_question",question);
+  const g=V.graph(p);
+  assert.notEqual(g.kind,"profile_learning");
+  assert.equal(I.contextualMedia(p,g).assets.length,0);
+ }
+});
+test("concept media is not borrowed across editions or missing context",()=>{
+ for(const version of ["","6.8","14.0"]){
+  const p=P.prepare({...profileInput,version}),g=V.graph(p);
+  assert.notEqual(g.kind,"profile_learning");assert.equal(I.contextualMedia(p,g).assets.length,0);
+ }
+});
+test("incomplete retrieved profile evidence cannot trigger the official media bundle",()=>{
+ const p=P.prepare(profileInput),g=V.graph(p,{sources:[{url:profileURL,text:"how the data is acquired (input)"}]});
+ assert.equal(g.kind,"source_route");assert.equal(I.contextualMedia(p,g).assets.length,0);
+});
+test("concept check gives evidence-based feedback and is not a learning evaluation",()=>{
+ const p=P.prepare(profileInput),m=I.contextualMedia(p,V.graph(p));
+ const wrong=I.checkUnderstanding(m,"output"),right=I.checkUnderstanding(m,"process");
+ assert.equal(wrong.correct,false);assert.equal(right.correct,true);
+ assert.match(wrong.feedback,/Process stage/);assert.equal(right.scope,"single_optional_self_check_not_learning_outcome");
+ assert.equal(I.checkUnderstanding(m,"invalid"),null);assert.equal(I.checkUnderstanding(I.contextualMedia(P.prepare(base),V.graph(P.prepare(base))),"process"),null);
+});

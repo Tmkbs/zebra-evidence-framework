@@ -1,5 +1,9 @@
 # Zebra Evidence Framework — research workbench and classroom demo
 
+## Contextual learning media — aligned with the original project
+
+See [Client-aligned visual scope](analysis/CLIENT_VISUAL_SCOPE.md). The same Ask & Guide now supports a DataWedge 15.0 Profiles concept lesson with an interactive data-path story, optional official diagram and officially listed introduction video, and an optional self-check. The selection is question/edition/evidence gated; remote media is never loaded automatically. This is a first implementation, not a confirmed customer approval, a new generated video, or measured learning improvement.
+
 ## Interactive Vision — evidence into action
 
 **Visual walkthroughs:** the same Ask & Guide page now offers three source-linked SVG illustration forms: a scan-trigger diagnostic scene, a side-by-side result-code comparison, and a DataWedge 15.0 nested configuration scene. Select illustrated components, advance or seek through steps, or play the short timed walkthrough with captions. Playback and the illustrations are deterministic and work without Qwen. This is not a captured device video or a live hardware simulation. Each scene is derived from the validated visual map, and the JSON handoff includes a portable `zebra-visual-storyboard/v1` contract. No new model API or separate case database is required.

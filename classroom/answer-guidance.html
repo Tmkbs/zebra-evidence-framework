@@ -46,14 +46,17 @@ button.vision-node[aria-pressed=true]{outline:3px solid #a7d3ca;outline-offset:2
  .story-player:not([hidden]){display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);grid-template-areas:"heading heading" "scene info" "controls info" "rail info";gap:8px 14px;align-items:start}
  .story-heading{grid-area:heading;padding-bottom:1px}.story-scene{grid-area:scene}.story-controls{grid-area:controls;margin:0}.story-rail{grid-area:rail;margin:0}.story-info{grid-area:info;align-self:stretch}
 }
+
+.media-panel{border:1px solid #d9e5e5;background:#fff;border-radius:10px;padding:13px;margin:0 0 15px}.media-panel h3{margin:4px 0 6px}.media-assets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}.media-asset{display:flex;flex-direction:column;gap:5px;padding:12px;background:#f5f9f8;border-radius:8px;border:1px solid #e0e9e8;min-width:0}.media-asset a{font-size:13px}.media-asset p{margin:0}.media-check{border-top:1px solid #e1e8e8;padding-top:11px}.media-check .actions{margin:8px 0}.media-check button[aria-pressed=true]{background:#e1f2eb;border-color:#8cbfb1;color:#08796d}.media-check p{margin:5px 0}@media(max-width:700px){.media-assets{grid-template-columns:1fr}}
 </style></head>
 <body><header><div><strong>Zebra TechDocs · student prototype</strong><a href="../analysis/zebra-pattern-analysis.html">Pattern research snapshot</a><a href="final-delivery.html">Document-review workflow</a></div></header>
 <main><div class="kicker">Answer-side contribution</div><h1>Ask &amp; Guide</h1>
-<p>Apply evidence-aware safeguards to a new developer question. This is not a second case reader or an automatic documentation editor.</p>
+<p>Ask a technical question, learn a concept through a contextual visual explanation, or explore a diagnostic step. Official media is selected only when relevant.</p>
 <div id="environment" class="notice">Offline planning is available. Checking for the optional local campus service…</div>
 <section class="vision-shell" id="visionBox" aria-label="Interactive visual guidance">
-<div class="actions vision-presets"><button id="loadPrereq">Scan-trigger flow</button><button id="loadExample">Compare parameter evidence</button><button id="loadConfig">Configuration structure</button><button id="loadUnknown">Missing version</button></div>
+<div class="actions vision-presets"><button id="loadConcept">Learn DataWedge Profiles</button><button id="loadPrereq">Scan-trigger flow</button><button id="loadExample">Compare parameter evidence</button><button id="loadConfig">Configuration structure</button><button id="loadUnknown">Missing version</button></div>
 <div id="storyOutput" class="story-player" hidden></div>
+<div id="mediaOutput" class="media-panel" hidden></div>
 <div id="visionOutput"><p class="vision-empty">Preparing the interactive evidence map…</p></div>
 </section>
 <section class="box">
@@ -77,7 +80,7 @@ button.vision-node[aria-pressed=true]{outline:3px solid #a7d3ca;outline-offset:2
 "use strict";
 const $=id=>document.getElementById(id);let access="",last=null,caseId="",csvRows=[];
 let visualState={},visualFocus="",visualConfirmed=false,visualApplied="",visualKey="",runEpoch=0,storyController=null;
-function clearStoryboard(){if(storyController)storyController.destroy();storyController=null;$("storyOutput").hidden=true;}
+function clearStoryboard(){if(storyController)storyController.destroy();storyController=null;$("storyOutput").hidden=true;$("mediaOutput").hidden=true;$("mediaOutput").replaceChildren();}
 function removeVisualReport(){
  if(visualApplied){
   const v=$("context").value;
@@ -93,6 +96,32 @@ function invalidate(){
  $("planBox").hidden=true;$("sourceBox").hidden=true;$("answerBox").hidden=true;$("download").hidden=true;
  $("visionOutput").replaceChildren(text("p","Question or context changed. Choose Offline guidance to rebuild the visual explanation.","vision-empty"));
 }
+function drawContextualMedia(result){
+ const packet=result.contextual_media,out=$("mediaOutput");
+ out.replaceChildren();out.hidden=!packet||!packet.assets.length;if(out.hidden)return;
+ out.append(text("div","CONTEXTUAL LEARNING MATERIAL","vision-kicker"),text("h3","Learn the concept · official resources"),text("p",packet.reason,"muted"));
+ const assets=text("div","","media-assets");
+ for(const asset of packet.assets){
+  const item=text("div","","media-asset");
+  item.append(text("span",asset.kind==="video"?"VIDEO · OFFICIAL PAGE LISTING":"DIAGRAM · OFFICIAL TECHDOCS","vision-kicker"),text("strong",asset.title));
+  const a=text("a",asset.kind==="video"?"Open introduction video ↗":"Open original diagram ↗");
+  try{const u=new URL(asset.url);const allowed=asset.kind==="video"?u.href==="https://www.youtube.com/watch?v=LCaPhWxk4y0":u.href==="https://techdocs.zebra.com/datawedge/15-0/guide/profiles/dw_profile.png";if(allowed){a.href=u.href;a.target="_blank";a.rel="noopener noreferrer"}}catch{}
+  item.append(a,link(asset.source_url,"Source documentation"),text("p",asset.kind==="video"?"Listed by Zebra; playback and timestamps not independently checked. Opens externally.":"Original official diagram was inspected. Open only if you want to load it.","muted"));
+  assets.append(item)
+ }
+ out.append(assets,text("p","No external media loads automatically. The interactive illustration above works without network or model access.","muted"));
+ if(packet.checkpoint){
+  const question=text("div","","media-check");question.append(text("h3","Quick understanding check"),text("p",packet.checkpoint.prompt));
+  const options=text("div","","actions"),feedback=text("p","","muted");feedback.setAttribute("role","status");
+  const choice=result.learning_checkpoint?.choice;
+  for(const option of packet.checkpoint.options){
+   const b=text("button",option.label);b.type="button";b.dataset.learnChoice=option.id;b.setAttribute("aria-pressed",String(choice===option.id));
+   b.addEventListener("click",()=>{const record=ZebraIntake.checkUnderstanding(packet,option.id);if(!record)return;result.learning_checkpoint=record;feedback.textContent=record.feedback;for(const child of options.children)child.setAttribute("aria-pressed",String(child.dataset.learnChoice===option.id))});options.append(b);
+  }
+  if(result.learning_checkpoint)feedback.textContent=result.learning_checkpoint.feedback;
+  question.append(options,feedback,text("p","Optional self-check only; this is not measured learning effectiveness or a model evaluation.","muted"));out.append(question)
+ }
+}
 function drawVision(result,restore=null){
  const p=result.plan,key=JSON.stringify([p.question,p.product,p.version,p.source_urls]);
  if(key!==visualKey){
@@ -102,6 +131,8 @@ function drawVision(result,restore=null){
  const reported=!!visualApplied&&p.context.includes(visualApplied)&&ZebraVisual.reportedContext(map,true)===visualApplied;
  result.visual_guidance=ZebraVisual.receipt(map,{reported});
  result.visual_storyboard=ZebraStoryboard.build(map);
+ result.contextual_media=ZebraIntake.contextualMedia(p,map);
+ drawContextualMedia(result);
  $("storyOutput").hidden=false;
  if(!storyController)storyController=ZebraStoryboard.mount($("storyOutput"));
  storyController.update(map,{focus:restore?.node||""});
@@ -137,7 +168,7 @@ const text=(tag,value,cls)=>{const e=document.createElement(tag);e.textContent=S
 function link(url,label){const e=text("a",label||url);try{const u=new URL(url);if(u.protocol==="https:"&&u.hostname==="techdocs.zebra.com"){e.href=u.href;e.target="_blank";e.rel="noopener noreferrer"}}catch{}return e}
 function addList(parent,items){const list=document.createElement("ul");for(const item of items||[])list.append(text("li",item));parent.append(list)}
 function busy(value){
- for(const id of ["plan","loadExample","loadUnknown","loadPrereq","loadConfig","question","product","version","context","sources","importFile","csvFile","consent"])$(id).disabled=value;
+ for(const id of ["plan","loadExample","loadUnknown","loadPrereq","loadConfig","loadConcept","question","product","version","context","sources","importFile","csvFile","consent"])$(id).disabled=value;
  for(const id of ["evidence","ask","compare"])$(id).disabled=value||!access;
  $("fetchCSV").disabled=value;
  $("csvCase").disabled=value||!csvRows.length;
@@ -220,6 +251,9 @@ function example(unknown=false){invalidate();caseId="";$("question").value=unkno
 $("loadExample").addEventListener("click",()=>example(false));$("loadUnknown").addEventListener("click",()=>example(true));
 $("loadPrereq").addEventListener("click",()=>{
  invalidate();caseId="";$("question").value="Why might the software scan trigger fail to start scanning in DataWedge 6.8?";$("product").value="datawedge";$("version").value="6.8";$("context").value="";$("sources").value="https://techdocs.zebra.com/datawedge/6-8/guide/api/softscantrigger/";$("consent").checked=false;run("plan")
+});
+$("loadConcept").addEventListener("click",()=>{
+ invalidate();caseId="";$("question").value="What is DataWedge, and how do its profiles handle input, processing and output?";$("product").value="datawedge";$("version").value="15.0";$("context").value="";$("sources").value="https://techdocs.zebra.com/datawedge/15-0/guide/profiles/";$("consent").checked=false;run("plan")
 });
 $("loadConfig").addEventListener("click",()=>{
  invalidate();caseId="";$("question").value="How should PARAM_LIST and PLUGIN_CONFIG be nested in DataWedge 15.0 SET_CONFIG?";$("product").value="datawedge";$("version").value="15.0";$("context").value="";$("sources").value="https://techdocs.zebra.com/datawedge/15-0/guide/api/setconfig/";$("consent").checked=false;run("plan")
