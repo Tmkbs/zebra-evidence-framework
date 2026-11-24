@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zebra 文档 · 模式整合分析（可分享单文件版）</title>
+<style>
+:root{--ink:#12161c;--muted:#5a6472;--line:#d7dde6;--bg:#f4f6fa;--card:#fff;--bad:#9c1f19;--warn:#875800;--ok:#11632e;--accent:#0b4f8a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 "Segoe UI",system-ui,-apple-system,"Noto Sans SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1140px;margin:0 auto;padding:26px 16px 72px}
+a{color:var(--accent)}
+header{border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:22px}
+h1{font-size:23px;line-height:1.3;margin:0 0 8px}
+h2{font-size:18px;margin:34px 0 10px}
+h3{font-size:15px;margin:20px 0 8px}
+p{margin:8px 0}
+.sub{color:var(--muted);font-size:13.5px}
+.note{border-left:4px solid var(--ink);background:#fff;padding:12px 14px;margin:12px 0}
+.warn{border-left-color:var(--bad)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:14px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.card h3{margin-top:0}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:#eef2f7;font-weight:600;white-space:nowrap}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 11px;font-size:13px}
+.chip b{font-variant-numeric:tabular-nums}
+.chip.bad{border-color:#e2b6b2;background:#fdf3f2;color:var(--bad)}
+.chip.ok{border-color:#bcd9c5;background:#f2f9f4;color:var(--ok)}
+.chip.warn{border-color:#e3cfa1;background:#fdf8ec;color:var(--warn)}
+.tag{display:inline-block;border-radius:4px;padding:1px 7px;font-size:12px;font-weight:600}
+.no{background:#fdeceb;color:var(--bad)}
+.yes{background:#eef6f0;color:var(--ok)}
+code{background:#eef1f5;padding:1px 5px;border-radius:4px;font-size:12.5px}
+pre{background:#12161c;color:#e8edf4;padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:12.5px}
+ul,ol{margin:8px 0 8px 22px;padding:0}
+li{margin:4px 0}
+footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.banner{background:#12161c;color:#fff;font-size:12.5px;padding:6px 10px;border-radius:6px;display:inline-block}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+<div class="banner">Independent student project · Not official Zebra documentation</div>
+<h1>文档缺口模式整合分析 · 可分享单文件版</h1>
+<p class="sub">语料快照 <code>2026-11-24T02:33:45Z</code>（schema <code>zebra-corpus/v1</code>）｜评测快照 <code>2026-11-23T22:32:30Z</code>｜本页零依赖、无脚本、无外链，可直接嵌入任意站点。</p>
+</header>
+
+<div class="note warn">
+<h3 style="margin-top:0">结论先说：当前语料没有可辩护的全局方向</h3>
+<p>版本适用边界未说明：名义复现 2/3，但其中 2 条证据被多案例共用（<code>DW15-VERSION-CHECK</code>、<code>DW66-MULTI-PLUGIN</code>），且 <code>FORUM-00476-REPORT</code> 自报安装版本未建立；去重后独立支撑 1 个，未达门槛 2，<b>不构成可汇报的方向</b>。</p>
+<p>名义复现全部来自共用证据或自报版本未建立，按方向汇报会被当场驳回。<b>处理方式：按个案处理，并把力气花在补充独立案例与固定安装版本上。</b></p>
+</div>
+
+<h2>1. 双轴模式表（recurring ≠ defensible）</h2>
+<p class="sub">左轴 <code>recurring</code> 只是词法事实：同一条证据被两个案例引用，算一次观察，不算两次复现。右轴 <code>defensible</code> 要求去掉共用证据、并剔除自报安装版本未建立的引用之后，独立支撑仍达门槛。</p>
+<div class="scroll">
+<table>
+<thead><tr><th>模式</th><th>命中数</th><th>覆盖率</th><th>名义复现<br>recurring</th><th>可汇报<br>defensible</th><th>去重后<br>独立支撑</th><th>独立案例</th><th>被复用证据</th><th>版本未建立证据</th><th>建议方向</th></tr></thead>
+<tbody>
+<tr><td>版本适用边界未说明<br><code>version_boundary</code></td><td class="num">2</td><td class="num">0.67</td><td><span class="tag yes">true</span></td><td><span class="tag no">false</span></td><td class="num">1</td><td>DW66-VERSION-BOUNDARY</td><td>DW15-VERSION-CHECK<br>DW66-MULTI-PLUGIN</td><td>FORUM-00476-REPORT</td><td>每个功能页顶部固定“适用版本 / 自 X 起变更”字段，弃用信息不许藏在正文里。</td></tr>
+<tr><td>示例代码与正文描述互相矛盾<br><code>example_body_conflict</code></td><td class="num">1</td><td class="num">0.33</td><td><span class="tag no">false</span></td><td><span class="tag no">false</span></td><td class="num">1</td><td>DW68-RESULT-CONSISTENCY</td><td>—</td><td>—</td><td>示例改为从可执行片段引入，与正文共用同一份参数定义，杜绝手写漂移。</td></tr>
+<tr><td>缺少可定位问题的上下文<br><code>missing_context</code></td><td class="num">1</td><td class="num">0.33</td><td><span class="tag no">false</span></td><td><span class="tag no">false</span></td><td class="num">1</td><td>DW-FORUM-00476</td><td>—</td><td>FORUM-00476-REPORT</td><td>问题上报与文档反馈表单强制填写产品/固件/SDK 版本，缺版本不予建档。</td></tr>
+<tr><td>前置条件缺失<br><code>missing_prerequisite</code></td><td class="num">1</td><td class="num">0.33</td><td><span class="tag no">false</span></td><td><span class="tag no">false</span></td><td class="num">1</td><td>DW68-RESULT-CONSISTENCY</td><td>—</td><td>—</td><td>每个示例前固定一个 Prerequisites 区块，列出 Profile/权限/硬件前提，模板强制。</td></tr>
+<tr><td>正文与示例的术语拼写不一致<br><code>naming_inconsistency</code></td><td class="num">1</td><td class="num">0.33</td><td><span class="tag no">false</span></td><td><span class="tag no">false</span></td><td class="num">1</td><td>DW68-RESULT-CONSISTENCY</td><td>—</td><td>—</td><td>为每个 API 建立“规范参数名”单一词表，正文与示例由同一来源生成，禁止手写第二份。</td></tr>
+<tr><td>未经验证的设备行为断言<br><code>unverified_device_claim</code></td><td class="num">1</td><td class="num">0.33</td><td><span class="tag no">false</span></td><td><span class="tag no">false</span></td><td class="num">1</td><td>DW68-RESULT-CONSISTENCY</td><td>—</td><td>—</td><td>任何设备行为结论必须挂真机验证记录；未验证的一律写成“待验证”，不许出现在正文。</td></tr>
+</tbody>
+</table>
+</div>
+<p class="sub">语料规模：3 个案例，复现门槛 = 至少 2 个独立案例。方法：对全案例集使用显式词法规则，产出候选模式，不是语义或因果结论；支撑度会因共用证据、以及引用自报“安装版本从未建立”而折减。</p>
+
+<h2>2. 证据健康度</h2>
+<div class="chips">
+<span class="chip">证据总数 <b>7</b></span>
+<span class="chip ok">官方来源 <b>6</b></span>
+<span class="chip bad">非官方 <b>1</b> FORUM-00476-REPORT</span>
+<span class="chip warn">版本未固定 <b>1</b> FORUM-00476-REPORT</span>
+<span class="chip">转述 <b>5</b></span>
+<span class="chip ok">未声明转述 <b>0</b></span>
+<span class="chip ok">逐字 <b>2</b> DW66-MULTI-PLUGIN、DW15-NESTED-BUNDLE-LIVE</span>
+<span class="chip warn">被多案例共用 <b>2</b> DW15-VERSION-CHECK、DW66-MULTI-PLUGIN</span>
+<span class="chip ok">缺 verifiedAt <b>0</b></span>
+<span class="chip ok">过期（30 天）<b>0</b></span>
+</div>
+<div class="note">
+<p>计数只反映引用声明状态，不判断内容真伪。非官方来源可用，但演示时必须口头声明。同一条证据被多个案例引用时，它只能算一次支撑。</p>
+</div>
+
+<h2>3. 案例与逐案命中</h2>
+<div class="scroll">
+<table>
+<thead><tr><th>案例 ID</th><th>标题</th><th>命中模式</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td><code>DW68-RESULT-CONSISTENCY</code></td><td>结果回执参数：正文与示例不一致</td><td>naming_inconsistency、missing_prerequisite、example_body_conflict、unverified_device_claim</td><td>个案命中。只有当同一模式在多个案例复现时，才值得改动全局文档方向。</td></tr>
+<tr><td><code>DW66-VERSION-BOUNDARY</code></td><td>版本边界与配置覆盖：检查待改草稿</td><td>version_boundary</td><td>同上。</td></tr>
+<tr><td><code>DW-FORUM-00476</code></td><td>论坛故障报告：信息缺口不等于文档错误</td><td>version_boundary、missing_context</td><td>同上。</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>4. 双轨评测（两条线独立评分，不可互相推断）</h2>
+<p class="sub">Track A 测人能否自己找到权威段落；Track B 测模型输出能否被信任。评测设置 <code>intervention: none</code>，计分模型运行 1 次，规则运行排除 0 次。</p>
+<div class="grid">
+<div class="card">
+<h3>Track A · 无人工提示</h3>
+<p>得分 <b>1</b>｜覆盖 <b>1</b>｜必经段落 2 / 到达 2｜结论状态 <b>provisional（暂定）</b></p>
+<p>阻塞项：<code>device_behaviour_untested</code>（设备行为未测）</p>
+<p class="sub">人只拿到案例原文，不给任何线索。</p>
+<p class="sub"><b>诚实限制：</b>目前 3 个案例全部由团队自编，出题的人就是被测的人，所以 Track A 现在测不出区分度。要它有意义，必须换成真实第三方上报的案例（见第 6 节）。</p>
+</div>
+<div class="card">
+<h3>Track B · 模型输出可信度</h3>
+<p>得分 <b>1</b>｜判定 <b>review_ready</b>｜候选 2｜有依据 2｜编造 <b>0</b>｜过度断言 <b>0</b>｜待人工审核 <b>2</b></p>
+<p class="sub">全部候选项仍需人工审核，Track B 不给“可直接采用”。</p>
+<p class="sub">被测模型 <code>nvidia/Qwen3.8-Flash-Next-FP4-Local</code>，运行 <code>53882f51…</code>（案例 DW68-RESULT-CONSISTENCY）。</p>
+</div>
+</div>
+<h3>写作侧发现（单一案例，先按个案处理）</h3>
+<ul>
+<li><b>文档一致性（正文与示例用词不同）</b>，计数 2，来源 <code>DW68-SOFT-RESULT</code>、<code>DW68-RESULT-PROTOTYPE</code>，recurring = false。<br><span class="sub">建议：仅出现在单个案例，先作为个案处理，不足以要求全局改写。</span></li>
+<li>样本一：Soft Scan Trigger 页面 <i>Result Codes</i> 正文要求添加 <code>RECEIVE_RESULT</code>，同页示例代码使用 <code>SEND_RESULT</code>。</li>
+<li>样本二：Intent Result Codes 页面 <i>Overview</i> 正文要求添加 <code>RECEIVE_RESULT</code>，紧随其后的 <i>Function Prototype</i> 及示例使用 <code>SEND_RESULT</code>。</li>
+</ul>
+
+<h2>5. 怎么读这张表</h2>
+<ol>
+<li>方向性改动只看 <code>defensible</code> 为 true 的模式。<code>recurring</code> 只是词法事实：同一条证据被两个案例引用，算一次观察，不算两次复现。</li>
+<li><code>defensible</code> 要求去掉共用证据、并剔除自报安装版本未建立的引用之后，独立支撑仍达门槛。</li>
+<li>每个 recurring 模式对应一处结构性改动，目标是让一批案例同时消解，而不是逐条修补。</li>
+<li>本表是词法规则，不是语义判断；复现不等于文档有错，仍需人工与真机验证。</li>
+</ol>
+<div class="note">
+<p>复现只说明该处值得文档复核，不证明文档本身有错，也不证明哪个参数在设备上正确。名义复现不等于可汇报方向。</p>
+</div>
+
+<h2>6. 给站点接入方的要求：把 57 条公开论坛案例喂进 Track A</h2>
+<p>Track A 现在唯一可行的素材，是站点上那 57 条来自开发者论坛的公开案例（<code>ZF-&lt;16hex&gt;</code>）。定性必须准确：<b>它们是真实第三方上报，不是 SPR</b>（SPR 指涉及产品行为的客户支持工单）。它们能支撑“人能否独立找到答案”，不得称为 SPR。</p>
+<p>接入用数据契约（逐字必须带 <code>quote</code>，转述必须带 <code>editorialNote</code>，否则判为“未声明转述”）：</p>
+<pre>{
+  "id": "ZF-...",
+  "title": "...",
+  "question": "...",
+  "inputOrigin": "public-developer-forum",
+  "documentText": "官方原文整段",
+  "evidence": [
+    { "id": "...", "url": "https://techdocs.zebra.com/...", "version": "...",
+      "section": "...", "text": "...", "kind": "official",
+      "verifiedAt": "YYYY-MM-DD", "quote": "逐字原文（逐字时必填）",
+      "verifiedVia": "...", "editorialNote": "转述说明（转述时必填）" }
+  ]
+}</pre>
+
+<h2>7. 接入方式（二选一）</h2>
+<h3>方式一 · iframe 直接嵌入（最快）</h3>
+<pre>&lt;iframe src="/analysis/zebra-pattern-analysis.html"
+        title="Zebra 文档模式整合分析"
+        style="width:100%;height:1400px;border:0"
+        loading="lazy"&gt;&lt;/iframe&gt;</pre>
+<h3>方式二 · 抽数据自己渲染</h3>
+<p>本页所有数字都来自三份 JSON：<code>outputs/corpus.json</code>（模式与证据健康度）、<code>outputs/evaluation.json</code>（Track A/B）、<code>data/cases.json</code>（案例正文）。保持字段名不变即可替换站点自有渲染层。</p>
+<p>字段契约：<code>id / label / count / coverage / recurring / defensible / defensibleCount / independentCaseIds / reusedEvidenceIds / unestablishedEvidenceIds / direction</code>。</p>
+<p><b>硬规则：</b>标题与任何“方向”结论只允许走 <code>defensible</code>；<code>recurring</code> 只能出现在明细列里。共用证据折减一旦去掉，页面就会把不可汇报的模式说成结论。</p>
+
+<h2>8. 移动端提醒</h2>
+<p>案例表现在是六列横向滚动（站点原文案 “Case table; scroll horizontally if needed”）。窄屏建议按案例卡片化：标题 / 问题 / 证据 / 版本状态 / 两个视图入口，表头与滚动条不进首屏。</p>
+
+<footer>
+<p>本页由 <code>doc-gap-demo</code> 语料管道生成，供 COMP_SCI_338 practicum 演示使用。方法：对全案例集使用显式词法规则产出候选模式（非语义、非因果）；支撑度对共用证据与“自报安装版本从未建立”的引用作折减。</p>
+<p>计数只反映引用声明状态，不判断内容真伪；所有候选项仍需人工与真机验证。Independent student project · Not official Zebra documentation.</p>
+</footer>
+
+</div>
+</body>
+</html>
