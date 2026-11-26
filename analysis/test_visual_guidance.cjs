@@ -89,7 +89,7 @@ test("only explicitly selected facts may transfer to context",()=>{
 });
 test("browser module matches server-side pure logic and page scripts parse",()=>{
  const context=vm.createContext({URL});
- for(const file of ["guidance-planner.js","guidance-intake.js","guidance-visual.js"])vm.runInContext(fs.readFileSync(path.join(__dirname,"../classroom",file),"utf8"),context);
+ for(const file of ["answer-strategies.js","guidance-planner.js","guidance-intake.js","guidance-visual.js"])vm.runInContext(fs.readFileSync(path.join(__dirname,"../classroom",file),"utf8"),context);
  const browser=vm.runInContext("ZebraVisual.graph(ZebraGuidance.prepare("+JSON.stringify(base)+"))",context);
  assert.deepEqual(JSON.parse(JSON.stringify(browser)),V.graph(p));
  const html=fs.readFileSync(path.join(__dirname,"../classroom/answer-guidance.html"),"utf8");

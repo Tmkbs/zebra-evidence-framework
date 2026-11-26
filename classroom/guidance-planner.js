@@ -1,19 +1,12 @@
 /* Shared, deterministic answer planner. No network, model, or storage. */
 (function(root,factory){
- const api=factory();
+ const api=factory(typeof module==="object"&&module.exports?require("./answer-strategies.js"):root.ZebraAnswerStrategies);
  if(typeof module==="object"&&module.exports)module.exports=api;
  else root.ZebraGuidance=api;
-})(typeof globalThis!=="undefined"?globalThis:this,function(){
+})(typeof globalThis!=="undefined"?globalThis:this,function(registry){
 "use strict";
 const PRODUCTS=new Set(["datawedge","ehs","enterprise-browser","emdk-for-android","stagenow"]);
-const POLICIES=Object.freeze({
- version_boundary:"Use the selected documentation edition. Treat the installed version as user-reported, not independently established. Do not transfer behavior from another edition.",
- missing_context:"Ask a focused question for missing device, OS, runtime, configuration or observed error. Do not fill in missing facts.",
- missing_prerequisite:"Identify applicable prerequisites from the exact source. Distinguish enabling a profile or permission from executing the command.",
- example_body_conflict:"When source prose and a code example appear to disagree, show both with their evidence. Do not silently choose one or recommend an unverified fix.",
- naming_inconsistency:"Preserve the exact API parameter spelling in the source; separate identifiers that merely look similar.",
- unverified_device_claim:"Distinguish documented behavior from a reported observation. Do not claim successful device operation, an established defect, or a repair without a reproducible device check."
-});
+if(!registry)throw Error("Load answer-strategies.js before guidance-planner.js");
 const ROUTES=[
  {re:/\b(?:soft[_ ]?scan[_ ]?trigger|start[_ ]?scanning|stop[_ ]?scanning|software scan trigger)\b/i,paths:["softscantrigger/"]},
  {re:/\b(?:send_result|receive_result|command_identifier|result_info|result codes?|command result|result intent)\b/i,paths:["resultinfo/"]},
@@ -62,18 +55,14 @@ function routeSources(question,product,version){
  }
  return urls.slice(0,2);
 }
-function policySelection(q,context){
- const s=q+" "+context;
- const ids=[];
- const versionSensitive=/\b(after (?:(?:a|an|the) )?update|after updating|since (?:the )?update|after (?:an )?upgrade|after upgrading|upgrade(?:d)?|version(?:s)?|compatib(?:ility|le)|deprecated|across releases|between releases|changed in (?:version )?\d)\b/i.test(s);
- const failure=/\b(fail(?:ed|ure|s|ing)?|error|not working|does not work|doesn't work|no longer|not received|cannot|can't|won't|stopped|not responding|does not start|won't start|problem|issue)\b/i.test(s);
- const device=/\b(device|scanner|scan|barcode|app|application|profile|trigger|broadcast|receiver|runtime|android|firmware)\b/i.test(s);
- if(versionSensitive)ids.push("version_boundary");
- if(failure&&device&&!context.trim())ids.push("missing_context");
- if(failure&&device)ids.push("unverified_device_claim");
- if(/\b(RECEIVE_RESULT)\b/i.test(s)&&/\b(SEND_RESULT)\b/i.test(s))
-  ids.push("example_body_conflict","naming_inconsistency");
- return [...new Set(ids)];
+// Compatibility view only. The registry is the single decision engine.
+function policySelection(question,context=""){
+ return registry.select({question,context},[]).map(s=>s.id);
+}
+function withEvidence(plan,evidence=[]){
+ const strategies=registry.select(plan,evidence);
+ const policies=strategies.map(s=>({id:s.id,strategy:s.safe_next_action,status:"provisional_answer_safeguard"}));
+ return {...plan,strategies,policies};
 }
 function prepare(input){
  if(!input||typeof input!=="object"||Array.isArray(input))throw Error("Expected a JSON object");
@@ -92,19 +81,18 @@ function prepare(input){
  const questions=[];
  if(!product)questions.push("Which Zebra software product are you using?");
  if(!version)questions.push("What exact software version or build is installed?");
- const policies=policySelection(question,context);
  let sources=[];
  if(product&&version){
   sources=supplied.length?supplied.map(s=>officialURL(s,product,version)):routeSources(question,product,version);
   sources=[...new Set(sources)];
   if(!sources.length)questions.push("Provide the applicable version-specific TechDocs article URL for this task.");
  }
- return {schema:"zebra-answer-plan/v1",case_id:caseId,question,product,version,context,action,
+ return withEvidence({schema:"zebra-answer-plan/v1",case_id:caseId,question,product,version,context,action,
   state:questions.length?"clarification_required":"ready_for_source_retrieval",
-  clarification:questions,policies:policies.map(id=>({id,strategy:POLICIES[id],status:"provisional_answer_safeguard"})),
+  clarification:questions,
   explanation_intent:explanationIntent(question,product),source_urls:sources,source_selection:supplied.length?"user_selected":"limited_topic_router",
-  installed_version_verified:false,global_pattern_validated:false};
+  installed_version_verified:false,global_pattern_validated:false});
 }
 
-return Object.freeze({prepare,officialURL,routeSources,policySelection,explanationIntent,edition,clean,products:[...PRODUCTS]});
+return Object.freeze({prepare,withEvidence,officialURL,routeSources,policySelection,explanationIntent,edition,clean,products:[...PRODUCTS]});
 });

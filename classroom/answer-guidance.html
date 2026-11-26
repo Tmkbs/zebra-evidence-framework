@@ -80,7 +80,7 @@ button.vision-node[aria-pressed=true]{outline:3px solid #a7d3ca;outline-offset:2
 <section class="box" id="sourceBox" hidden><h2>Source evidence</h2><div id="sourceOutput"></div></section>
 <section class="box" id="answerBox" hidden><h2>Model answer review</h2><div id="answerOutput"></div></section><button id="download" hidden>Download result / handoff (JSON)</button>
 <footer>Independent student research prototype. A quoted passage is not a verified technical answer. No device validation, document publication, or measured reduction in support demand is claimed. Campus model only.</footer>
-</main><script src="guidance-planner.js"></script><script src="guidance-intake.js"></script><script src="guidance-visual.js"></script><script src="guidance-storyboard.js"></script><script src="guidance-team-bridge.js"></script><script>
+</main><script src="answer-strategies.js"></script><script src="guidance-planner.js"></script><script src="guidance-intake.js"></script><script src="guidance-visual.js"></script><script src="guidance-storyboard.js"></script><script src="guidance-team-bridge.js"></script><script>
 "use strict";
 const $=id=>document.getElementById(id);let access="",last=null,caseId="",csvRows=[];
 let visualState={},visualFocus="",visualConfirmed=false,visualApplied="",visualKey="",runEpoch=0,storyController=null,teamHandoff=null;
@@ -246,7 +246,8 @@ async function run(action){
  try{
   const input={action,case_id:caseId,question:$("question").value,product:$("product").value,version:$("version").value,context:$("context").value,source_urls:$("sources").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean),public_only:$("consent").checked};
   if(action==="plan"){
-   const plan=ZebraGuidance.prepare(input),packet=ZebraIntake.offlineEvidence(plan);
+   const initial=ZebraGuidance.prepare(input),packet=ZebraIntake.offlineEvidence(initial);
+   const plan=ZebraGuidance.withEvidence(initial,packet.cards);
    last={schema:"zebra-offline-handoff/v1",mode:packet.mode,plan,offline_evidence:packet,model_attempts:0,model_runs_completed:0,device_tested:false,created_at:new Date().toISOString()};
    if(teamHandoff&&plan.question===teamHandoff.question&&plan.context===teamHandoff.context)last.team_reader_reference=teamHandoff;
    drawPlan(plan);drawCards(packet);drawVision(last);$("download").hidden=false;
@@ -314,5 +315,5 @@ function loadTeamReference(){
  const a=text("a","Return to contextual visual companion");a.href="visual-companion.html?reader="+encodeURIComponent(key);notice.append(a);
  return false;
 }
-if(window.ZebraGuidance&&window.ZebraIntake&&window.ZebraVisual&&window.ZebraStoryboard&&window.ZebraTeamVisual){busy(false);session();if(!loadTeamReference())run("plan")}else{$("environment").textContent="Required offline modules are missing; open the page from the full repository checkout.";for(const id of ["plan","evidence","ask","compare"])$(id).disabled=true}
+if(window.ZebraAnswerStrategies&&window.ZebraGuidance&&window.ZebraIntake&&window.ZebraVisual&&window.ZebraStoryboard&&window.ZebraTeamVisual){busy(false);session();if(!loadTeamReference())run("plan")}else{$("environment").textContent="Required offline modules are missing; open the page from the full repository checkout.";for(const id of ["plan","evidence","ask","compare"])$(id).disabled=true}
 </script></body></html>

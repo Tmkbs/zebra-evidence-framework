@@ -61,7 +61,11 @@ test("source discrepancy needs both exact identifiers in the same edition-matche
  const url="https://techdocs.zebra.com/datawedge/6-8/guide/api/resultinfo/";
  const p=plan("What is the difference between SEND_RESULT and RECEIVE_RESULT in the result code example?","datawedge","6.8");
  const card=I.offlineEvidence({...p,source_urls:[url]}).cards[0];
- const result=S.select(p,[card]);
+ const enriched=P.withEvidence(p,[card]);
+ const result=enriched.strategies;
+ assert.deepEqual(result,S.select(p,[card]));
+ assert.deepEqual(enriched.policies.map(x=>x.id),result.map(x=>x.id));
+ assert.ok(enriched.policies.some(x=>x.id==="example_body_conflict"));
  assert.ok(result.some(x=>x.id==="example_body_conflict"));
  assert.ok(result.some(x=>x.id==="naming_inconsistency"));
  assert.equal(result.find(x=>x.id==="example_body_conflict").application_status,"source_discrepancy_needs_review");
@@ -76,6 +80,9 @@ test("source discrepancy needs both exact identifiers in the same edition-matche
 test("mentioning two names in a question is not itself proof of a documentation conflict",()=>{
  const p=plan("I heard RECEIVE_RESULT and SEND_RESULT. Which should I use?","datawedge","6.8");
  assert.ok(!S.select(p,[]).some(x=>x.id==="example_body_conflict"));
+ assert.ok(!p.policies.some(x=>["example_body_conflict","naming_inconsistency"].includes(x.id)));
+ assert.deepEqual(p.policies.map(x=>x.id),p.strategies.map(x=>x.id));
+ assert.deepEqual(p.strategies,S.select(p,[]));
 });
 test("device guardrail is suppressed only when a real device test is explicitly recorded",()=>{
  const q="The scanner does not work on the TC700K. Is the fix confirmed?";

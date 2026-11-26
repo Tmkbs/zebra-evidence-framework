@@ -6,8 +6,7 @@
 const crypto=require("node:crypto");
 const {extractPage}=require("../api/review.js")._internals;
 const CAMPUS="c3dgx0.cs.northwestern.edu";
-const {prepare,officialURL,routeSources,clean}=require("../classroom/guidance-planner.js");
-const AnswerStrategies=require("../classroom/answer-strategies.js");
+const {prepare,withEvidence,officialURL,routeSources,clean}=require("../classroom/guidance-planner.js");
 const hash=s=>crypto.createHash("sha256").update(s).digest("hex");
 function campusBase(cfg){
  const u=new URL(cfg.base);
@@ -119,7 +118,6 @@ async function infer(cfg,messages,sources,request){
 }
 async function run(input,cfg,request=fetch){
  let plan=prepare(input);
- plan={...plan,strategies:AnswerStrategies.select(plan,[])};
  if(plan.action==="plan"||plan.state!=="ready_for_source_retrieval")
   return {ok:true,mode:"plan_only",plan,model_attempts:0,model_runs_completed:0,device_tested:false};
  if(input.public_only!==true)throw Error("Confirm that the question and context contain only public, approved material");
@@ -129,7 +127,7 @@ async function run(input,cfg,request=fetch){
   const source=await retrieve(url,plan,request);
   sources.push({...source,id:"E"+(sources.length+1)});
  }
- plan={...plan,strategies:AnswerStrategies.select(plan,sources)};
+ plan=withEvidence(plan,sources);
  const signals=observations(sources);
  const evidence_sha256=hash(JSON.stringify(sources.map(s=>({id:s.id,url:s.url,text:s.text}))));
  const frozen_input_sha256=hash(JSON.stringify({question:plan.question,context:plan.context,product:plan.product,version:plan.version,evidence_sha256}));

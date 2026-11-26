@@ -12,6 +12,7 @@ const fixture={question:"What is the difference between SEND_RESULT and RECEIVE_
 const sampleId="ZF-1234567890abcdef";
 test("shared browser planner agrees with node",()=>{
  const context=vm.createContext({URL});
+ vm.runInContext(fs.readFileSync(path.join(__dirname,"../classroom/answer-strategies.js"),"utf8"),context);
  vm.runInContext(fs.readFileSync(path.join(__dirname,"../classroom/guidance-planner.js"),"utf8"),context);
  assert.deepEqual(JSON.parse(JSON.stringify(context.ZebraGuidance.prepare(fixture))),P.prepare(fixture));
  assert.deepEqual(P.prepare(fixture),G.prepare(fixture));

@@ -16,7 +16,7 @@ function check(name,url,size){
  console.log("PASS Chromium "+name);
 }
 try{
- for(const f of ["guidance-planner.js","guidance-intake.js","guidance-visual.js","guidance-storyboard.js","guidance-team-bridge.js"])fs.copyFileSync(path.join(root,f),path.join(dir,f));
+ for(const f of ["answer-strategies.js","guidance-planner.js","guidance-intake.js","guidance-visual.js","guidance-storyboard.js","guidance-team-bridge.js"])fs.copyFileSync(path.join(root,f),path.join(dir,f));
  const companion=write("visual-companion.html","visual-companion.html",checks)+"?reader=dw62-intent-receiver";
  const guide=write("answer-guidance.html","answer-guidance.html",guideChecks)+"?reader=dw62-intent-receiver";
  check("team-companion-desktop",companion,"1280,1000");check("team-companion-narrow",companion,"500,900");check("team-answer-handoff",guide,"1100,900");

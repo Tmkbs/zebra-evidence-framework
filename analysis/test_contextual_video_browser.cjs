@@ -26,7 +26,7 @@ function cdp(url){
 const trap='<script>window.__remoteCalls=0;const nativeFetch=window.fetch.bind(window);window.fetch=(u,o)=>{if(String(u).startsWith("blob:"))return nativeFetch(u,o);window.__remoteCalls++;throw Error("Unexpected network fetch")};</script>';
 let child=null,connection=null,stderr="";
 async function main(){
- for(const f of ["guidance-planner.js","guidance-intake.js","guidance-visual.js","guidance-storyboard.js","guidance-team-bridge.js"])fs.copyFileSync(path.join(root,f),path.join(dir,f));
+ for(const f of ["answer-strategies.js","guidance-planner.js","guidance-intake.js","guidance-visual.js","guidance-storyboard.js","guidance-team-bridge.js"])fs.copyFileSync(path.join(root,f),path.join(dir,f));
  for(const f of ["answer-guidance.html","visual-companion.html"])fs.writeFileSync(path.join(dir,f),fs.readFileSync(path.join(root,f),"utf8").replace("</head>",trap+"</head>"));
  const profile=path.join(dir,"chrome-profile");
  child=spawn(browser,["--headless=new","--no-sandbox","--disable-dev-shm-usage","--disable-background-networking","--disable-background-timer-throttling","--disable-renderer-backgrounding","--no-first-run","--mute-audio","--autoplay-policy=no-user-gesture-required","--allow-file-access-from-files","--remote-debugging-port=0","--user-data-dir="+profile,"about:blank"],{stdio:["ignore","ignore","pipe"]});
