@@ -1,59 +1,30 @@
-# Draft video — COMP_SCI_338 / Zebra Forge
+# First draft video — Zebra Forge / COMP_SCI 338
+Draft due November 27, 2026, 11:59 PM CT; final due December 4. Proposed length about 3:30; screen recording plus narration. Confirm assignment-specific length and format in Canvas. This is a recording script, not a recorded video.
 
-Due: **27 November 2026, 23:59 America/Chicago** (draft video). Final video: **4 December 2026**.
-Target runtime for the draft: **3:00–3:45**. Screen recording + voice-over, no live audience.
+Title: Interactive Tech Docs with Conversation and Video
+Yuxuan Jin · Zhentong Ye · Minyang Zhang
+Northwestern University · Fall 2026 · Zebra Technologies
 
-> Every on-screen control named below exists in `classroom/answer-guidance.html` as committed.
-> Do not record a segment that depends on a known-unfixed defect — see the blocker at the bottom.
+## Recording sequence
+| Time | On screen | Narration |
+|---|---|---|
+| 0:00–0:20 | Title and project problem | Developers have difficulty finding the right technical guidance, and AI can give plausible but unsupported answers. Our project approaches both problems using shared evidence. |
+| 0:20–0:40 | Diagram: question → version and evidence review → documentation path / answer path | We separate two outcomes: improve the document so users can find the answer themselves, and improve how AI responds when users still have questions. |
+| 0:40–1:20 | Team case reader: DataWedge 6.2 Intent Output original/proposed edit | Zhentong's document-side work identifies applicable official passages and proposes an edit for review. In this example, the change clarifies which app declares the intent filter and distinguishes a test broadcast from scan delivery. It does not establish the device root cause. The public release contains 57 review cases. |
+| 1:20–1:45 | Main Demo, Evidence Framework and Pattern Recognition | On the answer side, we inspect evidence and compare cases. The separate three-case snapshot has seven evidence records. The version candidate has two nominal mentions, but only one independent supporting case. No global pattern is validated. |
+| 1:45–2:25 | Main Demo, Apply answer guidance; then Try the same rule on another product | Instead of reusing an old answer, we reuse an answer strategy. Both the DataWedge update question and the Enterprise Browser upgrade question trigger the version-clarification rule. The selected strategy and its provenance are visible. This is rule-based planning, not a live model answer. |
+| 2:25–2:45 | Try a source-backed question; show Soft Scan Trigger excerpt | A source-specific prerequisite check is only applied when the product and edition match the checked official source. The result is a useful next check, not a verified device fix. |
+| 2:45–3:00 | Optional narrated DataWedge concept clip (brief excerpt) | We also explore diagrams and short narrated explanations to make technical concepts easier to understand. |
+| 3:00–3:30 | Architecture and evaluation plan | We aim to integrate both paths into one repeatable workflow. We will test human answer-finding with revised documentation separately from baseline-versus-guided AI answers. Our tests verify software behavior; real-world answer quality, device outcomes, and support savings still need validation. |
 
-## Before you press record
+## Source links
+- Team reader: https://zebra-techdocs-practicum.vercel.app/document-reader/dw62-intent-receiver/index.html#receiving-app-intent-filter
+- Current public demo: https://tmkbs.github.io/zebra-evidence-framework/classroom/demo.html
+- Official result-code discrepancy: https://techdocs.zebra.com/datawedge/6-8/guide/api/resultinfo/
+- Official prerequisite: https://techdocs.zebra.com/datawedge/6-8/guide/api/softscantrigger/
 
-| Check | Why |
-|---|---|
-| Recorder at ≥ 1920×1080, browser zoom 100 %, no extensions | small type is unreadable at 100 % otherwise |
-| Terminal cleared, no other tabs, no personal data in bookmarks bar | a poster frame becomes the thumbnail |
-| Consent checkbox is visibly ticked before any network action | the flow is consent-gated; skipping it looks like we bypass our own gate |
-| The two demo questions are pre-typed in a scratch pad | avoids typing typos and long pauses |
-| Record the version-gated (no model) run **first** | it works with no network and no campus token |
+## Optional live comparison
+Only include a real campus-model comparison when the campus endpoint is reachable, the same model/settings and evidence are frozen, and an actual JSON receipt is retained. Exact quote matching is mechanical, not semantic accuracy. Do not cite the unverified 1/4 vs 4/4 observation or create a fake response. The first draft can be recorded using the two public prototypes without live model inference.
 
-## Storyboard
-
-| # | Time | On screen | Voice-over (read roughly as written) |
-|---|---|---|---|
-| 1 | 0:00–0:18 | Title card: project title, team, course, client | "Zebra developers post troubleshooting questions in public forums. The hard part of answering one is not generating text — it's knowing which documentation edition applies, and whether you should be answering at all." |
-| 2 | 0:18–0:40 | Pipeline diagram (F1), cursor traces the 7 stages | "Our prototype takes a public question, gates on the installed version, retrieves only version-pinned official documentation, freezes the excerpts, and only then asks a campus-hosted model. Every answer is a candidate for human review." |
-| 3 | 0:40–1:05 | Type the **Enterprise Browser** upgrade question, leave version empty, click **Offline guidance · no model** | "Here is an Enterprise Browser upgrade failure with no installed version supplied. Note what it does *not* do: no model call. It asks for the one fact that decides the answer — the exact installed build." |
-| 4 | 1:05–1:35 | Switch to the **DataWedge software scan trigger** question with a version and an official source URL, click **Fetch official excerpts only** | "Now a version-pinned DataWedge question. This step retrieves the official article and freezes the excerpt — the page and the excerpt are fingerprinted, so the evidence behind the answer cannot drift afterwards." |
-| 5 | 1:35–2:15 | Expand **Read the frozen excerpt**; scroll **Source vocabulary check** | "The two result identifiers appear in this article. We surface both passages with their locations and explicitly decline to choose between them: whether they genuinely conflict is a judgement for the documentation author." |
-| 6 | 2:15–2:55 | Click **Compare baseline / guided** | "Both arms get identical source bytes, temperature zero, the same output budget. The guided arm additionally receives only the strategies whose triggers actually matched, each labelled as a provisional candidate rather than a validated pattern." |
-| 7 | 2:55–3:15 | Show **Model answer review**: `x/y claims have an exact excerpt match (not accuracy)`, expand rejected claims | "Every claim must quote the excerpt exactly. Claims that fail stay visible as rejected rather than being deleted. And this counter measures a mechanical quote match — not correctness, and definitely not device behaviour." |
-| 8 | 3:15–3:35 | Open **Download result / handoff (JSON)**; end on the page footer disclaimer | "The whole run exports as a handoff record, so a reviewer can re-check our work. What we are *not* claiming: device validation, published documentation changes, or a measured reduction in support effort." |
-
-## Do not say, and what to say instead
-
-| Never say | Say instead |
-|---|---|
-| "we found N recurring documentation problems" | "one candidate pattern recurred; after discounting reused evidence it has one independent case against a threshold of two" |
-| "the guided answers are better / 4× better" | "on four claims in two cases, exact-quote agreement was higher in the pilot run; the configuration changed mid-run, so we treat it as a pilot observation" |
-| "the model answered correctly" | "the claim quotes the excerpt exactly; semantic accuracy still needs reviewer sign-off" |
-| "the scan trigger documentation is wrong" | "the article's description and its example use different identifiers; we report both for author review" |
-| "this works on devices" | "no device validation was performed" |
-
-## Recording blockers
-
-1. **Blocking:** the offline *Response safeguards* panel currently renders no strategy cards (see
-   `analysis/DEFECT_offline_strategy_panel.md`). Segments 3 and 6 depend on that panel. Either land the
-   patch and re-verify, or record segments 3/6 from the hosted/live path and say "offline guidance" only
-   for the parts that actually work.
-2. The `Compare baseline / guided` segment needs the campus endpoint reachable and a working local server.
-   If it is not reachable at recording time, **cut segment 6–7** and show the exported JSON receipt from an
-   earlier successful run instead — labelled with its date. Never re-enact a model answer in a text editor.
-3. Keep the exported JSON for every recorded run in `deliverables/video-evidence/` so the video and the
-   poster cite the same run.
-
-## 中文待办
-
-1. 录之前必须先确认第 1 条 blocker 有没有修；不修的话 3/6 两段拍出来是空的，等于把 bug 录进交作业的视频里。
-2. 6–7 段依赖校园端点 + 本地服务；现场录不出来就**直接砍**，用之前成功那次的导出 JSON 顶上，并在画面上标日期。禁止手打一段"模型回答"补拍。
-3. 谁出镜配音、字幕谁做（建议英文旁白 + 英文字幕，语速 140 wpm 左右，3:30 ≈ 500 词）。
-4. 最终版 12/4 截止，草稿 11/27 先交能看住的版本即可，不必一次到位。
+## Before recording
+Confirm the team-reader route and public demo are accessible. Use the main demo rather than relying on the previously broken extended offline strategy panel until PR #24 is verified and deployed. Use actual screen capture with no private material or credentials. Make the shared automation and integration a proposed next step until demonstrated; do not credit individual members with work that has not been confirmed. Suggested split: Zhentong provides document-side footage, Yuxuan provides evidence/answer/visual footage, Minyang integrates recording and QA; confirm with the team. Save the video and its evidence receipts; this script alone is not a Canvas submission.
