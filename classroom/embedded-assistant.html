@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Embedded documentation assistant · prototype</title>
+<style>body{font:16px/1.6 system-ui,sans-serif;color:#192b33;background:#f4f7f8;margin:0}main{max-width:980px;margin:32px auto;padding:16px}header{border-bottom:1px solid #cbd5db;padding-bottom:16px}a{color:#176d78}article,.tdw-panel{background:white;border:1px solid #d4e0e5;border-radius:12px;padding:24px;margin:20px 0}.tdw-panel label{display:block;margin:12px 0}.tdw-panel textarea{width:100%;box-sizing:border-box;border:1px solid #aabdc7;border-radius:6px;padding:9px;font:inherit}.tdw-controls{display:flex;gap:8px;flex-wrap:wrap}.tdw-panel button{font:inherit;border:1px solid #aabdc7;border-radius:6px;background:white;color:#192b33;padding:8px 12px;cursor:pointer}.tdw-panel button:disabled{opacity:.45}.tdw-panel button:nth-child(2){background:#12666e;color:white}.tdw-muted{font-size:14px;color:#54656d}.tdw-claim,blockquote{border-left:3px solid #9bc4ca;margin:12px 0;padding:4px 12px}.tdw-extras svg{max-width:100%;height:auto}.tdw-extras{overflow:hidden}.tdw-extras button{margin:4px}.tdw-extras .story-stage svg{display:block;width:100%}</style></head>
+<body><main><header><strong>TechDocs integration example</strong> · <a href="answer-guidance.html">Full Ask &amp; Guide</a> · <a href="https://zebra-techdocs-practicum.vercel.app/">Team document reader</a></header>
+<article><p class="tdw-muted">DEMO DOCUMENT CONTEXT · DataWedge 6.8</p><h1>Soft Scan Trigger</h1><p>The official reference describes prerequisites for sending a software scan trigger. These checked excerpts are from the linked edition; they are not proof of device behavior.</p><blockquote>Functional only when Barcode Input is enabled in the active Profile.</blockquote><blockquote>commands might be ignored if the scanner is busy</blockquote><p><a href="https://techdocs.zebra.com/datawedge/6-8/guide/api/softscantrigger/">Read the official DataWedge 6.8 reference</a>.</p><div id="assistant"></div></article>
+<p class="tdw-muted">Reference embedding only. No Zebra production site or confidential data is connected. The host controls the evidence context and server-side provider. Offline mode does not make a model request.</p></main>
+<script src="answer-strategies.js"></script><script src="guidance-planner.js"></script><script src="guidance-intake.js"></script><script src="guidance-visual.js"></script><script src="guidance-storyboard.js"></script><script src="techdocs-widget.js"></script>
+<script>
+"use strict";
+const scope={product:"datawedge",version:"6.8",source_urls:["https://techdocs.zebra.com/datawedge/6-8/guide/api/softscantrigger/"]};
+const local=location.protocol==="http:"&&["localhost","127.0.0.1"].includes(location.hostname);
+async function ask(input){
+ if(input.action==="plan"){const initial=ZebraGuidance.prepare(input),packet=ZebraIntake.offlineEvidence(initial);return {plan:ZebraGuidance.withEvidence(initial,packet.cards),offline_evidence:packet,mode:packet.mode,model_runs_completed:0}}
+ if(!local)throw Error("Model inference requires an approved host");
+ const session=await fetch("/api/session",{cache:"no-store",signal:AbortSignal.timeout(5000)}),s=await session.json();
+ if(!session.ok||!s.local_session||!s.model_config?.enabled||!s.review_access)throw Error("Host model is disabled or unavailable");
+ const response=await fetch("/api/answer-guidance",{method:"POST",headers:{"Content-Type":"application/json","X-Review-Access":s.review_access},body:JSON.stringify(input)});
+ const r=await response.json();if(!response.ok||!r.ok)throw Error(r.error||"Guidance unavailable");return r;
+}
+TechDocsWidget.mount(document.getElementById("assistant"),{scope,ask,live:local,renderExtras:(node,result)=>{
+ const map=ZebraVisual.graph(result.plan,result);
+ if(!ZebraStoryboard.videoPlan(map))return;
+ const heading=document.createElement("h3");heading.textContent="Interactive explanation";node.append(heading);
+ const stage=document.createElement("div");node.append(stage);const controller=ZebraStoryboard.mount(stage);controller.update(map);return ()=>controller.destroy();
+}});
+</script></body></html>
