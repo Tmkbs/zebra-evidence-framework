@@ -1,5 +1,9 @@
 # Zebra Evidence Framework — research workbench and classroom demo
 
+## Automated batch guidance and voiced explainer production
+
+Run the [batch workflow](analysis/BATCH_AUTOMATION.md) to process new questions, select candidate strategies, save evidence and optionally generate a locally narrated MP4 from each matched visual form. Public CSV intake is conservative; campus model runs require explicit reviewed public inputs and network consent.
+
 ## Contextual short-video generation
 
 The existing visual player can render a reviewed explanation into a silent, captioned WebM locally in a supported browser. It reuses the current question-specific SVG scenes, preserves source provenance, and supplies a preview and downloadable source receipt. No paid API, external media load, or device recording. Unknown topics do not get invented technical videos. See [the video workflow](analysis/CONTEXTUAL_VIDEO.md).

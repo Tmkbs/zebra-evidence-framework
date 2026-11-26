@@ -15,7 +15,7 @@ permissions:
 jobs:
   offline-regression:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 12
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -47,3 +47,23 @@ jobs:
           if-no-files-found: error
 
 
+
+      - name: Install local narration dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq espeak-ng ffmpeg fonts-dejavu-core
+          python3 -m pip install --quiet Pillow
+      - name: Render and verify four question-specific narrated clips
+        run: |
+          npm run batch -- --input analysis/batch-demo-input.json --output qa-output/narrated-batch --video
+          node -e 'const r=require("./qa-output/narrated-batch/batch-report.json");if(r.summary.narrated_videos_encoded!==4||r.summary.model_runs_completed!==0||r.summary.global_patterns_validated!==0)throw Error("Unexpected batch verification");console.log(r.summary)'
+          npm run batch -- --manifest classroom/public_case_manifest.json --output qa-output/public-manifest-intake
+      - name: Retain narrated videos, source receipts and batch report
+        uses: actions/upload-artifact@v4
+        with:
+          name: narrated-answer-batch
+          path: |
+            qa-output/narrated-batch/
+            qa-output/public-manifest-intake/
+          retention-days: 14
+          if-no-files-found: error

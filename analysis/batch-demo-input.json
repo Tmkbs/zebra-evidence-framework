@@ -1,0 +1,47 @@
+{
+  "schema": "zebra-batch-input/v1",
+  "cases": [
+    {
+      "id": "profiles",
+      "question": "What is DataWedge, and how do its profiles handle input and output?",
+      "question_origin": "synthetic_question",
+      "product": "datawedge",
+      "version": "15.0"
+    },
+    {
+      "id": "scan-trigger",
+      "question": "Why might the software scan trigger fail to start scanning?",
+      "question_origin": "synthetic_question",
+      "product": "datawedge",
+      "version": "6.8"
+    },
+    {
+      "id": "result-codes",
+      "question": "Why do the result codes mention RECEIVE_RESULT and SEND_RESULT?",
+      "question_origin": "synthetic_question",
+      "product": "datawedge",
+      "version": "6.8"
+    },
+    {
+      "id": "nested-config",
+      "question": "How should PARAM_LIST and PLUGIN_CONFIG be nested in SET_CONFIG?",
+      "question_origin": "synthetic_question",
+      "product": "datawedge",
+      "version": "15.0"
+    },
+    {
+      "id": "browser-upgrade",
+      "question": "After upgrading Enterprise Browser, the app no longer opens. What should I check?",
+      "question_origin": "synthetic_question",
+      "product": "enterprise-browser",
+      "version": ""
+    },
+    {
+      "id": "unmatched",
+      "question": "How do I connect an unfamiliar application feature to my device?",
+      "question_origin": "synthetic_question",
+      "product": "ehs",
+      "version": "4.0"
+    }
+  ]
+}
