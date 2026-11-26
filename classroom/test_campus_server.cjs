@@ -6,8 +6,10 @@ const {configure,allowHost,campusStatus,buildServer}=require("../campus_review_s
 async function main(){
  const env={};
  const cfg=configure(env);
- assert.equal(cfg.base,"http://c3dgx0.cs.northwestern.edu:8000/v1");
- assert.equal(cfg.model,"nvidia/Qwen3.8-Flash-Next-FP4-Local");
+ assert.equal(cfg.base,"http://c3dgx0.cs.northwestern.edu:8080/v1");
+ assert.equal(cfg.model,"Qwen3.8-Flash-Next-FP4-Local");
+ assert.equal(cfg.auto_detect_port,true);
+ assert.equal(cfg.auto_select_model,true);
  assert.equal(env.AI_ALLOW_HTTP,"true");
  assert.ok(cfg.passcode.length>=32);
  assert.ok(!env.AI_API_KEY||env.AI_API_KEY==="token-is-ignored");
@@ -25,6 +27,17 @@ async function main(){
  const status=await campusStatus(cfg,mockFetch);
  assert.equal(status.connected,true);
  assert.equal(status.model_listed,true);
+ const fallbackEnv={},fallbackCfg=configure(fallbackEnv);
+ const fallbackStatus=await campusStatus(fallbackCfg,async url=>{
+  if(url==="http://c3dgx0.cs.northwestern.edu:8080/v1/models")throw Error("ECONNREFUSED");
+  if(url==="http://c3dgx0.cs.northwestern.edu:8000/v1/models")return{ok:true,json:async()=>({data:[{id:fallbackCfg.model}]})};
+  throw Error("Unexpected fallback URL: "+url);
+ });
+ assert.equal(fallbackStatus.connected,true);
+ assert.equal(fallbackStatus.port,"8000");
+ assert.equal(fallbackCfg.base,"http://c3dgx0.cs.northwestern.edu:8000/v1");
+ assert.equal(fallbackEnv.AI_BASE_URL,fallbackCfg.base);
+
  const server=buildServer(cfg,mockFetch);
  await new Promise(resolve=>server.listen(0,"127.0.0.1",resolve));
  const port=server.address().port;
