@@ -136,6 +136,11 @@ function graph(plan,result={},inputState={}){
     node("prototype","Function prototype","SEND_RESULT","source","The code uses a different exact spelling.",[codes[1]]),
     node("boundary","Unresolved discrepancy","No device conclusion","check","These are two passages, not two independent failure cases. Their different spellings alone do not determine the correct device behavior.",codes)]);
  }
+ const lesson=Intake.reviewedLesson(plan,result);
+ if(lesson){
+  const ids=lesson.nodes.map(n=>[n.id]),last=lesson.nodes.at(-1);
+  return {...make("document_lesson",lesson.title,lesson.summary,ids,{id:last.id,text:last.detail},lesson.nodes),lesson_id:lesson.id,team_reader_url:lesson.reader_url,team_review_release:lesson.release};
+ }
  return make("source_route","Evidence route","No checked visual template matches this question and exact evidence. The generic map makes no additional technical claims.",
    [["question"],["edition"],["source"],["next"]],{id:"source",text:Array.isArray(result.sources)?"Inspect the retrieved excerpt and check whether it answers the question.":"Retrieve and inspect the version-specific official article before offering detailed guidance."},
    [genericStart,node("edition","Version scope",plan.product+" "+plan.version,"reported","Reported edition is not verified on-device."),
