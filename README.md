@@ -20,6 +20,7 @@ The two intake channels share one evidence and answer workflow. The current prot
 
 ## Start here
 
+- [Executive summary for client review](delivery/00_EXECUTIVE_SUMMARY.md)
 - [Final delivery and current status](delivery/README.md)
 - [Updated problem statement draft](delivery/07_PROBLEM_STATEMENT_DRAFT.md)
 - [Customer requirements and two channels](delivery/01_CUSTOMER_REQUIREMENTS.md)
