@@ -29,7 +29,7 @@ async function main(){
  for(const f of ["answer-strategies.js","guidance-planner.js","guidance-intake.js","guidance-visual.js","guidance-storyboard.js","guidance-team-bridge.js"])fs.copyFileSync(path.join(root,f),path.join(dir,f));
  for(const f of ["answer-guidance.html","visual-companion.html"])fs.writeFileSync(path.join(dir,f),fs.readFileSync(path.join(root,f),"utf8").replace("</head>",trap+"</head>"));
  const profile=path.join(dir,"chrome-profile");
- child=spawn(browser,["--headless=new","--no-sandbox","--disable-dev-shm-usage","--disable-background-networking","--disable-background-timer-throttling","--disable-renderer-backgrounding","--no-first-run","--mute-audio","--autoplay-policy=no-user-gesture-required","--allow-file-access-from-files","--remote-debugging-port=0","--user-data-dir="+profile,"about:blank"],{stdio:["ignore","ignore","pipe"]});
+ child=spawn(browser,["--headless=new","--no-sandbox","--disable-dev-shm-usage","--disable-background-networking","--disable-breakpad","--disable-crash-reporter","--disable-background-timer-throttling","--disable-renderer-backgrounding","--no-first-run","--mute-audio","--autoplay-policy=no-user-gesture-required","--allow-file-access-from-files","--remote-debugging-port=0","--user-data-dir="+profile,"about:blank"],{stdio:["ignore","ignore","pipe"],detached:process.platform!=="win32"});
  child.stderr.on("data",b=>{stderr=(stderr+b.toString()).slice(-2400)});
  let launchError;child.once("error",e=>launchError=e);
  const port=await until(()=>{if(launchError)throw launchError;if(child.exitCode!==null)throw Error("Chromium exited: "+stderr);try{return Number(fs.readFileSync(path.join(profile,"DevToolsActivePort"),"utf8").split("\n")[0])}catch{return 0}},15000);
@@ -82,16 +82,34 @@ async function main(){
  assert.equal(await evaluate("!!document.querySelector('.story-video-output video')"),false);
  console.log("PASS concept renderer reuse and unsupported-question video gate");
 }
-main().catch(e=>{console.error(e.stack||e);console.error(stderr);process.exitCode=1}).finally(async()=>{
- // Ask Chrome to close cleanly before closing the CDP connection.
- if(connection){try{await Promise.race([connection.send("Browser.close"),sleep(1800)])}catch{}connection.close()}
- if(child&&child.exitCode===null){
-  await Promise.race([new Promise(resolve=>child.once("exit",resolve)),sleep(1200)]);
-  if(child.exitCode===null){child.kill("SIGTERM");await Promise.race([new Promise(resolve=>child.once("exit",resolve)),sleep(1500)])}
-  if(child.exitCode===null){child.kill("SIGKILL");await Promise.race([new Promise(resolve=>child.once("exit",resolve)),sleep(1200)])}
+// On Linux Chromium starts helper processes that can outlive its parent.
+// Terminate only our detached browser process group before removing its profile.
+function signalBrowser(signal){
+ if(!child?.pid)return;
+ try{
+  if(process.platform==="win32"){if(child.exitCode===null&&child.signalCode===null)child.kill(signal)}
+  else process.kill(-child.pid,signal);
+ }catch(e){if(e.code!=="ESRCH")throw e}
+}
+async function cleanup(){
+ connection?.close();
+ if(child?.pid){
+  const closed=child.exitCode!==null||child.signalCode!==null?Promise.resolve():new Promise(resolve=>child.once("close",resolve));
+  signalBrowser("SIGTERM");
+  await Promise.race([closed,sleep(2000)]);
+  signalBrowser("SIGKILL");
+  await Promise.race([closed,sleep(2000)]);
+  // Child helpers may finish closing and rename profile entries asynchronously.
+  await sleep(350);
  }
- // The media assertions above still fail the test. A transient OS cleanup
- // race after a successful test is reported separately, not as a codec failure.
- try{await fs.promises.rm(dir,{recursive:true,force:true,maxRetries:8,retryDelay:200})}
- catch(e){if(!["ENOTEMPTY","EBUSY","EPERM"].includes(e.code))throw e;console.warn("Chromium temporary profile cleanup deferred:",e.code)}
-});
+ try{
+  await fs.promises.rm(dir,{recursive:true,force:true,maxRetries:20,retryDelay:150});
+ }catch(e){
+  // Cleanup is not a codec, provenance, or browser assertion. Keep the original
+  // exit code and make the residual ephemeral profile visible in the CI log.
+  if(!["ENOTEMPTY","EBUSY","EPERM"].includes(e.code))throw e;
+  console.warn("Chromium test profile cleanup incomplete:",e.code,dir);
+ }
+}
+main().catch(e=>{console.error(e.stack||e);console.error(stderr);process.exitCode=1})
+ .finally(cleanup).catch(e=>{console.error(e.stack||e);process.exitCode=1});
