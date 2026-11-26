@@ -57,7 +57,7 @@ button.vision-node[aria-pressed=true]{outline:3px solid #a7d3ca;outline-offset:2
 <p>Ask a technical question, learn a concept through a contextual visual explanation, or explore a diagnostic step. Official media is selected only when relevant.</p>
 <div id="environment" class="notice">Offline planning is available. Checking for the optional local prototype service…</div>
 <section class="vision-shell" id="visionBox" aria-label="Interactive visual guidance">
-<div class="actions vision-presets"><button id="loadConcept">Learn DataWedge Profiles</button><button id="loadPrereq">Scan-trigger flow</button><button id="loadExample">Compare parameter evidence</button><button id="loadConfig">Configuration structure</button><button id="loadUnknown">Missing version</button></div>
+<div class="actions vision-presets"><button id="loadConcept">Learn DataWedge Profiles</button><button id="loadPrereq">Scan-trigger flow</button><button id="loadExample">Compare parameter evidence</button><button id="loadConfig">Configuration structure</button><button id="loadEHS">EHS settings access · team case</button><button id="loadUnknown">Missing version</button></div>
 <div id="storyOutput" class="story-player" hidden></div>
 <div id="narratedPanel" class="media-panel" hidden><h3>Generate a narrated technical explanation</h3><p class="muted">Generate a source-linked MP4 with locally synthesized English narration and captions. This uses the checked offline source cards, not a live model or device recording.</p><button id="narratedGenerate" disabled>Generate narrated MP4</button><p id="narratedStatus" class="muted" role="status"></p><video id="narratedPreview" controls playsinline preload="none" style="width:100%;max-width:780px" hidden></video><div class="actions" id="narratedLinks" hidden><a id="narratedSave" download="zebra-explanation.mp4">Save MP4</a><a id="narratedCaptions" download="zebra-explanation.vtt">Save captions</a></div></div>
 <div id="mediaOutput" class="media-panel" hidden></div>
@@ -141,7 +141,7 @@ function invalidate({keepTeam=false}={}){
 }
 function drawContextualMedia(result){
  const packet=result.contextual_media,out=$("mediaOutput");
- out.replaceChildren();out.hidden=!packet||!packet.assets.length;if(out.hidden)return;
+ out.replaceChildren();out.hidden=!packet||(!packet.assets.length&&!packet.checkpoint);if(out.hidden)return;
  out.append(text("div","CONTEXTUAL LEARNING MATERIAL","vision-kicker"),text("h3","Learn the concept · official resources"),text("p",packet.reason,"muted"));
  const assets=text("div","","media-assets");
  for(const asset of packet.assets){
@@ -152,7 +152,8 @@ function drawContextualMedia(result){
   item.append(a,link(asset.source_url,"Source documentation"),text("p",asset.kind==="video"?"Listed by Zebra; playback and timestamps not independently checked. Opens externally.":"Original official diagram was inspected. Open only if you want to load it.","muted"));
   assets.append(item)
  }
- out.append(assets,text("p","No external media loads automatically. The interactive illustration above works without network or model access.","muted"));
+ if(packet.assets.length)out.append(assets,text("p","No external media loads automatically. The interactive illustration above works without network or model access.","muted"));
+ if(packet.reader_url==="https://zebra-techdocs-practicum.vercel.app/document-reader/ehs40-settings-access/index.html#settings-control-scope"){const a=text("a","Open Phase 1 team document proposal ↗");a.href=packet.reader_url;a.target="_blank";a.rel="noopener noreferrer";out.append(a)}
  if(packet.checkpoint){
   const question=text("div","","media-check");question.append(text("h3","Quick understanding check"),text("p",packet.checkpoint.prompt));
   const options=text("div","","actions"),feedback=text("p","","muted");feedback.setAttribute("role","status");
@@ -211,7 +212,7 @@ const text=(tag,value,cls)=>{const e=document.createElement(tag);e.textContent=S
 function link(url,label){const e=text("a",label||url);try{const u=new URL(url);if(u.protocol==="https:"&&u.hostname==="techdocs.zebra.com"){e.href=u.href;e.target="_blank";e.rel="noopener noreferrer"}}catch{}return e}
 function addList(parent,items){const list=document.createElement("ul");for(const item of items||[])list.append(text("li",item));parent.append(list)}
 function busy(value){
- for(const id of ["plan","loadExample","loadUnknown","loadPrereq","loadConfig","loadConcept","question","product","version","context","sources","importFile","csvFile","consent"])$(id).disabled=value;
+ for(const id of ["plan","loadExample","loadUnknown","loadPrereq","loadConfig","loadConcept","loadEHS","question","product","version","context","sources","importFile","csvFile","consent"])$(id).disabled=value;
  $("evidence").disabled=value||!access;
  for(const id of ["ask","compare"])$(id).disabled=value||!access||!modelEnabled;
  $("fetchCSV").disabled=value;
@@ -245,7 +246,7 @@ function drawCards(packet){
  $("sourceBox").hidden=false;const out=$("sourceOutput");out.replaceChildren();
  out.append(text("p",packet.notice,"notice"));
  for(const c of cards){
-  const item=text("section","","step");item.append(text("h3",c.title+" · DataWedge "+c.version),link(c.url,"Open official article"),text("p","Source inspected "+c.checked+"; not fetched in this run.","muted"));
+  const item=text("section","","step");item.append(text("h3",c.title+" · "+(c.product==="datawedge"?"DataWedge":c.product==="ehs"?"EHS":c.product)+" "+c.version),link(c.url,"Open official article"),text("p","Source inspected "+c.checked+"; not fetched in this run.","muted"));
   const grid=text("div","","grid");
   for(const x of c.sections){const card=text("div","","evidence");card.append(text("strong",x.section),text("blockquote",x.quote),text("p",x.note,"muted"));grid.append(card)}
   item.append(grid,text("p",c.next,"notice"));out.append(item)
@@ -312,6 +313,9 @@ $("loadConcept").addEventListener("click",()=>{
 });
 $("loadConfig").addEventListener("click",()=>{
  invalidate();caseId="";$("question").value="How should PARAM_LIST and PLUGIN_CONFIG be nested in DataWedge 15.0 SET_CONFIG?";$("product").value="datawedge";$("version").value="15.0";$("context").value="";$("sources").value="https://techdocs.zebra.com/datawedge/15-0/guide/api/setconfig/";$("consent").checked=false;run("plan")
+});
+$("loadEHS").addEventListener("click",()=>{
+ invalidate();caseId="";$("question").value="Does hiding the Settings icon in EHS 4.0 restrict Settings access or disable the app?";$("product").value="ehs";$("version").value="4.0";$("context").value="";$("sources").value="";$("consent").checked=false;run("plan")
 });
 function showCSV(csv){
  const result=ZebraIntake.importCSV(csv);csvRows=result.rows;
