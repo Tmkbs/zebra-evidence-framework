@@ -51,7 +51,7 @@ The team's public r62 README reports a 57-row, 19-column case export. The full C
 
 ## Northwestern model and enterprise portability
 
-A local Northwestern-compatible model adapter remains available for development/testing. The CI workflow is offline and does not call the campus endpoint. Confirm the actual endpoint, model identity and live response in the authorized local environment before claiming a current successful inference. Do not infer the port from old examples.
+The local Northwestern runner reuses Harper's previously documented `http://c3dgx0.cs.northwestern.edu:8080/v1` endpoint first, automatically checks `:8000` as a fallback, reads `/v1/models`, and selects an advertised Qwen/DeepSeek model when no explicit override is set. The smoke test uses `/v1/chat/completions` with a harmless synthetic `READY` prompt; it does not use `/responses`. CI tests this discovery/fallback logic with mocked HTTP responses and remains offline. A live campus request has not been executed from this hosted chat environment.
 
 The same answer engine can use an explicitly administrator-approved HTTPS OpenAI-compatible enterprise gateway. The enterprise prototype defaults to model inference off. No Zebra production gateway, private knowledge base, private ticket feed or external model provider has been connected in this branch.
 
