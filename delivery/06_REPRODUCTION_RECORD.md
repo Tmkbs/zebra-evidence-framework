@@ -18,6 +18,8 @@ GitHub Actions run [#146](https://github.com/Tmkbs/zebra-evidence-framework/acti
 - Contextual video encode/decode test: passed.
 - Narrated regression and consolidated reproduction: passed.
 
+A later run, [Actions run 45898457023](https://github.com/Tmkbs/zebra-evidence-framework/actions/runs/45898457023), also completed with both offline jobs successful after the answer-routing and evolutionary-strategy code was integrated. Subsequent commits in this delivery pass only updated Markdown documentation and indexes; no application code changed after that test run.
+
 The reproduction command is:
 
 ```sh
