@@ -46,6 +46,7 @@ function explanationIntent(question,product){
  return /\b(?:datawedge|profiles?)\b/i.test(q)&&/\b(?:what (?:is|are|does|do)|how (?:does|do)|explain|overview|introduction|learn about|understand)\b/i.test(q)&&!/\b(?:can i|can it|can datawedge|support(?:ed|s)?)\b/i.test(q)?"concept_overview":"technical_question";
 }
 function routeSources(question,product,version){
+ if(product==="ehs"&&version==="4.0"&&/\b(?:settings|system_settings_restricted|apps_disabled|apps_enabled)\b/i.test(question)&&/\b(?:hide|hidden|restrict\w*|disable\w*|access|shortcut|icon|visibility|available)\b/i.test(question))return ["https://techdocs.zebra.com/ehs/4-0/guide/setup/","https://techdocs.zebra.com/ehs/4-0/guide/settings/"];
  if(product!=="datawedge")return [];
  if(version==="15.0"&&explanationIntent(question,product)==="concept_overview")return ["https://techdocs.zebra.com/datawedge/15-0/guide/profiles/"];
  const urls=[];
