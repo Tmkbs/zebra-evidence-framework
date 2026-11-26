@@ -12,7 +12,7 @@ test("uses the prior 8080 endpoint first and automatically falls back to 8000",a
  };
  const r=await probeCampus({env,request});
  assert.equal(r.live_model_call,true);assert.equal(r.port,"8000");assert.equal(r.reported_model,"Qwen3.8-Flash-Next-FP4-Local");assert.equal(r.reply,"READY");assert.equal(r.attempts.length,2);assert.ok(r.attempts.every(x=>x.port==="8080"));assert.deepEqual(r.attempts.map(x=>x.stage),["models","chat/completions"]);
- assert.ok(calls[0].includes(":8080/"));assert.ok(calls.some(x=>x.includes(":8000/chat/completions")));
+ assert.ok(calls[0].includes(":8080/"));assert.ok(calls.some(x=>x.includes(":8000/v1/chat/completions")));
 });
 test("stops on the first working documented endpoint",async()=>{
  const calls=[],env={};const request=async url=>{calls.push(url);if(url.endsWith("/models"))return new Response(JSON.stringify({data:[{id:"DeepSeek-V4-Flash-0731"}]}));return new Response(JSON.stringify({model:"DeepSeek-V4-Flash-0731",choices:[{message:{content:"READY"}}]}))};
