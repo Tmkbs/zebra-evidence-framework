@@ -47,6 +47,8 @@ Two artifacts were retained:
 
 These artifacts are CI outputs with limited retention, not permanent customer deliverables.
 
+A further run, [Actions run 45899988043](https://github.com/Tmkbs/zebra-evidence-framework/actions/runs/45899988043), passed both offline jobs after the campus endpoint auto-discovery change. The campus probe regression tests passed for 8080-first selection, automatic 8000 fallback, first-working-endpoint behavior, and advertised-model selection. These tests use mocked HTTP responses; they do not constitute a live campus API call.
+
 ## Northwestern campus API configuration
 
 The earlier Harper connection example used `http://c3dgx0.cs.northwestern.edu:8080/v1/chat/completions` and Chat Completions (not the Responses API). The previously provided model identifiers included `Qwen3.8-Flash-Next-FP4-Local` and DeepSeek V4 variants. The project files had later drifted to port 8000 and a `nvidia/`-prefixed Qwen name; this has been corrected.
