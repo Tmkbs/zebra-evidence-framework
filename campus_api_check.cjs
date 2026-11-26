@@ -7,8 +7,9 @@ const KNOWN=["Qwen3.8-Flash-Next-FP4-Local","DeepSeek-V4-Flash-0731/DeepSeek-V4-
 const LEGACY_QWEN="nvidia/Qwen3.8-Flash-Next-FP4-Local";
 function normalize(raw){
  const u=new URL(raw);
- if(!["http:","https:"].includes(u.protocol)||u.hostname!==CAMPUS||u.pathname.replace(/\/+$/,"")!=="/v1"||u.username||u.password||u.search||u.hash)throw Error("Only the approved Northwestern campus /v1 endpoint is allowed");
- return u.href.replace(/\/+$/,"");
+ const path=u.pathname.endsWith("/")?u.pathname.slice(0,-1):u.pathname;
+ if(!["http:","https:"].includes(u.protocol)||u.hostname!==CAMPUS||path!=="/v1"||u.username||u.password||u.search||u.hash)throw Error("Only the approved Northwestern campus /v1 endpoint is allowed");
+ return u.href.endsWith("/")?u.href.slice(0,-1):u.href;
 }
 function endpoints(env=process.env){
  if(env.AI_BASE_URL){
