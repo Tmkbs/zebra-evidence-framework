@@ -125,10 +125,11 @@ function options(args){
   const arg=args[i];
   if(arg==="--video")o.video=true;
   else if(arg==="--allow-network")o.allowNetwork=true;
-  else if(["--input","--csv","--manifest","--output","--mode"].includes(arg)){if(!args[i+1]||args[i+1].startsWith("--"))throw Error("Missing value for "+arg);o[arg.slice(2)]=args[++i]}
+  else if(["--input","--csv","--manifest","--output","--mode","--population","--candidate"].includes(arg)){if(!args[i+1]||args[i+1].startsWith("--"))throw Error("Missing value for "+arg);o[arg.slice(2)]=args[++i]}
   else throw Error("Unknown option "+arg);
  }
  if([o.input,o.csv,o.manifest].filter(Boolean).length!==1||!o.output)throw Error("Use --input FILE (or --csv FILE or --manifest FILE) --output NEW_DIR [--mode offline|evidence|guided|compare] [--allow-network] [--video]");
+ if(!!o.population!==!!o.candidate||o.population&&o.mode!=="guided")throw Error("Supply both --population and --candidate only in guided mode");
  return o;
 }
 async function main(){
@@ -140,6 +141,7 @@ async function main(){
  if(o.manifest&&o.mode!=="offline")throw Error("Public manifest contains paraphrases, not reviewed original questions");
  fs.mkdirSync(out,{recursive:true});
  const cfg=require("./model-provider.cjs").configure(process.env,{defaultMode:"campus"});
+ if(o.population){const candidates=require("./strategy-evolution.cjs").population(JSON.parse(read(o.population)));cfg.strategy_candidate=candidates.find(c=>c.id===o.candidate);if(!cfg.strategy_candidate)throw Error("Candidate not in population");}
  const result=await execute(packet,{mode:o.mode,allowNetwork:o.allowNetwork,cfg,renderVideo:o.video?localRenderer(out):null});
  fs.writeFileSync(path.join(out,"batch-report.json"),JSON.stringify(result,null,2)+"\n");
  console.log(JSON.stringify(result.summary,null,2));
