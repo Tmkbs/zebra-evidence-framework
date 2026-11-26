@@ -1,0 +1,50 @@
+{
+  "schema": "zebra-batch-input/v1",
+  "scope": "Reviewed template smoke-test inputs; not an independent evaluation set. Historical reader is a paraphrased archived report.",
+  "cases": [
+    {
+      "case_id": "demo-profiles",
+      "question": "What is DataWedge and how do profiles handle input and output?",
+      "product": "datawedge",
+      "version": "15.0"
+    },
+    {
+      "case_id": "demo-trigger",
+      "question": "Why might the software scan trigger fail to start scanning?",
+      "product": "datawedge",
+      "version": "6.8"
+    },
+    {
+      "case_id": "demo-result",
+      "question": "What is the difference between SEND_RESULT and RECEIVE_RESULT in result codes?",
+      "product": "datawedge",
+      "version": "6.8"
+    },
+    {
+      "case_id": "demo-config",
+      "question": "How should PARAM_LIST and PLUGIN_CONFIG be nested in SET_CONFIG?",
+      "product": "datawedge",
+      "version": "15.0"
+    },
+    {
+      "case_id": "archived-reader-pilot",
+      "question": "Why does a Xamarin app receive an ADB test broadcast but not DataWedge intents?",
+      "product": "datawedge",
+      "version": "",
+      "reader_key": "dw62-intent-receiver",
+      "forum_url": "https://developer.zebra.com/content/datawedge-broadcast-intents-are-not-being-delivered"
+    },
+    {
+      "case_id": "demo-cross-product",
+      "question": "After upgrading Enterprise Browser, the app no longer opens.",
+      "product": "enterprise-browser",
+      "version": ""
+    },
+    {
+      "case_id": "demo-unsupported",
+      "question": "How do I change a completely unrelated feature?",
+      "product": "ehs",
+      "version": "4.0"
+    }
+  ]
+}
