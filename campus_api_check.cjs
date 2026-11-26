@@ -1,13 +1,14 @@
 "use strict";
-// Live, harmless Northwestern model probe. Automatically tries the prior
-// documented 8080 endpoint first, then 8000 if needed. No Zebra or personal data.
+// Live, harmless Northwestern model probe. Try the prior documented 8080
+// endpoint first and 8000 second if needed. No Zebra or personal data.
 const M=require("./analysis/model-provider.cjs");
 const CAMPUS="c3dgx0.cs.northwestern.edu";
 const KNOWN=["Qwen3.8-Flash-Next-FP4-Local","DeepSeek-V4-Flash-0731/DeepSeek-V4-Flash-0731-UD-IQ3_XXS","DeepSeek-V4-Flash-0731"];
+const LEGACY_QWEN="nvidia/Qwen3.8-Flash-Next-FP4-Local";
 function normalize(raw){
  const u=new URL(raw);
- if(!["http:","https:"].includes(u.protocol)||u.hostname!==CAMPUS||u.pathname.replace(/\\/+$/,"")!=="/v1"||u.username||u.password||u.search||u.hash)throw Error("Only the approved Northwestern campus /v1 endpoint is allowed");
- return u.href.replace(/\\/+$/,"");
+ if(!["http:","https:"].includes(u.protocol)||u.hostname!==CAMPUS||u.pathname.replace(/\/+$/,"")!=="/v1"||u.username||u.password||u.search||u.hash)throw Error("Only the approved Northwestern campus /v1 endpoint is allowed");
+ return u.href.replace(/\/+$/,"");
 }
 function endpoints(env=process.env){
  if(env.AI_BASE_URL){
@@ -17,7 +18,8 @@ function endpoints(env=process.env){
  return [8080,8000].map(port=>"http://"+CAMPUS+":"+port+"/v1");
 }
 function chooseModel(available,env=process.env){
- if(env.AI_MODEL)return env.AI_MODEL;
+ const requested=String(env.AI_MODEL||"");
+ if(requested&&requested!==LEGACY_QWEN)return requested;
  return KNOWN.find(x=>available.includes(x))||available[0]||M.DEFAULT_MODEL;
 }
 async function probeCampus({env=process.env,request=fetch}={}){
