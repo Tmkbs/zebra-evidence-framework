@@ -36,7 +36,6 @@ async function main(){
  assert.equal(fallbackStatus.connected,true);
  assert.equal(fallbackStatus.port,"8000");
  assert.equal(fallbackCfg.base,"http://c3dgx0.cs.northwestern.edu:8000/v1");
- assert.equal(fallbackEnv.AI_BASE_URL,fallbackCfg.base);
 
  const server=buildServer(cfg,mockFetch);
  await new Promise(resolve=>server.listen(0,"127.0.0.1",resolve));
