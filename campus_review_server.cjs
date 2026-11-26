@@ -59,8 +59,8 @@ function configure(env=process.env){
   if(portable.mode!=="off")Model.resolve(portable,env);
   return {...portable,port,passcode:env.AI_REVIEW_ACCESS_TOKEN||crypto.randomBytes(24).toString("hex")};
  }
- const autoDetectPort=!env.AI_BASE_URL;
- const autoSelectModel=!env.AI_MODEL;
+ const autoDetectPort=["8080","8000"].includes(new URL(base).port);
+ const autoSelectModel=!env.AI_MODEL||env.AI_MODEL==="nvidia/Qwen3.8-Flash-Next-FP4-Local";
  const base=String(env.AI_BASE_URL||DEFAULT_API).replace(/\/+$/,"");
  let u;try{u=new URL(base)}catch{throw Error("Invalid AI_BASE_URL")}
  if(!["http:","https:"].includes(u.protocol)||u.username||u.password||u.search||u.hash||u.pathname.replace(/\/+$/,"")!=="/v1")throw Error("AI_BASE_URL must end with /v1 and have no credentials");
@@ -91,7 +91,8 @@ function allowHost(req,port){
 }
 async function campusStatus(cfg,request=fetch){
  if(cfg.mode==="off")return{connected:false,model:null,error:"Model inference is disabled by administrator"};
- const candidates=[cfg.base];
+ const configuredBase=cfg.base;
+ const candidates=[configuredBase];
  if(cfg.mode==="campus"&&cfg.auto_detect_port){
   const alternate=cfg.base.includes(":8080/")?cfg.base.replace(":8080/",":8000/"):cfg.base.includes(":8000/")?cfg.base.replace(":8000/",":8080/"):null;
   if(alternate&&!candidates.includes(alternate))candidates.push(alternate);
@@ -110,7 +111,7 @@ async function campusStatus(cfg,request=fetch){
     process.env.AI_MODEL=cfg.model;
    }
    cfg.base=base;process.env.AI_BASE_URL=base;
-   return{connected:true,endpoint:base,port:new URL(base).port,model:cfg.model,model_listed:models.length?models.includes(cfg.model):null,available_models:models,auto_detected:candidates.length>1};
+   return{connected:true,endpoint:base,port:new URL(base).port,model:cfg.model,model_listed:models.length?models.includes(cfg.model):null,available_models:models,auto_detected:base!==configuredBase};
   }catch(e){failures.push(new URL(base).port+" "+String(e.message||e).slice(0,100))}
  }
  return{connected:false,model:cfg.model,attempted_ports:candidates.map(x=>new URL(x).port),error:"No campus model-list response. "+failures.join("; ")};
