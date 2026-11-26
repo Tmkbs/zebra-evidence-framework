@@ -1,5 +1,9 @@
 # Zebra Evidence Framework — research workbench and classroom demo
 
+## Portable enterprise prototype
+
+[Enterprise integration and setup](analysis/ENTERPRISE_HANDOFF.md) · [Embedded documentation assistant](classroom/embedded-assistant.html). Run `npm run enterprise` for the local, provider-disabled-by-default prototype. The campus adapter is a development option; an explicitly administrator-approved HTTPS OpenAI-compatible provider can be configured separately. The widget can be embedded by a host application with its own answer adapter and page scope. It does not contain credentials or contact providers itself. Public-only material, version-scoped source retrieval and the original evidence/visual gates remain in place. This is not a Zebra production integration.
+
 ## Automated batch guidance and voiced explainer production
 
 Run the [batch workflow](analysis/BATCH_AUTOMATION.md) to process new questions, select candidate strategies, save evidence and optionally generate a locally narrated MP4 from each matched visual form. Public CSV intake is conservative; campus model runs require explicit reviewed public inputs and network consent.
