@@ -1,0 +1,84 @@
+{
+  "schema": "zebra-reviewed-pattern-input/v1",
+  "scope": "Four purposively selected archived first posts, inspected 2026-11-26. Public reports, not SPRs or held-out cases. AI-assisted source inspection; team review pending.",
+  "archive_commit": "e1f57bcc5d034d2f025661a0ee0455e2e8bd6f22",
+  "threshold": 2,
+  "cases": [
+    {
+      "id": "ARCHIVE-TC26-EMDK",
+      "question_summary": "TC26 scanner stops responding after obtaining BarcodeManager at Xamarin startup.",
+      "forum_url": "https://developer.zebra.com/content/zebra-tc26-scanner-does-not-scan-when-config-changed-code-xamarin",
+      "archive_path": "Zebra_Forum_Backup_2026-10-26/threads/00976.html",
+      "archive_blob_sha": "02c6d5e61dee1864b32603e1707de11897dbb45e",
+      "review_status": "first_post_inspected_team_review_pending",
+      "software": "EMDK for Xamarin",
+      "reported_installed_version": null,
+      "version_reference": "The linked tutorial uses EMDK for Xamarin 7.0; the installed SDK version is not stated.",
+      "observations": [
+        {
+          "pattern_id": "installed_version_gap",
+          "support": true,
+          "source_excerpt": "I followed this tutorial:",
+          "review_note": "Inspected the initial post only. A documentation URL with an edition does not establish the installed version."
+        }
+      ]
+    },
+    {
+      "id": "ARCHIVE-TC52-MULTIBARCODE",
+      "question_summary": "TC52 MultiBarcode works manually but the reported programmatic configuration does not; the post also asks about scanner-status notifications.",
+      "forum_url": "https://developer.zebra.com/forum/25873",
+      "archive_path": "Zebra_Forum_Backup_2026-10-26/threads/resume-00577.html",
+      "archive_blob_sha": "23952bc9b4586d4b607a779f917cc7f2ae217cd7",
+      "review_status": "first_post_inspected_team_review_pending",
+      "software": "DataWedge",
+      "reported_installed_version": null,
+      "version_reference": "The sample uses ACTION_DATAWEDGE_FROM_6_2; this identifier is not an installed-version statement.",
+      "observations": [
+        {
+          "pattern_id": "installed_version_gap",
+          "support": true,
+          "source_excerpt": "But I'm unable to set it programmatically.",
+          "review_note": "Inspected the initial post, including configuration code. No installed DataWedge release was established. Do not infer one from the action constant."
+        }
+      ]
+    },
+    {
+      "id": "ARCHIVE-WEB-INTEGRATION",
+      "question_summary": "A developer is planning web application integration on Zebra devices and asks about seven capabilities, including scanner control.",
+      "forum_url": "https://developer.zebra.com/content/zebra-android-web-application-development-datawedge-and-enterprise-browser-integration-1",
+      "archive_path": "Zebra_Forum_Backup_2026-10-26/threads/00006.html",
+      "archive_blob_sha": "bc92cc19319d1d225c8bb2cda04f94916f90f6a0",
+      "review_status": "first_post_inspected_team_review_pending",
+      "software": "Multiple Zebra products; design-stage question",
+      "reported_installed_version": null,
+      "version_reference": "Target models and software configurations are not finalized; several documentation editions are referenced.",
+      "observations": [
+        {
+          "pattern_id": "installed_version_gap",
+          "support": true,
+          "source_excerpt": "The device models, Android OS versions, and software configurations have not yet been finalized.",
+          "review_note": "This is a planning question, not a device failure. Ask about target versions or state conditional advice; do not require a nonexistent installed build."
+        }
+      ]
+    },
+    {
+      "id": "ARCHIVE-DW62-INTENT",
+      "question_summary": "A Xamarin app reportedly receives ADB test broadcasts but not the configured DataWedge broadcast intents.",
+      "forum_url": "https://developer.zebra.com/content/datawedge-broadcast-intents-are-not-being-delivered",
+      "archive_path": "Zebra_Forum_Backup_2026-10-26/offline-structured-forum-20261027-v3/pages/89377fa2869e7f7ff472418f.html",
+      "archive_blob_sha": "6e5f61f606380955a8354da8d57994da4e1c5431",
+      "review_status": "first_post_inspected_team_review_pending",
+      "software": "DataWedge",
+      "reported_installed_version": "6.2.23",
+      "version_reference": "Version is reported by the developer, not device-verified; applicable documentation edition still needs confirmation.",
+      "observations": [
+        {
+          "pattern_id": "installed_version_gap",
+          "support": false,
+          "source_excerpt": "My datawedge version is 6.2.23 on Android 6.0.1 running on TC700K.",
+          "review_note": "Negative case: the first post explicitly supplies the installed release. Do not redundantly ask the user for it. Confirm source applicability separately."
+        }
+      ]
+    }
+  ]
+}
