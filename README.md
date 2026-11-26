@@ -21,6 +21,7 @@ The two intake channels share one evidence and answer workflow. The current prot
 ## Start here
 
 - [Final delivery and current status](delivery/README.md)
+- [Updated problem statement draft](delivery/07_PROBLEM_STATEMENT_DRAFT.md)
 - [Customer requirements and two channels](delivery/01_CUSTOMER_REQUIREMENTS.md)
 - [Case intake and evidence protocol](delivery/02_CASE_EVIDENCE_PROTOCOL.md)
 - [Experiment plan](delivery/03_EXPERIMENT_PLAN.md)
