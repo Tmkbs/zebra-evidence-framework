@@ -128,7 +128,7 @@ async function main(){
  if(o.csv&&o.mode!=="offline")throw Error("CSV import is offline intake only; review original questions first");
  if(o.manifest&&o.mode!=="offline")throw Error("Public manifest contains paraphrases, not reviewed original questions");
  fs.mkdirSync(out,{recursive:true});
- const cfg={base:process.env.AI_BASE_URL||"http://c3dgx0.cs.northwestern.edu:8000/v1",model:process.env.AI_MODEL||"nvidia/Qwen3.8-Flash-Next-FP4-Local"};
+ const cfg=require("./model-provider.cjs").configure(process.env,{defaultMode:"campus"});
  const result=await execute(packet,{mode:o.mode,allowNetwork:o.allowNetwork,cfg,renderVideo:o.video?localRenderer(out):null});
  fs.writeFileSync(path.join(out,"batch-report.json"),JSON.stringify(result,null,2)+"\n");
  console.log(JSON.stringify(result.summary,null,2));
