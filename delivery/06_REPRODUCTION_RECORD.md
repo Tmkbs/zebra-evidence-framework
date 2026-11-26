@@ -47,6 +47,14 @@ Two artifacts were retained:
 
 These artifacts are CI outputs with limited retention, not permanent customer deliverables.
 
+## Northwestern campus API configuration
+
+The earlier Harper connection example used `http://c3dgx0.cs.northwestern.edu:8080/v1/chat/completions` and Chat Completions (not the Responses API). The previously provided model identifiers included `Qwen3.8-Flash-Next-FP4-Local` and DeepSeek V4 variants. The project files had later drifted to port 8000 and a `nvidia/`-prefixed Qwen name; this has been corrected.
+
+The local server now tries the previously documented 8080 endpoint first, automatically falls back to 8000 when needed, reads `/v1/models`, and selects an advertised Qwen/DeepSeek model when no explicit model override is set. The smoke-test script uses a synthetic `READY` prompt only, through `/v1/chat/completions`, and records endpoint, model ID, HTTP response, latency and token count without printing credentials.
+
+**Live campus request status in this hosted session: NOT RUN.** The current chat execution environment cannot resolve/reach the campus-only hostname, and the user's desktop/browser is not attached to this execution context. The code and offline tests cover discovery/fallback; they do not substitute for an actual request from the connected campus machine.
+
 ## What a successful reproduction proves
 
 It proves that the tested commit can run the offline regression suite, render and decode the included development videos, create evidence receipts and reproduce the annotated-case counts under the recorded environment.
