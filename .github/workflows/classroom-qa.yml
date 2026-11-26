@@ -67,6 +67,7 @@ jobs:
           npm run batch -- --input analysis/batch-demo-input.json --output qa-output/narrated-batch --video
           node -e 'const r=require("./qa-output/narrated-batch/batch-report.json");if(r.summary.narrated_videos_encoded!==4||r.summary.model_runs_completed!==0||r.summary.global_patterns_validated!==0)throw Error(JSON.stringify(r.rows.map(x=>({id:x.id,video:x.video}))));console.log(r.summary)'
           npm run batch -- --manifest classroom/public_case_manifest.json --output qa-output/public-manifest-intake
+          node --test analysis/test_narrated_http.cjs
       - name: Retain narrated videos, source receipts and batch report
         if: always()
         uses: actions/upload-artifact@v4

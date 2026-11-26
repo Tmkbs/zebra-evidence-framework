@@ -177,3 +177,7 @@ https://github.com/1235357/zebra-public-site-archive
 The original, separate application was described as `zebra-techdocs-practicum` (private). Access to that private repository and a real live API run were **not** established here. Do not report either as complete.
 
 Run local checks with `python -m unittest -v test_lab_proxy.py`. No additional Python packages are required.
+
+### On-demand narrated video
+
+The local Ask & Guide page can generate and play a source-linked narrated MP4 using the shared batch renderer. [Setup, scope, and reproducible checks](analysis/LOCAL_NARRATION.md).

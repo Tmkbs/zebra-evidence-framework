@@ -98,7 +98,8 @@ test("malformed or unstructured model output is not accepted",()=>{
  assert.throws(()=>G.normalize("Here is an answer",[]),/required JSON/);
 });
 test("same-origin local route requires session and uses the existing server",async()=>{
- const f=fixtureFetch(),server=buildServer(cfg,f.request);
+ const f=fixtureFetch();let narrationCalls=0;
+ const server=buildServer(cfg,f.request,async input=>{narrationCalls++;assert.equal(input.public_only,true);return {ok:true,model_calls:0,receipt:{fixture_only:true}}});
  await new Promise((resolve,reject)=>{server.once("error",reject);server.listen(0,"127.0.0.1",resolve)});
  try{
   const url="http://127.0.0.1:"+server.address().port;
@@ -119,5 +120,11 @@ test("same-origin local route requires session and uses the existing server",asy
   assert.equal((await post("/api/answer-guidance",{token:cfg.passcode,origin:"https://evil.example",body:input})).status,403);
   const r=await post("/api/answer-guidance",{token:cfg.passcode,body:{...input,action:"compare"}});
   assert.equal(r.status,200);assert.equal(JSON.parse(r.body).model_runs_completed,2);
+  const before=f.calls.length;
+  assert.equal((await post("/api/narrated-video",{body:input})).status,401);
+  assert.equal((await post("/api/narrated-video",{token:cfg.passcode,origin:"https://evil.example",body:input})).status,403);
+  assert.equal((await post("/api/narrated-video",{token:cfg.passcode,body:{...input,public_only:false}})).status,422);
+  const clip=await post("/api/narrated-video",{token:cfg.passcode,body:{...input,public_only:true}});
+  assert.equal(clip.status,200);assert.equal(JSON.parse(clip.body).model_calls,0);assert.equal(narrationCalls,1);assert.equal(f.calls.length,before);
  }finally{await new Promise(resolve=>server.close(resolve))}
 });

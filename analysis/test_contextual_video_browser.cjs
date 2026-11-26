@@ -83,8 +83,15 @@ async function main(){
  console.log("PASS concept renderer reuse and unsupported-question video gate");
 }
 main().catch(e=>{console.error(e.stack||e);console.error(stderr);process.exitCode=1}).finally(async()=>{
- connection?.close();
- if(child&&child.exitCode===null){child.kill("SIGTERM");await Promise.race([new Promise(resolve=>child.once("exit",resolve)),sleep(2500)]);if(child.exitCode===null)child.kill("SIGKILL")}
- // Chromium subprocesses may still be closing files after the parent exits.
- fs.rmSync(dir,{recursive:true,force:true,maxRetries:12,retryDelay:150});
+ // Ask Chrome to close cleanly before closing the CDP connection.
+ if(connection){try{await Promise.race([connection.send("Browser.close"),sleep(1800)])}catch{}connection.close()}
+ if(child&&child.exitCode===null){
+  await Promise.race([new Promise(resolve=>child.once("exit",resolve)),sleep(1200)]);
+  if(child.exitCode===null){child.kill("SIGTERM");await Promise.race([new Promise(resolve=>child.once("exit",resolve)),sleep(1500)])}
+  if(child.exitCode===null){child.kill("SIGKILL");await Promise.race([new Promise(resolve=>child.once("exit",resolve)),sleep(1200)])}
+ }
+ // The media assertions above still fail the test. A transient OS cleanup
+ // race after a successful test is reported separately, not as a codec failure.
+ try{await fs.promises.rm(dir,{recursive:true,force:true,maxRetries:8,retryDelay:200})}
+ catch(e){if(!["ENOTEMPTY","EBUSY","EPERM"].includes(e.code))throw e;console.warn("Chromium temporary profile cleanup deferred:",e.code)}
 });
