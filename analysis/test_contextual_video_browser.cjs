@@ -85,5 +85,6 @@ async function main(){
 main().catch(e=>{console.error(e.stack||e);console.error(stderr);process.exitCode=1}).finally(async()=>{
  connection?.close();
  if(child&&child.exitCode===null){child.kill("SIGTERM");await Promise.race([new Promise(resolve=>child.once("exit",resolve)),sleep(2500)]);if(child.exitCode===null)child.kill("SIGKILL")}
- fs.rmSync(dir,{recursive:true,force:true});
+ // Chromium subprocesses may still be closing files after the parent exits.
+ fs.rmSync(dir,{recursive:true,force:true,maxRetries:12,retryDelay:150});
 });
