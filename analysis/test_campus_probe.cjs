@@ -1,6 +1,6 @@
 "use strict";
 const test=require("node:test"),assert=require("node:assert/strict");
-const {probeCampus,endpoints}=require("./campus_api_check.cjs");
+const {probeCampus,endpoints}=require("../campus_api_check.cjs");
 test("uses the prior 8080 endpoint first and automatically falls back to 8000",async()=>{
  const env={},calls=[];
  const request=async(url)=>{
