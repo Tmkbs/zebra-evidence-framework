@@ -29,6 +29,7 @@ The two intake channels share one evidence and answer workflow. The current prot
 - [Backlog traceability](delivery/05_BACKLOG_TRACEABILITY.md)
 - [Reproduction record](delivery/06_REPRODUCTION_RECORD.md)
 - [Existing file inventory and disposition](delivery/08_SOURCE_FILE_INVENTORY.md)
+- [Updated three-person Team Audit draft](delivery/09_TEAM_AUDIT_DRAFT.md)
 
 ## Existing prototype
 
