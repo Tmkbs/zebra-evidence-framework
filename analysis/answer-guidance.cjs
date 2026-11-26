@@ -1,19 +1,14 @@
 "use strict";
 /*
  * Live answer-side guidance, not a documentation editor or a claim of learned
- * recurring causes. Campus-only model calls; official, version-pinned sources.
+ * recurring causes. Admin-configured model provider; official, version-pinned sources.
  */
 const crypto=require("node:crypto");
 const {extractPage}=require("../api/review.js")._internals;
-const CAMPUS="c3dgx0.cs.northwestern.edu";
+const Model=require("./model-provider.cjs");
 const {prepare,withEvidence,officialURL,routeSources,clean}=require("../classroom/guidance-planner.js");
 const hash=s=>crypto.createHash("sha256").update(s).digest("hex");
-function campusBase(cfg){
- const u=new URL(cfg.base);
- if(u.hostname!==CAMPUS||!["http:","https:"].includes(u.protocol)||u.username||u.password||u.search||u.hash||u.pathname.replace(/\/+$/,"")!=="/v1")
-  throw Error("Answer guidance permits only Northwestern's campus model endpoint");
- return u.href.replace(/\/+$/,"");
-}
+function campusBase(cfg){return Model.resolve({...cfg,mode:"campus",model:cfg.model||Model.DEFAULT_MODEL}).base;}
 async function readBounded(res,limit){
  const n=Number(res.headers?.get("content-length")||0);
  if(n>limit)throw Error("Response exceeds size limit");
@@ -102,26 +97,22 @@ function normalize(raw,sources){
   metric_scope:"Exact quote presence is a mechanical check, not semantic entailment, answer accuracy or device validation."};
 }
 async function infer(cfg,messages,sources,request){
- const base=campusBase(cfg);
- const model=clean(cfg.model,180,"model",true);
- // No other provider or generic API key can be used by this route.
- const token=process.env.CAMPUS_QWEN_TOKEN||"token-is-ignored";
- if(base.startsWith("http:")&&token!=="token-is-ignored")throw Error("Real authentication tokens require HTTPS");
- const res=await request(base+"/chat/completions",{method:"POST",redirect:"error",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},
+ const provider=Model.resolve(cfg),model=provider.model;
+ const res=await request(provider.base+"/chat/completions",{method:"POST",redirect:"error",headers:{"Content-Type":"application/json",...provider.headers},
   body:JSON.stringify({model,messages,temperature:0,max_tokens:1800}),signal:AbortSignal.timeout(90000)});
- if(!res.ok)throw Error("Campus Qwen returned HTTP "+res.status);
+ if(!res.ok)throw Error("Configured model returned HTTP "+res.status);
  const raw=await readBounded(res,1000000),obj=JSON.parse(raw),answer=obj?.choices?.[0]?.message?.content;
  if(typeof answer!=="string"||!answer.trim())throw Error("No model answer returned");
  if(obj.model&&obj.model!==model)throw Error("Model identity changed; comparison invalid");
  return {model:obj.model||model,model_identity_reported:!!obj.model,prompt_sha256:hash(JSON.stringify(messages)),
-  raw_answer_sha256:hash(answer),raw_answer:answer,result:normalize(answer,sources),ran_at:new Date().toISOString()};
+  raw_answer_sha256:hash(answer),raw_answer:answer,result:normalize(answer,sources),provider_mode:provider.mode,ran_at:new Date().toISOString()};
 }
 async function run(input,cfg,request=fetch){
  let plan=prepare(input);
  if(plan.action==="plan"||plan.state!=="ready_for_source_retrieval")
   return {ok:true,mode:"plan_only",plan,model_attempts:0,model_runs_completed:0,device_tested:false};
  if(input.public_only!==true)throw Error("Confirm that the question and context contain only public, approved material");
- if(plan.action!=="evidence")campusBase(cfg);
+ if(plan.action!=="evidence")Model.resolve(cfg);
  const sources=[];
  for(const url of plan.source_urls){
   const source=await retrieve(url,plan,request);
