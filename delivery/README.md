@@ -80,6 +80,7 @@ The five videos are development demonstrations. The four archived reports are a 
 - [04 — Demonstration script](04_DEMO_SCRIPT.md)
 - [05 — Backlog traceability](05_BACKLOG_TRACEABILITY.md)
 - [06 — Reproduction and artifact record](06_REPRODUCTION_RECORD.md)
+- [08 — Existing file inventory and disposition](08_SOURCE_FILE_INVENTORY.md)
 - [Engineering rules](../AGENTS.md)
 - [One-command offline reproduction](../analysis/REPRODUCE_DELIVERY.md)
 - [Evolutionary strategy experiment](../analysis/STRATEGY_EVOLUTION.md)
