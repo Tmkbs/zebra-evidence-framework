@@ -83,16 +83,68 @@ const CARDS=Object.freeze([
   {section:"Sample 'SCANNER_STATUS' Notification",quote:"commands might be ignored if the scanner is busy",note:"Check whether the scanner is ready before retrying."}
  ],next:"Confirm the active profile and scanner state; request a reproducible observation. These are documented prerequisites, not an observed device fix."}
 ]);
+// A reviewed document lesson is data, not a new drawing implementation. The
+// original team proposal is provenance, not permission to claim a device fix.
+const DOCUMENT_LESSONS=Object.freeze([{
+ id:"ehs-settings-access-r62",product:"ehs",version:"4.0",
+ title:"EHS settings access — three distinct controls",
+ summary:"Distinguish launcher visibility, the Settings panel, and app availability before changing a device policy.",
+ reader_url:"https://zebra-techdocs-practicum.vercel.app/document-reader/ehs40-settings-access/index.html#settings-control-scope",
+ release:"r62",checked:"2026-11-26",
+ topic:/\b(?:settings|system_settings_restricted|apps_disabled|apps_enabled)\b/i,
+ intent:/\b(?:hide|hidden|restrict\w*|disable\w*|access|shortcut|icon|visibility|available)\b/i,
+ cards:[
+  {url:"https://techdocs.zebra.com/ehs/4-0/guide/setup/",title:"EHS Setup — User Mode",sections:[{id:"visibility",section:"Select Apps for User Mode",quote:"Long-press an app icon to alternatively display or hide it",note:"The launcher can display or hide an app icon in User Mode. Icon visibility alone is not proof that an app has been disabled."}],next:"Separate launcher visibility from app availability."},
+  {url:"https://techdocs.zebra.com/ehs/4-0/guide/settings/",title:"EHS Advanced Settings",sections:[
+   {id:"panel",section:"System Settings Restricted — notes",quote:"only prevents their display in the Settings panel",note:"The documented restriction concerns what is shown in the Settings panel; it is not a guarantee that the underlying features are blocked."},
+   {id:"enabled",section:"System Settings Restricted — prerequisite",quote:"must be explicitly enabled in advance",note:"The System Settings app must be enabled before the restriction can be used."},
+   {id:"availability",section:"Enable/Disable Apps",quote:"explicitly disabled or enabled",note:"Application enablement is a separate control from the launcher icon and Settings panel."}
+  ],next:"Confirm the applicable device, Android version, intended access policy and uninstall implications before recommending a configuration."}
+ ],
+ scenes:[
+  {id:"launcher",title:"Launcher icon",caption:"Visible or hidden",detail:"EHS User Mode can display or hide an app icon. This controls its launcher presentation; it does not establish that the application itself is unavailable.",refs:["visibility"]},
+  {id:"panel",title:"Settings panel",caption:"Full or limited display",detail:"System Settings Restricted limits what appears in the Settings panel. The Settings app must be enabled first. A restricted display does not guarantee that every underlying settings feature is blocked.",refs:["panel","enabled"]},
+  {id:"application",title:"Settings app",caption:"Separate app control",detail:"Enable or disable app availability is a separate documented control. Treat it separately from hiding an icon or restricting the panel; do not apply a device policy solely from this illustration.",refs:["availability"]},
+  {id:"decision",title:"Choose the scope",caption:"Review before changing",detail:"First establish whether the goal concerns launcher visibility, the displayed Settings panel or actual app availability. Confirm the installed edition, required access policy and side effects before a change. No device behavior is verified.",refs:["visibility","panel","availability"]}
+ ],
+ checkpoint:{id:"ehs_visibility_boundary",prompt:"Does hiding a Settings icon prove that all underlying Settings features are blocked?",options:[{id:"yes",label:"Yes"},{id:"no",label:"No"},{id:"unknown",label:"Not sure"}],explanation:"Icon visibility, the restricted Settings panel and application availability are different controls.",correct:"no"}
+}]);
+function articleKey(raw){try{const u=new URL(raw);u.hash="";return u.href}catch{return ""}}
+function lessonCards(){
+ return DOCUMENT_LESSONS.flatMap(l=>l.cards.map(c=>({...c,product:l.product,version:l.version,checked:l.checked,lesson_id:l.id})));
+}
+function reviewedLesson(plan,result={}){
+ if(!plan||plan.state!=="ready_for_source_retrieval")return null;
+ const matches=DOCUMENT_LESSONS.filter(l=>l.product===plan.product&&l.version===plan.version&&l.topic.test(plan.question)&&l.intent.test(plan.question));
+ if(matches.length!==1)return null;
+ const l=matches[0],selected=new Set((plan.source_urls||[]).map(articleKey)),evidence=new Map();
+ for(const c of l.cards){
+  if(!selected.has(c.url))return null;
+  // Once fresh retrieval is attempted, never substitute a cached quotation.
+  const retrieved=Array.isArray(result.sources);
+  const source=retrieved?result.sources.find(s=>articleKey(s.url)===c.url&&typeof s.text==="string"):null;
+  if(retrieved&&(!source||!c.sections.every(s=>source.text.includes(s.quote))))return null;
+  for(const s of c.sections)evidence.set(s.id,{url:c.url,section:s.section,quote:s.quote,origin:retrieved?"retrieved_excerpt":"checked_source_card",...(retrieved?{retrieved_at:source.retrieved_at||null,evidence_id:source.id||null,excerpt_sha256:source.excerpt_sha256||null}:{checked:l.checked})});
+ }
+ const nodes=l.scenes.map(s=>({id:s.id,title:s.title,caption:s.caption,detail:s.detail,status:s.id==="decision"?"check":"source",evidence:s.refs.map(id=>evidence.get(id))}));
+ if(nodes.some(n=>!n.evidence.length||n.evidence.some(e=>!e?.quote)))return null;
+ return {id:l.id,title:l.title,summary:l.summary,reader_url:l.reader_url,release:l.release,nodes,checkpoint:l.checkpoint};
+}
+
 function offlineEvidence(plan){
  const urls=(plan.source_urls||[]).map(s=>{try{let u=new URL(s);u.hash="";return u.href}catch{return ""}});
- const cards=plan.state==="ready_for_source_retrieval"?CARDS.filter(c=>c.product===plan.product&&c.version===plan.version&&urls.includes(c.url)):[];
+ const cards=plan.state==="ready_for_source_retrieval"?[...CARDS,...lessonCards()].filter(c=>c.product===plan.product&&c.version===plan.version&&urls.includes(c.url)):[];
  return {mode:"offline_curated_source_cards",model_attempts:0,model_runs_completed:0,cards,
-   notice:"Short excerpts inspected on the official pages on 2026-11-24; not a current retrieval, complete source, or model-generated answer. Review the original pages when connected.",device_tested:false};
+   notice:"Short excerpts inspected on the official pages on the dates shown; not a current retrieval, complete source, or model-generated answer. Review the original pages when connected.",device_tested:false};
 }
 // A media recommendation is separate from a live answer, video analysis or
 // a newly generated video. The official page lists the assets below.
 function contextualMedia(plan,map){
  const base={schema:"zebra-contextual-media/v1",assets:[],auto_load:false,video_playback_verified:false,model_calls:0};
+ if(map?.kind==="document_lesson"&&map.lesson_id){
+  const lesson=DOCUMENT_LESSONS.find(l=>l.id===map.lesson_id);
+  if(lesson&&plan?.product===lesson.product&&plan?.version===lesson.version)return {...base,selection:"reviewed_document_lesson",reason:"Concept explanation based on the exact edition and reviewed document distinctions.",checkpoint:{...lesson.checkpoint},reader_url:lesson.reader_url};
+ }
  if(!plan||!map||plan.state!=="ready_for_source_retrieval"||plan.product!=="datawedge"||plan.version!=="15.0"||
     plan.explanation_intent!=="concept_overview"||map.kind!=="profile_learning")
   return {...base,selection:"not_selected",reason:"No matched introductory source and explanation need. Avoid irrelevant or cross-edition media."};
@@ -109,8 +161,14 @@ function contextualMedia(plan,map){
  };
 }
 function checkUnderstanding(packet,choice){
+ if(packet?.selection==="reviewed_document_lesson"){
+  const lesson=DOCUMENT_LESSONS.find(l=>l.checkpoint.id===packet.checkpoint?.id);
+  if(!lesson||!lesson.checkpoint.options.some(o=>o.id===choice))return null;
+  const correct=choice===lesson.checkpoint.correct;
+  return {checkpoint_id:lesson.checkpoint.id,choice,correct,feedback:(correct?"Correct. ":"Not quite. ")+lesson.checkpoint.explanation,scope:"single_optional_self_check_not_learning_outcome",device_tested:false};
+ }
  if(packet?.selection!=="official_media_and_interactive_concept"||packet.checkpoint?.id!=="profile_formatting"||!packet.checkpoint.options.some(o=>o.id===choice))return null;
  return {checkpoint_id:packet.checkpoint.id,choice,correct:choice==="process",feedback:choice==="process"?"Correct. "+packet.checkpoint.explanation:"Not quite. "+packet.checkpoint.explanation,scope:"single_optional_self_check_not_learning_outcome",device_tested:false};
 }
-return Object.freeze({parseCSV,importCSV,offlineEvidence,contextualMedia,checkUnderstanding});
+return Object.freeze({parseCSV,importCSV,offlineEvidence,reviewedLesson,contextualMedia,checkUnderstanding});
 });
