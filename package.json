@@ -12,6 +12,7 @@
     "campus:check": "node campus_api_check.cjs",
     "test:vision:browser": "node analysis/test_visual_browser.cjs",
     "batch": "node analysis/batch-answer.cjs",
-    "enterprise": "node analysis/enterprise-start.cjs"
+    "enterprise": "node analysis/enterprise-start.cjs",
+    "reproduce": "node analysis/reproduce-delivery.cjs"
   }
 }
