@@ -2,7 +2,7 @@
 // One command for answer-side planning, evidence, optional paired inference,
 // and narrated visual production. Offline by default; no new provider.
 const fs=require("node:fs"),path=require("node:path"),crypto=require("node:crypto");
-const {spawnSync}=require("node:child_process");
+const {execFile}=require("node:child_process"),runFile=require("node:util").promisify(execFile);
 const P=require("../classroom/guidance-planner.js"),I=require("../classroom/guidance-intake.js");
 const V=require("../classroom/guidance-visual.js"),S=require("../classroom/guidance-storyboard.js");
 const G=require("./answer-guidance.cjs");
@@ -96,14 +96,15 @@ async function execute(packet,{mode="offline",allowNetwork=false,cfg={},request=
  return {schema:"zebra-answer-batch/v1",created_at:new Date().toISOString(),summary:summarize(rows,mode),csv_intake:packet.csv_intake||null,rows};
 }
 function localRenderer(out){
- return row=>{
+ return async row=>{
   const dir=path.join(out,row.id),file=path.join(dir,"narration-input.json");
   fs.mkdirSync(dir,{recursive:true});
   fs.writeFileSync(file,JSON.stringify({schema:"zebra-narration-input/v1",map:row.visual_guide,video_plan:row.video_plan},null,2)+"\n");
-  const p=spawnSync(process.env.PYTHON||"python3",[path.join(__dirname,"build_narrated_clip.py"),file,dir],{encoding:"utf8",timeout:150000,maxBuffer:2000000});
-  if(p.error||p.status!==0)throw Error(p.error?.message||String(p.stderr||p.stdout||"Narration encoder failed").slice(-500));
+  try{await runFile(process.env.PYTHON||(process.platform==="win32"?"python":"python3"),[path.join(__dirname,"build_narrated_clip.py"),file,dir],{encoding:"utf8",timeout:150000,maxBuffer:2000000,windowsHide:true})}
+  catch(e){throw Error(String(e.stderr||e.message||"Narration encoder failed").slice(-500))}
   const receipt=JSON.parse(fs.readFileSync(path.join(dir,"receipt.json"),"utf8"));
-  if(receipt.decoded_audio_and_video!==true)throw Error("Narration verification failed");
+  const video=fs.readFileSync(path.join(dir,"explainer.mp4"));
+  if(receipt.decoded_audio_and_video!==true||receipt.bytes!==video.length||receipt.video_sha256!==digest(video))throw Error("Narration verification failed");
   return {status:"encoded_and_decoded",video_file:row.id+"/explainer.mp4",caption_file:row.id+"/explainer.vtt",receipt_file:row.id+"/receipt.json",duration_seconds:receipt.duration_seconds,audio_peak_db:receipt.audio_peak_db,video_sha256:receipt.video_sha256};
  };
 }

@@ -59,6 +59,7 @@ button.vision-node[aria-pressed=true]{outline:3px solid #a7d3ca;outline-offset:2
 <section class="vision-shell" id="visionBox" aria-label="Interactive visual guidance">
 <div class="actions vision-presets"><button id="loadConcept">Learn DataWedge Profiles</button><button id="loadPrereq">Scan-trigger flow</button><button id="loadExample">Compare parameter evidence</button><button id="loadConfig">Configuration structure</button><button id="loadUnknown">Missing version</button></div>
 <div id="storyOutput" class="story-player" hidden></div>
+<div id="narratedPanel" class="media-panel" hidden><h3>Generate a narrated technical explanation</h3><p class="muted">Generate a source-linked MP4 with locally synthesized English narration and captions. This uses the checked offline source cards, not a live model or device recording.</p><button id="narratedGenerate" disabled>Generate narrated MP4</button><p id="narratedStatus" class="muted" role="status"></p><video id="narratedPreview" controls playsinline preload="none" style="width:100%;max-width:780px" hidden></video><div class="actions" id="narratedLinks" hidden><a id="narratedSave" download="zebra-explanation.mp4">Save MP4</a><a id="narratedCaptions" download="zebra-explanation.vtt">Save captions</a></div></div>
 <div id="mediaOutput" class="media-panel" hidden></div>
 <div id="visionOutput"><p class="vision-empty">Preparing the interactive evidence map…</p></div>
 </section>
@@ -84,7 +85,45 @@ button.vision-node[aria-pressed=true]{outline:3px solid #a7d3ca;outline-offset:2
 "use strict";
 const $=id=>document.getElementById(id);let access="",last=null,caseId="",csvRows=[];
 let visualState={},visualFocus="",visualConfirmed=false,visualApplied="",visualKey="",runEpoch=0,storyController=null,teamHandoff=null;
-function clearStoryboard(){if(storyController)storyController.destroy();storyController=null;$("storyOutput").hidden=true;$("mediaOutput").hidden=true;$("mediaOutput").replaceChildren();}
+let narratedURLs=[],narratedBusy=false;
+function clearStoryboard(){clearNarrated();if(storyController)storyController.destroy();storyController=null;$("storyOutput").hidden=true;$("mediaOutput").hidden=true;$("mediaOutput").replaceChildren();}
+function clearNarrated(){
+ for(const u of narratedURLs)URL.revokeObjectURL(u);
+ narratedURLs=[];$("narratedPreview").removeAttribute("src");$("narratedPreview").replaceChildren();
+ $("narratedPreview").hidden=true;$("narratedLinks").hidden=true;$("narratedPanel").hidden=true;
+ $("narratedStatus").textContent="";
+}
+function refreshNarrated(){
+ let supported=false;
+ try{supported=!!last?.offline_evidence&&!!ZebraStoryboard.videoPlan(ZebraVisual.graph(last.plan))}catch{}
+ $("narratedPanel").hidden=!supported;
+ $("narratedGenerate").disabled=!supported||!access||narratedBusy;
+ if(supported&&!access)$("narratedStatus").textContent="On-demand narration runs in the local campus app with Python, Pillow, FFmpeg and eSpeak installed. Browser-only guidance still works here.";
+ else if(supported&&access&&!$("narratedStatus").textContent)$("narratedStatus").textContent="Ready to render locally. No model or external video service is used.";
+}
+async function generateNarrated(){
+ if(!last||!access||narratedBusy)return;
+ if(!$("consent").checked){$("narratedStatus").textContent="Confirm public/approved material in the question form first.";return}
+ const current=last,epoch=runEpoch,p=current.plan;
+ narratedBusy=true;clearNarrated();$("narratedPanel").hidden=false;$("narratedGenerate").disabled=true;
+ $("narratedStatus").textContent="Rendering the checked explanation with local speech synthesis…";
+ try{
+  const r=await fetch("/api/narrated-video",{method:"POST",headers:{"Content-Type":"application/json","X-Review-Access":access},body:JSON.stringify({question:p.question,product:p.product,version:p.version,context:p.context,source_urls:p.source_urls,public_only:true}),signal:AbortSignal.timeout(160000)});
+  const x=await r.json();if(epoch!==runEpoch||last!==current)return;
+  if(!r.ok||!x.ok||!x.receipt?.decoded_audio_and_video)throw Error(x.error||"Unverified video response");
+  const bytes=Uint8Array.from(atob(x.video_base64),c=>c.charCodeAt(0));
+  if(bytes.length!==x.receipt.bytes)throw Error("Video receipt does not match the response");
+  const video=URL.createObjectURL(new Blob([bytes],{type:"video/mp4"})),captions=URL.createObjectURL(new Blob([x.captions],{type:"text/vtt"}));
+  narratedURLs=[video,captions];
+  const preview=$("narratedPreview");preview.src=video;
+  const track=document.createElement("track");track.kind="captions";track.label="English";track.srclang="en";track.src=captions;preview.append(track);preview.hidden=false;
+  $("narratedSave").href=video;$("narratedCaptions").href=captions;$("narratedLinks").hidden=false;
+  current.narrated_video=x.receipt;
+  $("narratedStatus").textContent="Verified audio and video · "+Math.round(x.receipt.duration_seconds)+" seconds · source receipt included in Download result / handoff.";
+ }catch(e){if(epoch===runEpoch&&last===current)$("narratedStatus").textContent=String(e.message).slice(0,500)}
+ finally{narratedBusy=false;refreshNarrated()}
+}
+$("narratedGenerate").addEventListener("click",generateNarrated);
 function removeVisualReport(){
  if(visualApplied){
   const v=$("context").value;
@@ -136,7 +175,7 @@ function drawVision(result,restore=null){
  result.visual_guidance=ZebraVisual.receipt(map,{reported});
  result.visual_storyboard=ZebraStoryboard.build(map);
  result.contextual_media=ZebraIntake.contextualMedia(p,map);
- drawContextualMedia(result);
+ drawContextualMedia(result);refreshNarrated();
  $("storyOutput").hidden=false;
  if(!storyController)storyController=ZebraStoryboard.mount($("storyOutput"));
  storyController.update(map,{focus:restore?.node||""});
@@ -181,7 +220,7 @@ function busy(value){
 async function session(){
  busy(false);
  if(!local){$("environment").textContent="Offline guidance is active: no server or model is needed for planning and the checked source cards. Live inference requires the authorized local campus server.";return}
- try{const r=await fetch("/api/session",{cache:"no-store",signal:AbortSignal.timeout(3000)});const x=await r.json();if(!r.ok||!x.local_session||!x.review_access)throw Error("No local session");access=x.review_access;$("environment").textContent="Offline guidance and official-source retrieval are available. Campus Qwen is optional; its configured model is "+x.model+". Actual connectivity is not yet established.";busy(false)}catch(e){$("environment").textContent="Local service unavailable. Offline guidance still works; restart the campus service for live evidence or inference.";busy(false)}
+ try{const r=await fetch("/api/session",{cache:"no-store",signal:AbortSignal.timeout(3000)});const x=await r.json();if(!r.ok||!x.local_session||!x.review_access)throw Error("No local session");access=x.review_access;$("environment").textContent="Offline guidance and official-source retrieval are available. Campus Qwen is optional; its configured model is "+x.model+". Actual connectivity is not yet established.";busy(false);$("narratedStatus").textContent="";refreshNarrated()}catch(e){$("environment").textContent="Local service unavailable. Offline guidance still works; restart the campus service for live evidence or inference.";busy(false)}
 }
 function drawPlan(p){
  $("planBox").hidden=false;const out=$("planOutput");out.replaceChildren();

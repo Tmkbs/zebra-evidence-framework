@@ -11,6 +11,7 @@ const path=require("node:path");
 const crypto=require("node:crypto");
 const review=require("./api/review.js");
 const guidance=require("./analysis/answer-guidance.cjs");
+const localNarration=require("./analysis/local-narration.cjs");
 
 const DEFAULT_API="http://c3dgx0.cs.northwestern.edu:8000/v1";
 const DEFAULT_MODEL="nvidia/Qwen3.8-Flash-Next-FP4-Local";
@@ -108,7 +109,8 @@ async function readBody(req,limit=160000){
  for await(const b of req){total+=b.length;if(total>limit)throw Error("Request body exceeds 160 KB");parts.push(b)}
  return Buffer.concat(parts).toString("utf8");
 }
-function buildServer(cfg,request=fetch){
+function buildServer(cfg,request=fetch,generateNarration=localNarration.generate){
+ let rendering=false;
  return http.createServer(async(req,res)=>{
   res.setHeader("Cache-Control","no-store");
   res.setHeader("X-Content-Type-Options","nosniff");
@@ -142,6 +144,20 @@ function buildServer(cfg,request=fetch){
    try{input=JSON.parse(await readBody(req,12000))}catch{return json(res,400,{ok:false,error:"Invalid JSON or request too large"})}
    try{return json(res,200,await guidance.run(input,cfg,request))}
    catch(e){return json(res,422,{ok:false,error:String(e.message).slice(0,300),model_calls_confirmed:false})}
+  }
+  if(route==="/api/narrated-video"){
+   if(req.method!=="POST")return json(res,405,{ok:false,error:"POST required"});
+   if(!sameOriginRequest(req,cfg))return json(res,403,{ok:false,error:"Same-origin local rendering only"});
+   const supplied=Buffer.from(String(req.headers["x-review-access"]||"")),expected=Buffer.from(String(cfg.passcode||""));
+   if(!expected.length||supplied.length!==expected.length||!crypto.timingSafeEqual(supplied,expected))return json(res,401,{ok:false,error:"Local session required"});
+   let input;
+   try{input=JSON.parse(await readBody(req,12000))}catch{return json(res,400,{ok:false,error:"Invalid JSON or request too large"})}
+   if(input?.public_only!==true)return json(res,422,{ok:false,error:"Confirm public/approved material first"});
+   if(rendering)return json(res,409,{ok:false,error:"A local rendering job is already running"});
+   rendering=true;
+   try{return json(res,200,await generateNarration(input))}
+   catch(e){return json(res,422,{ok:false,error:String(e.message).slice(0,500)})}
+   finally{rendering=false}
   }
   if(route==="/api/review"){
    if(req.method==="POST"){

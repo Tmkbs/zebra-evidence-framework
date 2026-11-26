@@ -2,7 +2,7 @@
 """Render any matched storyboard as narrated MP4, local speech + authored visuals.
 Input is the generated batch receipt; no model, external media, or device capture.
 """
-import hashlib, json, math, re, shutil, subprocess, sys, tempfile, wave
+import hashlib, json, math, os, re, shutil, subprocess, sys, tempfile, wave
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
@@ -10,7 +10,13 @@ W,H,FPS=1280,720,12
 KINDS={"scan_prerequisite","result_discrepancy","configuration_hierarchy","profile_learning","reported_path_comparison"}
 FONT=Path("/usr/share/fonts/truetype/dejavu")
 def font(size,bold=False):
-    return ImageFont.truetype(str(FONT/("DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf")),size)
+    name="DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf"
+    candidates=[os.environ.get("ZEBRA_FONT_BOLD" if bold else "ZEBRA_FONT"),str(FONT/name),"C:/Windows/Fonts/"+("arialbd.ttf" if bold else "arial.ttf"),name]
+    for candidate in candidates:
+        if candidate:
+            try:return ImageFont.truetype(candidate,size)
+            except OSError:pass
+    raise RuntimeError("Install DejaVu Sans or set ZEBRA_FONT and ZEBRA_FONT_BOLD")
 def cmd(args,**kw):
     return subprocess.run([str(x) for x in args],check=True,timeout=90,**kw)
 def stamp(s):
