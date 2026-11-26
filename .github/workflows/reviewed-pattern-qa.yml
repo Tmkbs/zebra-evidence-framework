@@ -1,0 +1,33 @@
+name: Reviewed case pattern audit
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'analysis/archived-version-context.json'
+      - 'analysis/reviewed-pattern-audit.cjs'
+      - 'analysis/test_reviewed_pattern_audit.cjs'
+      - '.github/workflows/reviewed-pattern-qa.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'analysis/archived-version-context.json'
+      - 'analysis/reviewed-pattern-audit.cjs'
+      - 'analysis/test_reviewed_pattern_audit.cjs'
+      - '.github/workflows/reviewed-pattern-qa.yml'
+permissions:
+  contents: read
+jobs:
+  reviewed-pattern:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test analysis/test_reviewed_pattern_audit.cjs
+      - run: node analysis/reviewed-pattern-audit.cjs analysis/archived-version-context.json archived-pattern-report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: archived-pattern-report
+          path: archived-pattern-report.json
