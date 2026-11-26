@@ -22,6 +22,8 @@ The run produces:
   (not a scored dataset).
 - pattern-report.json: the repeatable count from four annotated public reports,
   including three version-context gaps and one counterexample.
+- strategy-population-0.json: four reproducible experimental candidate genomes;
+  no real fitness assessment or promotion. See STRATEGY_EVOLUTION.md.
 
 The annotations are frozen, AI-assisted source inspections awaiting team review;
 this command recomputes their counts, not the original forum inspection.
