@@ -1,8 +1,8 @@
 "use strict";
 // Server-owned model adapter. No request body can set a host, model, or secret.
 const CAMPUS="c3dgx0.cs.northwestern.edu";
-const DEFAULT_BASE="http://"+CAMPUS+":8000/v1";
-const DEFAULT_MODEL="nvidia/Qwen3.8-Flash-Next-FP4-Local";
+const DEFAULT_BASE="http://"+CAMPUS+":8080/v1";
+const DEFAULT_MODEL="Qwen3.8-Flash-Next-FP4-Local";
 function configure(env=process.env,{defaultMode="off"}={}){
  const mode=env.ZEBRA_MODEL_MODE||defaultMode;
  if(!["off","campus","enterprise"].includes(mode))throw Error("Unknown ZEBRA_MODEL_MODE");
