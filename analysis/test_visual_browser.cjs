@@ -18,6 +18,10 @@ const harness=String.raw`
  const report=()=>Array.from(document.querySelectorAll("#visionOutput button")).find(b=>b.textContent==="Use as reported context for next answer");
  try{
   ensure(last.visual_guidance.kind==="scan_prerequisite","Initial scan visual missing");
+  const strategyIds=()=>last.plan.strategies.map(s=>s.id);
+  const receiptConsistent=()=>JSON.stringify(last.plan.policies.map(s=>s.id))===JSON.stringify(strategyIds());
+  ensure(strategyIds().includes("missing_prerequisite")&&receiptConsistent(),"Offline prerequisite missing from receipt");
+  ensure($test("planOutput").textContent.includes("Check a documented prerequisite"),"Offline strategy panel empty");
   const scene=()=>document.querySelector(".story-info h3").textContent;
   const play=()=>document.querySelector('[data-story-action="play"]');
   ensure(last.visual_storyboard.scene==="diagnostic","Diagnostic storyboard not exported");
@@ -53,6 +57,8 @@ const harness=String.raw`
   ensure(last.visual_guidance.observation_status==="hypothetical_or_unverified","New scenario not reset");
   click("#loadExample");
   ensure(last.visual_guidance.kind==="result_discrepancy","Parameter comparison not opened");
+  ensure(strategyIds().includes("example_body_conflict")&&receiptConsistent(),"Same-source discrepancy strategy missing from receipt");
+  ensure($test("planOutput").textContent.includes("Show both sides of a source discrepancy"),"Discrepancy strategy not rendered");
   click('[data-vision-node="overview"]');
   ensure(document.querySelector(".vision-inspector").textContent.includes("RECEIVE_RESULT"),"Overview quote not shown");
   click('[data-vision-node="prototype"]');
@@ -80,6 +86,14 @@ const harness=String.raw`
   ensure(last.learning_checkpoint.scope==="single_optional_self_check_not_learning_outcome","Learning check incorrectly labeled as evaluation");
   ensure($test("context").value==="","Learning answer leaked into model context");
   click("#loadUnknown");ensure(last.visual_guidance.kind==="scope_required","Missing version not blocked");
+  ensure(!strategyIds().includes("example_body_conflict")&&receiptConsistent(),"Stale source-based strategy survived missing scope");
+  $test("question").value="After upgrading Enterprise Browser, the app no longer opens.";
+  $test("product").value="enterprise-browser";
+  $test("version").value="";
+  click("#plan");
+  ensure(strategyIds().includes("version_boundary")&&receiptConsistent(),"Offline cross-product strategy missing from receipt");
+  ensure($test("planOutput").textContent.includes("Confirm the applicable version"),"Version strategy not rendered");
+  ensure(last.model_attempts===0&&last.model_runs_completed===0,"Offline path falsely reports inference");
   ensure($test("mediaOutput").hidden,"Old media remained after missing version");
   ensure(!document.querySelector(".vision-quote"),"Out-of-scope source shown");
   click("#loadPrereq");ensure(last.visual_guidance.kind==="scan_prerequisite","Preset did not rebuild visual");
@@ -98,7 +112,7 @@ const harness=String.raw`
 </script>
 `;
 try{
- for(const file of ["guidance-planner.js","guidance-intake.js","guidance-visual.js","guidance-storyboard.js","guidance-team-bridge.js"])fs.copyFileSync(path.join(source,file),path.join(dir,file));
+ for(const file of ["answer-strategies.js","guidance-planner.js","guidance-intake.js","guidance-visual.js","guidance-storyboard.js","guidance-team-bridge.js"])fs.copyFileSync(path.join(source,file),path.join(dir,file));
  const html=fs.readFileSync(path.join(source,"answer-guidance.html"),"utf8")
   .replace('<script src="guidance-planner.js">','<script>window.__visionFetches=0;window.fetch=()=>{window.__visionFetches++;throw Error("Unexpected network fetch")};</script><script src="guidance-planner.js">')
   .replace("</body>",harness+"</body>");

@@ -25,6 +25,8 @@ const PAGES=Object.freeze({
  "/classroom/final-delivery.html":"final-delivery.html",
  "/answer-guidance.html":"answer-guidance.html",
  "/classroom/answer-guidance.html":"answer-guidance.html",
+ "/answer-strategies.js":"answer-strategies.js",
+ "/classroom/answer-strategies.js":"answer-strategies.js",
  "/guidance-planner.js":"guidance-planner.js",
  "/classroom/guidance-planner.js":"guidance-planner.js",
  "/guidance-intake.js":"guidance-intake.js",

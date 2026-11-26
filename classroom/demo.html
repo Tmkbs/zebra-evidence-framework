@@ -47,7 +47,7 @@
 <details id="video-tools"><summary>Research tool · Try interactive explanation and silent video export</summary><p class="muted">This optional prototype is separate from the ready-to-watch narrated video above.</p><div id="optional-player" class="story-player"></div><p id="video-message" class="muted" role="status"></p></details>
 </details>
 <footer>Student prototype. Candidate patterns come from a small, team-authored research snapshot. The public demo prepares an answer plan; no live model, device diagnosis or measured improvement is claimed. <details><summary>Additional project materials</summary><a href="visual-companion.html?reader=dw62-intent-receiver">Optional contextual diagram and video prototype</a> · <a href="answer-guidance.html">Full research interface</a> · <a href="https://zebra-techdocs-practicum.vercel.app/document-reader/project-shift.html#main" target="_blank" rel="noopener noreferrer">Team Project Shift</a></details></footer>
-</main><script src="guidance-planner.js"></script><script src="answer-strategies.js"></script><script src="pattern-demo.js"></script><script src="guidance-intake.js"></script><script src="guidance-visual.js"></script><script src="guidance-storyboard.js"></script><script>
+</main><script src="answer-strategies.js"></script><script src="guidance-planner.js"></script><script src="pattern-demo.js"></script><script src="guidance-intake.js"></script><script src="guidance-visual.js"></script><script src="guidance-storyboard.js"></script><script>
 "use strict";
 const $=id=>document.getElementById(id);
 function clear(){ $("result").hidden=true;$("status").textContent="";$("rules").replaceChildren();$("source-result").replaceChildren();$("answer-evidence").replaceChildren();$("strategy-result").replaceChildren(); }
@@ -57,7 +57,7 @@ function render(){
   const x=ZebraPatternDemo.plan({question:$("question").value,product:$("product").value,version:$("version").value,context:$("context").value,source_urls:$("source").value.trim()?[$("source").value.trim()]:[]});
   $("original").textContent=x.plan.question;$("next-title").textContent=x.title;$("next").textContent=x.next;$("next-note").textContent=x.note;
   const evidence=ZebraIntake.offlineEvidence(x.plan);
-  const strategies=ZebraAnswerStrategies.select(x.plan,evidence.cards);
+  const strategies=ZebraGuidance.withEvidence(x.plan,evidence.cards).strategies;
   for(const strategy of strategies){
    const card=document.createElement("div");card.className="strategy-card";
    const status=document.createElement("div");status.className="strategy-status";

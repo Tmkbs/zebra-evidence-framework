@@ -54,7 +54,9 @@ test("reject latest, wrong edition, product and external URLs",()=>{
 });
 test("provisional safeguards do not imply validated patterns",()=>{
  const p=G.prepare(input);assert.equal(p.global_pattern_validated,false);assert.equal(p.installed_version_verified,false);
- assert.ok(p.policies.some(x=>x.id==="example_body_conflict"));
+ assert.ok(!p.policies.some(x=>x.id==="example_body_conflict"));
+ assert.ok(!p.strategies.some(x=>x.id==="example_body_conflict"));
+ assert.deepEqual(p.policies.map(x=>x.id),p.strategies.map(x=>x.id));
 });
 test("no campus call when consent missing",async()=>{
  const f=fixtureFetch();await assert.rejects(G.run({...input,action:"guided",public_only:false},cfg,f.request),/public, approved/);assert.equal(f.calls.length,0);
@@ -111,6 +113,8 @@ test("same-origin local route requires session and uses the existing server",asy
    });
   }
   assert.equal((await post("/answer-guidance.html",{method:"GET"})).status,200);
+  assert.equal((await post("/answer-strategies.js",{method:"GET"})).status,200);
+  assert.equal((await post("/classroom/answer-strategies.js",{method:"GET"})).status,200);
   assert.equal((await post("/api/answer-guidance",{body:input})).status,401);
   assert.equal((await post("/api/answer-guidance",{token:cfg.passcode,origin:"https://evil.example",body:input})).status,403);
   const r=await post("/api/answer-guidance",{token:cfg.passcode,body:{...input,action:"compare"}});
