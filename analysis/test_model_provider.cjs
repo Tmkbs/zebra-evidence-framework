@@ -5,6 +5,9 @@ const {configure,buildServer}=require("../campus_review_server.cjs");
 const source="https://techdocs.zebra.com/datawedge/6-8/guide/api/softscantrigger/";
 const input={question:"Why might the software scan trigger fail to start scanning?",product:"datawedge",version:"6.8",source_urls:[source],public_only:true,action:"compare"};
 const env={ZEBRA_MODEL_MODE:"enterprise",ZEBRA_MODEL_APPROVED_ORIGIN:"https://approved.example",ZEBRA_MODEL_BASE_URL:"https://approved.example/v1",ZEBRA_MODEL_NAME:"approved-model",ZEBRA_MODEL_API_KEY:"fixture-secret"};
+test("campus defaults reuse the prior documented 8080 endpoint and Qwen model",()=>{
+ const c=M.configure({}, {defaultMode:"campus"});assert.equal(c.base,"http://c3dgx0.cs.northwestern.edu:8080/v1");assert.equal(c.model,"Qwen3.8-Flash-Next-FP4-Local");assert.equal(M.DEFAULT_BASE,c.base);
+});
 test("portable profile is disabled by default and requires explicit approved HTTPS origin",()=>{
  assert.equal(M.configure({}).mode,"off");
  assert.throws(()=>M.resolve(M.configure({})),/disabled/);
