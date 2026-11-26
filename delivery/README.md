@@ -73,6 +73,7 @@ The five videos are development demonstrations. The four archived reports are a 
 
 ## Read the handoff
 
+- [00 — Problem statement draft](07_PROBLEM_STATEMENT_DRAFT.md)
 - [01 — Customer requirements and scope](01_CUSTOMER_REQUIREMENTS.md)
 - [02 — Case intake and evidence protocol](02_CASE_EVIDENCE_PROTOCOL.md)
 - [03 — Experiment plan](03_EXPERIMENT_PLAN.md)
