@@ -2,9 +2,9 @@
 
 **Project:** Interactive Tech Docs with Conversation and Video  
 **Team:** Yuxuan Jin, Zhentong Ye, Minyang Zhang  
-**Status snapshot:** 26 November 2026  
-**Code branch:** `release/enterprise-portable-20261126`  
-**Release PR:** [#30 — draft, not merged](https://github.com/Tmkbs/zebra-evidence-framework/pull/30)
+**Status snapshot:** 27 November 2026  
+**Engineering baseline:** [`main` at `1a58112`](https://github.com/Tmkbs/zebra-evidence-framework/commit/1a58112d66e52519ba48ea20df215d28efa5bc4b)  
+**Merged reviews:** [#29](https://github.com/Tmkbs/zebra-evidence-framework/pull/29) and [#30](https://github.com/Tmkbs/zebra-evidence-framework/pull/30)
 
 ## The customer problem
 

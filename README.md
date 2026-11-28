@@ -1,8 +1,8 @@
 # Zebra Forge — Interactive Tech Docs with Conversation and Video
 
 **Current handoff:** [Final delivery package](delivery/README.md)  
-**Engineering branch:** `release/enterprise-portable-20261126`  
-**Review:** [Draft PR #30](https://github.com/Tmkbs/zebra-evidence-framework/pull/30) — not merged
+**Engineering baseline:** [`main` at `1a58112`](https://github.com/Tmkbs/zebra-evidence-framework/commit/1a58112d66e52519ba48ea20df215d28efa5bc4b)  
+**Merged reviews:** [#29](https://github.com/Tmkbs/zebra-evidence-framework/pull/29) and [#30](https://github.com/Tmkbs/zebra-evidence-framework/pull/30)
 
 ## Customer goal
 
