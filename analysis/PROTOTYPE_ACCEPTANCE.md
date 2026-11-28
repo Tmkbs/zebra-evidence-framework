@@ -1,6 +1,6 @@
 # Final prototype acceptance — paired answer pilot
 
-This is the release gate for the existing Ask & Guide prototype, not another case dashboard. The reviewer tool reads the existing batch-report.json. It makes no network or model calls.
+This is the release gate for the existing Ask & Guide prototype, not another case dashboard. The reviewer tool reads the existing batch-report.json. It makes no network or model calls. Save real intake, runs, and review outputs in a private directory outside the checkout when possible. The default named run and review artifacts are Git-ignored; never force-add them.
 
 ## Demonstrate the product
 
@@ -19,7 +19,7 @@ The review tool admits only receipts reporting two completed same-model calls, r
 
 ## Independent review
 
-Give the reviewer review-packet.json and review-scores.json only, not review-key.private.json or original condition labels. Randomized A/B order hides the mapping, though wording may reveal it. Score every dimension 0/1/2 and enter a concrete rationale and critical-error boolean for each response:
+Give the reviewer review-packet.json and review-scores.json only, not review-key.private.json or original condition labels. The private key uses a salted binding committed into the packet; grading rejects changes to the arm mapping, exclusion accounting or nonce. Preserve the original packet digest and private key separately. This protects integrity against accidental changes, not authenticity against a party who can replace every artifact. On POSIX, new review directories and files request owner-only permissions; also restrict access to the original run directory. On other platforms, confirm local access controls before using real data. Review v2 packets must be generated afresh; older unbound v1 packets are not accepted. Randomized A/B order hides the mapping, though wording may reveal it. Score every dimension 0/1/2 and enter a concrete rationale and critical-error boolean for each response:
 
 - Source support: 0 unsupported; 1 partly supported; 2 claims entailed by evidence.
 - Technical correctness: 0 serious error; 1 incomplete/minor error; 2 sound within established scope.

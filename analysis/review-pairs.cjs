@@ -1,10 +1,13 @@
 "use strict";
 const fs=require("node:fs"),path=require("node:path"),crypto=require("node:crypto");
 const hash=s=>crypto.createHash("sha256").update(s).digest("hex");
-function reviewer(hash,flip){
+function reviewer(hash,flip,nonce=()=>crypto.randomBytes(32).toString("hex")){
  const dims=["source_support","technical_correctness","version_applicability","uncertainty_calibration","useful_next_action"];
  const requireThat=(v,m)=>{if(!v)throw Error(m)};
  const digest=x=>hash(JSON.stringify(x)),text=x=>typeof x==="string"&&!!x.trim();
+ // Bind the private mapping and exclusion accounting to the reviewer packet
+ // without revealing the A/B mapping or making small mappings guessable.
+ const keyMaterial=k=>({schema:k.schema,batch_sha256:k.batch_sha256,mapping:k.mapping,excluded:k.excluded,input_rows:k.input_rows,binding_nonce:k.binding_nonce});
  function inspect(row){
   const r=row?.result,p=r?.plan;
   if(row?.question_origin!=="original_public_question"||row.origin_verified_by_operator!==true)return "original_not_reviewed";
@@ -43,15 +46,19 @@ function reviewer(hash,flip){
    cases.push({id,question:p.question,reported_product:p.product,reported_edition:p.version,context:p.context,original_forum:row.forum_url,evidence:r.sources.map(s=>({id:s.id,url:s.url,excerpt:s.text})),answers:{A:arms[0].raw_answer,B:arms[1].raw_answer}});
    mapping.push({id,case_id:row.id,run_id:r.run_id,frozen_input_sha256:r.frozen_input_sha256,arm_modes:{A:arms[0].mode,B:arms[1].mode}});
   }
-  const packet={schema:"zebra-blinded-review/v1",scope:"Receipt-reported pairs; verify provenance independently. Labels hidden, not necessarily fully blind. Held-out status not established.",rubric:dims,cases};
-  const key={schema:"zebra-review-key/v1",packet_sha256:digest(packet),batch_sha256:digest(batch),mapping,excluded,input_rows:batch.rows.length};
+  const binding_nonce=nonce();
+  requireThat(typeof binding_nonce==="string"&&/^[a-f0-9]{64}$/.test(binding_nonce),"Invalid private binding nonce");
+  const key={schema:"zebra-review-key/v2",batch_sha256:digest(batch),mapping,excluded,input_rows:batch.rows.length,binding_nonce};
+  const packet={schema:"zebra-blinded-review/v2",scope:"Receipt-reported pairs; verify provenance independently. Labels hidden, not necessarily fully blind. Held-out status not established.",rubric:dims,cases,key_binding_sha256:digest(keyMaterial(key))};
+  key.packet_sha256=digest(packet);
   const empty=()=>({scores:Object.fromEntries(dims.map(d=>[d,null])),critical_error:null,note:""});
-  const sheet={schema:"zebra-review-scores/v1",packet_sha256:key.packet_sha256,reviewer:"",independent_review_confirmed:false,items:cases.map(c=>({id:c.id,A:empty(),B:empty()}))};
+  const sheet={schema:"zebra-review-scores/v2",packet_sha256:key.packet_sha256,reviewer:"",independent_review_confirmed:false,items:cases.map(c=>({id:c.id,A:empty(),B:empty()}))};
   return {packet,key,sheet};
  }
  function grade(packet,key,sheet){
-  requireThat(packet?.schema==="zebra-blinded-review/v1"&&key?.schema==="zebra-review-key/v1"&&sheet?.schema==="zebra-review-scores/v1","Invalid review schema");
+  requireThat(packet?.schema==="zebra-blinded-review/v2"&&key?.schema==="zebra-review-key/v2"&&sheet?.schema==="zebra-review-scores/v2","Invalid review schema; prepare a new v2 review packet");
   requireThat(digest(packet)===key.packet_sha256&&key.packet_sha256===sheet.packet_sha256,"Packet digest mismatch");
+  requireThat(typeof key.binding_nonce==="string"&&/^[a-f0-9]{64}$/.test(key.binding_nonce)&&typeof packet.key_binding_sha256==="string"&&digest(keyMaterial(key))===packet.key_binding_sha256,"Private key binding mismatch");
   requireThat(Array.isArray(packet.cases)&&Array.isArray(key.mapping)&&Array.isArray(sheet.items)&&key.mapping.length===packet.cases.length&&sheet.items.length===packet.cases.length,"Review every admitted pair");
   requireThat(text(sheet.reviewer)&&sheet.independent_review_confirmed===true,"Independent human reviewer must be recorded");
   const by=new Map(sheet.items.map(r=>[r.id,r])),maps=new Map(key.mapping.map(r=>[r.id,r]));
@@ -74,8 +81,8 @@ function reviewer(hash,flip){
 }
 const api=reviewer(hash,()=>crypto.randomInt(2));
 function main(args){
- const [command,...a]=args,read=f=>JSON.parse(fs.readFileSync(f,"utf8")),write=(f,x)=>fs.writeFileSync(f,JSON.stringify(x,null,2)+"\n",{flag:"wx"});
- if(command==="prepare"&&a.length===2){const r=api.prepare(read(a[0]));fs.mkdirSync(a[1]);write(path.join(a[1],"review-packet.json"),r.packet);write(path.join(a[1],"review-key.private.json"),r.key);write(path.join(a[1],"review-scores.json"),r.sheet);console.log(JSON.stringify({admitted_pairs:r.packet.cases.length,excluded:r.key.excluded},null,2));}
+ const [command,...a]=args,read=f=>JSON.parse(fs.readFileSync(f,"utf8")),write=(f,x)=>fs.writeFileSync(f,JSON.stringify(x,null,2)+"\n",{flag:"wx",mode:0o600});
+ if(command==="prepare"&&a.length===2){const r=api.prepare(read(a[0]));fs.mkdirSync(a[1],{mode:0o700});write(path.join(a[1],"review-packet.json"),r.packet);write(path.join(a[1],"review-key.private.json"),r.key);write(path.join(a[1],"review-scores.json"),r.sheet);console.log(JSON.stringify({admitted_pairs:r.packet.cases.length,excluded:r.key.excluded},null,2));}
  else if(command==="grade"&&a.length===4){const r=api.grade(read(a[0]),read(a[1]),read(a[2]));write(a[3],r);console.log(JSON.stringify({reviewed_pairs:r.reviewed_pairs,baseline_mean:r.baseline_mean,guided_mean:r.guided_mean,mean_paired_delta:r.mean_paired_delta,guided_critical_errors:r.guided_critical_errors,quality_improvement_established:false},null,2));}
  else throw Error("Use prepare BATCH_REPORT NEW_DIR or grade REVIEW_PACKET PRIVATE_KEY REVIEW_SCORES NEW_SUMMARY");
 }
