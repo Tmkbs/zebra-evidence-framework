@@ -52,12 +52,12 @@ button.vision-node[aria-pressed=true]{outline:3px solid #a7d3ca;outline-offset:2
 /* Explicitly requested, browser-local video export; never auto-play. */
 .story-video{grid-column:1/-1;min-width:0;border-top:1px solid #d9e5e5;padding:12px 2px 2px;margin-top:5px}.story-video[hidden]{display:none}.story-video strong{font-size:14px;color:#25444a}.story-video p{margin:5px 0}.story-video-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:7px 0}.story-video-actions button,.story-video-actions a{font-size:12px}.story-video-actions button[hidden]{display:none}.story-video-output video{display:block;width:100%;max-width:780px;height:auto;background:#17393f;border-radius:8px;margin:8px 0}.story-video-output a{overflow-wrap:anywhere}
 </style></head>
-<body><header><div><strong>Zebra TechDocs · student prototype</strong><a href="../analysis/zebra-pattern-analysis.html">Pattern research snapshot</a><a href="final-delivery.html">Document-review workflow</a><a href="visual-companion.html?reader=dw62-intent-receiver">Team reader visual companion</a></div></header>
+<body><header><div><strong>Zebra TechDocs · student prototype</strong><a href="../analysis/zebra-pattern-analysis.html">Pattern research snapshot</a><a href="final-delivery.html">Document-review workflow</a><a href="visual-companion.html?reader=dw62-intent-receiver">Team reader visual companion</a><a href="embedded-assistant.html">Embedded assistant demo</a></div></header>
 <main><div class="kicker">Answer-side contribution</div><h1>Ask &amp; Guide</h1>
 <p>Ask a technical question, learn a concept through a contextual visual explanation, or explore a diagnostic step. Official media is selected only when relevant.</p>
-<div id="environment" class="notice">Offline planning is available. Checking for the optional local campus service…</div>
+<div id="environment" class="notice">Offline planning is available. Checking for the optional local prototype service…</div>
 <section class="vision-shell" id="visionBox" aria-label="Interactive visual guidance">
-<div class="actions vision-presets"><button id="loadConcept">Learn DataWedge Profiles</button><button id="loadPrereq">Scan-trigger flow</button><button id="loadExample">Compare parameter evidence</button><button id="loadConfig">Configuration structure</button><button id="loadUnknown">Missing version</button></div>
+<div class="actions vision-presets"><button id="loadConcept">Learn DataWedge Profiles</button><button id="loadPrereq">Scan-trigger flow</button><button id="loadExample">Compare parameter evidence</button><button id="loadConfig">Configuration structure</button><button id="loadEHS">EHS settings access · team case</button><button id="loadUnknown">Missing version</button></div>
 <div id="storyOutput" class="story-player" hidden></div>
 <div id="narratedPanel" class="media-panel" hidden><h3>Generate a narrated technical explanation</h3><p class="muted">Generate a source-linked MP4 with locally synthesized English narration and captions. This uses the checked offline source cards, not a live model or device recording.</p><button id="narratedGenerate" disabled>Generate narrated MP4</button><p id="narratedStatus" class="muted" role="status"></p><video id="narratedPreview" controls playsinline preload="none" style="width:100%;max-width:780px" hidden></video><div class="actions" id="narratedLinks" hidden><a id="narratedSave" download="zebra-explanation.mp4">Save MP4</a><a id="narratedCaptions" download="zebra-explanation.vtt">Save captions</a></div></div>
 <div id="mediaOutput" class="media-panel" hidden></div>
@@ -75,15 +75,15 @@ button.vision-node[aria-pressed=true]{outline:3px solid #a7d3ca;outline-offset:2
 <details><summary>Import public case handoff</summary><p class="muted">Accepts the team's public case contract, including question and official evidence URLs. Imported text is not treated as verified evidence. Installed version is left blank for confirmation.</p><input id="importFile" type="file" accept=".json,application/json"><p id="importStatus" class="muted"></p></details>
 <details><summary>Import team public case CSV</summary><p class="muted">Question-only intake: never copies a root-cause label or recommended edit into a model question. Case IDs do not prove original-question provenance.</p><div class="actions"><button id="fetchCSV">Load published team CSV</button><input id="csvFile" type="file" accept=".csv,text/csv"></div><p id="csvStatus" class="muted" role="status"></p><label for="csvCase">Select imported public case</label><select id="csvCase" disabled><option value="">No cases loaded</option></select><button id="useCSV" disabled>Use selected question</button><div id="caseOrigin" class="muted"></div></details>
 <label class="check"><input id="consent" type="checkbox">I confirm the question and context contain only public or explicitly approved material. No customer SPRs, credentials or private device data.</label>
-<div class="actions"><button id="plan">Offline guidance · no model</button><button id="evidence">Fetch official excerpts only</button><button id="ask" class="primary">Ask campus Qwen</button><button id="compare">Compare baseline / guided</button></div><p id="status" class="muted" role="status" aria-live="polite"></p>
+<div class="actions"><button id="plan">Offline guidance · no model</button><button id="evidence">Fetch official excerpts only</button><button id="ask" class="primary">Ask configured model</button><button id="compare">Compare baseline / guided</button></div><p id="status" class="muted" role="status" aria-live="polite"></p>
 </section>
 <section class="box" id="planBox" hidden><h2>Response safeguards</h2><div id="planOutput"></div></section>
 <section class="box" id="sourceBox" hidden><h2>Source evidence</h2><div id="sourceOutput"></div></section>
 <section class="box" id="answerBox" hidden><h2>Model answer review</h2><div id="answerOutput"></div></section><button id="download" hidden>Download result / handoff (JSON)</button>
-<footer>Independent student research prototype. A quoted passage is not a verified technical answer. No device validation, document publication, or measured reduction in support demand is claimed. Campus model only.</footer>
+<footer>Independent student research prototype. A quoted passage is not a verified technical answer. No device validation, document publication, or measured reduction in support demand is claimed. Model provider is configured on the server.</footer>
 </main><script src="answer-strategies.js"></script><script src="guidance-planner.js"></script><script src="guidance-intake.js"></script><script src="guidance-visual.js"></script><script src="guidance-storyboard.js"></script><script src="guidance-team-bridge.js"></script><script>
 "use strict";
-const $=id=>document.getElementById(id);let access="",last=null,caseId="",csvRows=[];
+const $=id=>document.getElementById(id);let access="",last=null,caseId="",csvRows=[],modelEnabled=false;
 let visualState={},visualFocus="",visualConfirmed=false,visualApplied="",visualKey="",runEpoch=0,storyController=null,teamHandoff=null;
 let narratedURLs=[],narratedBusy=false;
 function clearStoryboard(){clearNarrated();if(storyController)storyController.destroy();storyController=null;$("storyOutput").hidden=true;$("mediaOutput").hidden=true;$("mediaOutput").replaceChildren();}
@@ -98,7 +98,7 @@ function refreshNarrated(){
  try{supported=!!last?.offline_evidence&&!!ZebraStoryboard.videoPlan(ZebraVisual.graph(last.plan))}catch{}
  $("narratedPanel").hidden=!supported;
  $("narratedGenerate").disabled=!supported||!access||narratedBusy;
- if(supported&&!access)$("narratedStatus").textContent="On-demand narration runs in the local campus app with Python, Pillow, FFmpeg and eSpeak installed. Browser-only guidance still works here.";
+ if(supported&&!access)$("narratedStatus").textContent="On-demand narration runs in the local prototype app with Python, Pillow, FFmpeg and eSpeak installed. Browser-only guidance still works here.";
  else if(supported&&access&&!$("narratedStatus").textContent)$("narratedStatus").textContent="Ready to render locally. No model or external video service is used.";
 }
 async function generateNarrated(){
@@ -141,7 +141,7 @@ function invalidate({keepTeam=false}={}){
 }
 function drawContextualMedia(result){
  const packet=result.contextual_media,out=$("mediaOutput");
- out.replaceChildren();out.hidden=!packet||!packet.assets.length;if(out.hidden)return;
+ out.replaceChildren();out.hidden=!packet||(!packet.assets.length&&!packet.checkpoint);if(out.hidden)return;
  out.append(text("div","CONTEXTUAL LEARNING MATERIAL","vision-kicker"),text("h3","Learn the concept · official resources"),text("p",packet.reason,"muted"));
  const assets=text("div","","media-assets");
  for(const asset of packet.assets){
@@ -152,7 +152,8 @@ function drawContextualMedia(result){
   item.append(a,link(asset.source_url,"Source documentation"),text("p",asset.kind==="video"?"Listed by Zebra; playback and timestamps not independently checked. Opens externally.":"Original official diagram was inspected. Open only if you want to load it.","muted"));
   assets.append(item)
  }
- out.append(assets,text("p","No external media loads automatically. The interactive illustration above works without network or model access.","muted"));
+ if(packet.assets.length)out.append(assets,text("p","No external media loads automatically. The interactive illustration above works without network or model access.","muted"));
+ if(packet.reader_url==="https://zebra-techdocs-practicum.vercel.app/document-reader/ehs40-settings-access/index.html#settings-control-scope"){const a=text("a","Open Phase 1 team document proposal ↗");a.href=packet.reader_url;a.target="_blank";a.rel="noopener noreferrer";out.append(a)}
  if(packet.checkpoint){
   const question=text("div","","media-check");question.append(text("h3","Quick understanding check"),text("p",packet.checkpoint.prompt));
   const options=text("div","","actions"),feedback=text("p","","muted");feedback.setAttribute("role","status");
@@ -211,16 +212,17 @@ const text=(tag,value,cls)=>{const e=document.createElement(tag);e.textContent=S
 function link(url,label){const e=text("a",label||url);try{const u=new URL(url);if(u.protocol==="https:"&&u.hostname==="techdocs.zebra.com"){e.href=u.href;e.target="_blank";e.rel="noopener noreferrer"}}catch{}return e}
 function addList(parent,items){const list=document.createElement("ul");for(const item of items||[])list.append(text("li",item));parent.append(list)}
 function busy(value){
- for(const id of ["plan","loadExample","loadUnknown","loadPrereq","loadConfig","loadConcept","question","product","version","context","sources","importFile","csvFile","consent"])$(id).disabled=value;
- for(const id of ["evidence","ask","compare"])$(id).disabled=value||!access;
+ for(const id of ["plan","loadExample","loadUnknown","loadPrereq","loadConfig","loadConcept","loadEHS","question","product","version","context","sources","importFile","csvFile","consent"])$(id).disabled=value;
+ $("evidence").disabled=value||!access;
+ for(const id of ["ask","compare"])$(id).disabled=value||!access||!modelEnabled;
  $("fetchCSV").disabled=value;
  $("csvCase").disabled=value||!csvRows.length;
  $("useCSV").disabled=value||!csvRows.length||$("csvCase").value==="";
 }
 async function session(){
  busy(false);
- if(!local){$("environment").textContent="Offline guidance is active: no server or model is needed for planning and the checked source cards. Live inference requires the authorized local campus server.";return}
- try{const r=await fetch("/api/session",{cache:"no-store",signal:AbortSignal.timeout(3000)});const x=await r.json();if(!r.ok||!x.local_session||!x.review_access)throw Error("No local session");access=x.review_access;$("environment").textContent="Offline guidance and official-source retrieval are available. Campus Qwen is optional; its configured model is "+x.model+". Actual connectivity is not yet established.";busy(false);$("narratedStatus").textContent="";refreshNarrated()}catch(e){$("environment").textContent="Local service unavailable. Offline guidance still works; restart the campus service for live evidence or inference.";busy(false)}
+ if(!local){$("environment").textContent="Offline guidance is active: no server or model is needed for planning and the checked source cards. Live inference requires the authorized local prototype server.";return}
+ try{const r=await fetch("/api/session",{cache:"no-store",signal:AbortSignal.timeout(3000)});const x=await r.json();if(!r.ok||!x.local_session||!x.review_access)throw Error("No local session");access=x.review_access;modelEnabled=x.model_config?.enabled!==false;$("environment").textContent=modelEnabled?"Offline guidance and official-source retrieval are available. Configured model: "+x.model+". Connectivity is not yet established.":"Offline guidance and official-source retrieval are available. Model inference is disabled by the administrator.";busy(false);$("narratedStatus").textContent="";refreshNarrated()}catch(e){$("environment").textContent="Local service unavailable. Offline guidance still works; restart the local service for live evidence or inference.";busy(false)}
 }
 function drawPlan(p){
  $("planBox").hidden=false;const out=$("planOutput");out.replaceChildren();
@@ -244,7 +246,7 @@ function drawCards(packet){
  $("sourceBox").hidden=false;const out=$("sourceOutput");out.replaceChildren();
  out.append(text("p",packet.notice,"notice"));
  for(const c of cards){
-  const item=text("section","","step");item.append(text("h3",c.title+" · DataWedge "+c.version),link(c.url,"Open official article"),text("p","Source inspected "+c.checked+"; not fetched in this run.","muted"));
+  const item=text("section","","step");item.append(text("h3",c.title+" · "+(c.product==="datawedge"?"DataWedge":c.product==="ehs"?"EHS":c.product)+" "+c.version),link(c.url,"Open official article"),text("p","Source inspected "+c.checked+"; not fetched in this run.","muted"));
   const grid=text("div","","grid");
   for(const x of c.sections){const card=text("div","","evidence");card.append(text("strong",x.section),text("blockquote",x.quote),text("p",x.note,"muted"));grid.append(card)}
   item.append(grid,text("p",c.next,"notice"));out.append(item)
@@ -279,9 +281,10 @@ function drawAnswers(result){
 }
 async function run(action){
  if(action!=="plan"&&!access)return;
+ if(["guided","compare"].includes(action)&&!modelEnabled)return;
  if(action!=="plan"&&!$("consent").checked){$("status").textContent="Confirm public/approved material before the network request.";return}
  const epoch=++runEpoch;busy(true);last=null;clearStoryboard();$("visionOutput").replaceChildren(text("p","Preparing the current evidence map…","vision-empty"));$("planBox").hidden=true;$("sourceBox").hidden=true;$("answerBox").hidden=true;$("download").hidden=true;
- $("status").textContent=action==="plan"?"Preparing offline guidance without network or model…":action==="evidence"?"Fetching official excerpts only. No model call…":"Retrieving version-pinned official sources and requesting campus inference…";
+ $("status").textContent=action==="plan"?"Preparing offline guidance without network or model…":action==="evidence"?"Fetching official excerpts only. No model call…":"Retrieving version-pinned official sources and requesting configured model inference…";
  try{
   const input={action,case_id:caseId,question:$("question").value,product:$("product").value,version:$("version").value,context:$("context").value,source_urls:$("sources").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean),public_only:$("consent").checked};
   if(action==="plan"){
@@ -310,6 +313,9 @@ $("loadConcept").addEventListener("click",()=>{
 });
 $("loadConfig").addEventListener("click",()=>{
  invalidate();caseId="";$("question").value="How should PARAM_LIST and PLUGIN_CONFIG be nested in DataWedge 15.0 SET_CONFIG?";$("product").value="datawedge";$("version").value="15.0";$("context").value="";$("sources").value="https://techdocs.zebra.com/datawedge/15-0/guide/api/setconfig/";$("consent").checked=false;run("plan")
+});
+$("loadEHS").addEventListener("click",()=>{
+ invalidate();caseId="";$("question").value="Does hiding the Settings icon in EHS 4.0 restrict Settings access or disable the app?";$("product").value="ehs";$("version").value="4.0";$("context").value="";$("sources").value="";$("consent").checked=false;run("plan")
 });
 function showCSV(csv){
  const result=ZebraIntake.importCSV(csv);csvRows=result.rows;

@@ -12,9 +12,10 @@ const crypto=require("node:crypto");
 const review=require("./api/review.js");
 const guidance=require("./analysis/answer-guidance.cjs");
 const localNarration=require("./analysis/local-narration.cjs");
+const Model=require("./analysis/model-provider.cjs");
 
-const DEFAULT_API="http://c3dgx0.cs.northwestern.edu:8000/v1";
-const DEFAULT_MODEL="nvidia/Qwen3.8-Flash-Next-FP4-Local";
+const DEFAULT_API="http://c3dgx0.cs.northwestern.edu:8080/v1";
+const DEFAULT_MODEL="Qwen3.8-Flash-Next-FP4-Local";
 const PUBLIC_CASE_CSV="https://zebra-techdocs-practicum.vercel.app/document-reader/zebra-cases.csv";
 const UI_ROOT=path.join(__dirname,"classroom");
 const PAGES=Object.freeze({
@@ -25,6 +26,10 @@ const PAGES=Object.freeze({
  "/final-delivery.html":"final-delivery.html",
  "/classroom/final-delivery.html":"final-delivery.html",
  "/answer-guidance.html":"answer-guidance.html",
+ "/embedded-assistant.html":"embedded-assistant.html",
+ "/classroom/embedded-assistant.html":"embedded-assistant.html",
+ "/techdocs-widget.js":"techdocs-widget.js",
+ "/classroom/techdocs-widget.js":"techdocs-widget.js",
  "/classroom/answer-guidance.html":"answer-guidance.html",
  "/answer-strategies.js":"answer-strategies.js",
  "/classroom/answer-strategies.js":"answer-strategies.js",
@@ -49,7 +54,14 @@ const PAGES=Object.freeze({
 function configure(env=process.env){
  const port=Number(env.ZEBRA_REVIEW_PORT||3000);
  if(!Number.isInteger(port)||port<1024||port>65535)throw Error("Invalid local port");
+ const portable=Model.configure(env,{defaultMode:"campus"});
+ if(portable.mode!=="campus"){
+  if(portable.mode!=="off")Model.resolve(portable,env);
+  return {...portable,port,passcode:env.AI_REVIEW_ACCESS_TOKEN||crypto.randomBytes(24).toString("hex")};
+ }
  const base=String(env.AI_BASE_URL||DEFAULT_API).replace(/\/+$/,"");
+ const autoDetectPort=["8080","8000"].includes(new URL(base).port);
+ const autoSelectModel=!env.AI_MODEL||env.AI_MODEL==="nvidia/Qwen3.8-Flash-Next-FP4-Local";
  let u;try{u=new URL(base)}catch{throw Error("Invalid AI_BASE_URL")}
  if(!["http:","https:"].includes(u.protocol)||u.username||u.password||u.search||u.hash||u.pathname.replace(/\/+$/,"")!=="/v1")throw Error("AI_BASE_URL must end with /v1 and have no credentials");
  const campus=u.hostname==="c3dgx0.cs.northwestern.edu";
@@ -65,7 +77,7 @@ function configure(env=process.env){
  env.AI_REVIEW_ACCESS_TOKEN=env.AI_REVIEW_ACCESS_TOKEN||crypto.randomBytes(24).toString("hex");
  const origins=["http://127.0.0.1:"+port,"http://localhost:"+port];
  env.AI_ALLOWED_ORIGINS=[...origins,...String(env.AI_ALLOWED_ORIGINS||"").split(",").filter(Boolean)].join(",");
- return{port,base,model:env.AI_MODEL,passcode:env.AI_REVIEW_ACCESS_TOKEN};
+ return{port,base,model:env.AI_MODEL,mode:"campus",token:portable.token,passcode:env.AI_REVIEW_ACCESS_TOKEN,auto_detect_port:autoDetectPort,auto_select_model:autoSelectModel};
 }
 function json(res,status,body){
  res.statusCode=status;
@@ -78,15 +90,31 @@ function allowHost(req,port){
  return h==="localhost:"+port||h==="127.0.0.1:"+port;
 }
 async function campusStatus(cfg,request=fetch){
- try{
-  const res=await request(cfg.base+"/models",{redirect:"error",headers:{Accept:"application/json"},signal:AbortSignal.timeout(6000)});
-  if(!res.ok)return{connected:false,model:cfg.model,error:"HTTP "+res.status+" from model-list route"};
-  const payload=await res.json();
-  const models=(Array.isArray(payload?.data)?payload.data:[]).map(x=>x?.id).filter(x=>typeof x==="string").slice(0,60);
-  return{connected:true,model:cfg.model,model_listed:models.includes(cfg.model),available_models:models};
- }catch{
-  return{connected:false,model:cfg.model,error:"Cannot reach the model endpoint. Check Northwestern VPN/eduroam, current port, and active deployment."};
+ if(cfg.mode==="off")return{connected:false,model:null,error:"Model inference is disabled by administrator"};
+ const configuredBase=cfg.base;
+ const candidates=[configuredBase];
+ if(cfg.mode==="campus"&&cfg.auto_detect_port){
+  const alternate=cfg.base.includes(":8080/")?cfg.base.replace(":8080/",":8000/"):cfg.base.includes(":8000/")?cfg.base.replace(":8000/",":8080/"):null;
+  if(alternate&&!candidates.includes(alternate))candidates.push(alternate);
  }
+ const failures=[];
+ for(const base of candidates){
+  try{
+   const provider=Model.resolve({...cfg,base});
+   const res=await request(provider.base+"/models",{redirect:"error",headers:provider.headers,signal:AbortSignal.timeout(6000)});
+   if(!res.ok){failures.push(new URL(base).port+" HTTP "+res.status);continue}
+   const payload=await res.json();
+   const models=(Array.isArray(payload?.data)?payload.data:[]).map(x=>x?.id).filter(x=>typeof x==="string").slice(0,60);
+   if(cfg.mode==="campus"&&cfg.auto_select_model&&models.length){
+    const preferred=["Qwen3.8-Flash-Next-FP4-Local","DeepSeek-V4-Flash-0731/DeepSeek-V4-Flash-0731-UD-IQ3_XXS","DeepSeek-V4-Flash-0731"];
+    cfg.model=preferred.find(x=>models.includes(x))||models[0];
+    process.env.AI_MODEL=cfg.model;
+   }
+   cfg.base=base;process.env.AI_BASE_URL=base;
+   return{connected:true,endpoint:base,port:new URL(base).port,model:cfg.model,model_listed:models.length?models.includes(cfg.model):null,available_models:models,auto_detected:base!==configuredBase};
+  }catch(e){failures.push(new URL(base).port+" "+String(e.message||e).slice(0,100))}
+ }
+ return{connected:false,model:cfg.model,attempted_ports:candidates.map(x=>new URL(x).port),error:"No campus model-list response. "+failures.join("; ")};
 }
 async function publicCases(request=fetch){
  const result=await request(PUBLIC_CASE_CSV,{method:"GET",redirect:"manual",headers:{Accept:"text/csv,text/plain"},signal:AbortSignal.timeout(12000)});
@@ -121,7 +149,7 @@ function buildServer(cfg,request=fetch,generateNarration=localNarration.generate
   if(route==="/api/session"){
    if(req.method!=="GET")return json(res,405,{ok:false,error:"GET required"});
    if(!sameOriginRequest(req,cfg))return json(res,403,{ok:false,error:"Same-origin local review only"});
-   return json(res,200,{ok:true,local_session:true,model:cfg.model,review_access:cfg.passcode});
+   return json(res,200,{ok:true,local_session:true,model:cfg.model,model_config:Model.publicConfig(cfg),review_access:cfg.passcode});
   }
   if(route==="/api/public-cases"){
    if(req.method!=="GET")return json(res,405,{ok:false,error:"GET required"});
@@ -129,7 +157,7 @@ function buildServer(cfg,request=fetch,generateNarration=localNarration.generate
    try{return json(res,200,await publicCases(request))}
    catch(e){return json(res,502,{ok:false,error:String(e.message).slice(0,260)})}
   }
-  if(route==="/api/campus-status"){
+  if(route==="/api/campus-status"||route==="/api/model-status"){
    if(req.method!=="GET")return json(res,405,{ok:false,error:"GET required"});
    if(!sameOriginRequest(req,cfg))return json(res,403,{ok:false,error:"Same-origin local review only"});
    return json(res,200,await campusStatus(cfg,request));
@@ -160,6 +188,7 @@ function buildServer(cfg,request=fetch,generateNarration=localNarration.generate
    finally{rendering=false}
   }
   if(route==="/api/review"){
+   if(cfg.mode&&cfg.mode!=="campus")return json(res,403,{ok:false,error:"Legacy document-review model route is disabled in portable mode. Use Ask & Guide."});
    if(req.method==="POST"){
     try{req.body=JSON.parse(await readBody(req))}catch{return json(res,400,{ok:false,error:"Invalid JSON or request too large"})}
    }
@@ -177,8 +206,13 @@ function buildServer(cfg,request=fetch,generateNarration=localNarration.generate
   }catch{return json(res,500,{ok:false,error:"Bundled page unavailable"})}
  });
 }
-function start(){
+async function start(){
  const cfg=configure();
+ if(cfg.mode==="campus"){
+  const status=await campusStatus(cfg);
+  if(status.connected)console.log("Campus endpoint selected: "+status.port+" / "+status.model);
+  else console.log("Campus model not detected at startup; local UI will remain available. "+status.error);
+ }
  const server=buildServer(cfg);
  server.listen(cfg.port,"127.0.0.1",()=>{
   console.log("Zebra final AI review: http://127.0.0.1:"+cfg.port+"/final-delivery.html");
@@ -186,10 +220,10 @@ function start(){
   console.log("New-question answer guidance: http://127.0.0.1:"+cfg.port+"/answer-guidance.html");
   console.log("Campus status check: http://127.0.0.1:"+cfg.port+"/api/campus-status");
   console.log("Configured model: "+cfg.model);
-  console.log("Session review access code (enter under AI connection): "+cfg.passcode);
+  console.log("Local prototype session is available; model mode: "+(cfg.mode||"campus"));
   console.log("Send PUBLIC/approved document excerpts only. Press Ctrl+C to stop.");
  });
  return server;
 }
-if(require.main===module)start();
-module.exports={configure,allowHost,sameOriginRequest,publicCases,campusStatus,buildServer};
+if(require.main===module)start().catch(e=>{console.error(e.message);process.exitCode=1});
+module.exports={configure,allowHost,sameOriginRequest,publicCases,campusStatus,buildServer,start};

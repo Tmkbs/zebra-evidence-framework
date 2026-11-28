@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 W,H,FPS=1280,720,12
-KINDS={"scan_prerequisite","result_discrepancy","configuration_hierarchy","profile_learning","reported_path_comparison"}
+KINDS={"scan_prerequisite","result_discrepancy","configuration_hierarchy","profile_learning","reported_path_comparison","document_lesson"}
 FONT=Path("/usr/share/fonts/truetype/dejavu")
 def font(size,bold=False):
     name="DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf"
@@ -53,6 +53,7 @@ def validate(packet):
     ids=[x for col in columns for x in col]
     if len(columns)>4 or not all(1<=len(col)<=2 for col in columns) or len(ids)!=len(set(ids)) or ids!=[f["id"] for f in frames] or not all(i in nodes for i in ids):raise ValueError("Invalid storyboard layout")
     if not any(e.get("quote") for f in frames for e in f["evidence"]):raise ValueError("Evidence required")
+    if m["kind"]=="document_lesson" and (not m.get("lesson_id") or not all(f["evidence"] and all(e.get("origin") in ("checked_source_card","retrieved_excerpt") and len(e.get("quote",""))>=8 for e in f["evidence"]) for f in frames)):raise ValueError("Every reviewed lesson scene needs evidence")
     for f in frames:
         node=nodes[f["id"]]
         if f["caption"]!=node["detail"].strip() or f["title"]!=node["title"] or f["evidence"]!=node["evidence"]:raise ValueError("Frame diverges from source map")

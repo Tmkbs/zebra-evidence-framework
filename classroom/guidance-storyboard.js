@@ -19,7 +19,7 @@ function build(map){
   const n=by.get(id);
   return {id,index,title:n.title,caption:n.detail,status:n.status,evidence:(n.evidence||[]).map(e=>({...e})),duration_ms:6000};
  });
- const scene=map.kind==="scan_prerequisite"?"diagnostic":map.kind==="result_discrepancy"?"comparison":map.kind==="configuration_hierarchy"?"containment":map.kind==="profile_learning"?"data_path":map.kind==="reported_path_comparison"?"reported_paths":"scope";
+ const scene=map.kind==="scan_prerequisite"?"diagnostic":map.kind==="result_discrepancy"?"comparison":map.kind==="configuration_hierarchy"?"containment":map.kind==="profile_learning"?"data_path":map.kind==="reported_path_comparison"?"reported_paths":map.kind==="document_lesson"?"reviewed_document":"scope";
  return {schema:"zebra-visual-storyboard/v1",kind:map.kind,scene,title:map.title,frames,
   next_check:map.next,representation:"authored_conceptual_illustration",video_file:false,model_generated:false,device_tested:false,
   total_duration_ms:frames.reduce((n,f)=>n+f.duration_ms,0)};
@@ -211,7 +211,7 @@ function createSVG(doc,map,story,index,onSelect=()=>{}){
    rows.slice(0,3).forEach((r,i)=>text(g,x+w/2,150+i*16,r.slice(0,21),13,c.ink,650,"middle"));
    if(k<n-1)arrow(x+w+2,136,x+w+14,c.line);
   }
-  text(svg,320,235,"Clarify scope and inspect sources before giving detailed advice.",14,c.muted,600,"middle");
+  text(svg,320,235,story.scene==="reviewed_document"?"Compare the documented controls; presentation order is not a device workflow.":"Clarify scope and inspect sources before giving detailed advice.",12,c.muted,600,"middle");
  }
  return svg;
 }
@@ -221,11 +221,12 @@ function createSVG(doc,map,story,index,onSelect=()=>{}){
  * encoded using the browser's own MediaRecorder. No remote asset, model,
  * speech service, capture permission, or paid API is involved.
  */
-const CLIP_KINDS=new Set(["scan_prerequisite","result_discrepancy","configuration_hierarchy","profile_learning","reported_path_comparison"]);
+const CLIP_KINDS=new Set(["scan_prerequisite","result_discrepancy","configuration_hierarchy","profile_learning","reported_path_comparison","document_lesson"]);
 function videoPlan(map){
  if(!map||!CLIP_KINDS.has(map.kind))return null;
  const story=build(map);
  if(!story.frames.some(f=>f.evidence.some(e=>typeof e.quote==="string"&&e.quote.length>0)))return null;
+ if(map.kind==="document_lesson"&&(!map.lesson_id||!story.frames.every(f=>f.evidence.length&&f.evidence.every(e=>typeof e.quote==="string"&&e.quote.length>=8&&["checked_source_card","retrieved_excerpt"].includes(e.origin)))))return null;
  const frames=story.frames.map(f=>{
   const caption=String(f.caption||"").trim();
   if(!caption||caption.length>520)throw Error("A short, complete scene caption is required");

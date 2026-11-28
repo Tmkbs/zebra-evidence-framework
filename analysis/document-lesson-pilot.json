@@ -1,0 +1,15 @@
+{
+  "schema": "zebra-batch-input/v1",
+  "cases": [
+    {
+      "id": "ehs-settings-access-r62",
+      "question_origin": "synthetic_question",
+      "question": "Does hiding the Settings icon in EHS 4.0 restrict Settings access or disable the app?",
+      "product": "ehs",
+      "version": "4.0",
+      "context": "Concept-learning pilot based on the public r62 document proposal, not an original forum question or held-out evaluation.",
+      "source_urls": [],
+      "public_only": true
+    }
+  ]
+}

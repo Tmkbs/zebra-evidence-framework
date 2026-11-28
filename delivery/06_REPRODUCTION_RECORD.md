@@ -1,0 +1,75 @@
+# 06 — Reproduction and artifact record
+
+## Source state
+
+- Repository: `Tmkbs/zebra-evidence-framework`
+- Branch: `release/enterprise-portable-20261126`
+- Tested commit: `0ad9035227c4d5a543cb88f9d451423fd5ec5577`
+- Draft PR: [#30](https://github.com/Tmkbs/zebra-evidence-framework/pull/30)
+- Default branch: `main`
+- At the last comparison, the delivery branch was 51 commits ahead of main and 0 behind. No merge or deployment was performed.
+
+## Automated run
+
+GitHub Actions run [#146](https://github.com/Tmkbs/zebra-evidence-framework/actions/runs/45884549661) completed successfully:
+- Offline regression: passed.
+- Actual Chromium interactive-vision test: passed.
+- Team-reader visual companion browser test: passed.
+- Contextual video encode/decode test: passed.
+- Narrated regression and consolidated reproduction: passed.
+
+A later run, [Actions run 45898457023](https://github.com/Tmkbs/zebra-evidence-framework/actions/runs/45898457023), also completed with both offline jobs successful after the answer-routing and evolutionary-strategy code was integrated. Subsequent commits in this delivery pass only updated Markdown documentation and indexes; no application code changed after that test run.
+
+The reproduction command is:
+
+```sh
+npm run reproduce -- runs/reproduction-01
+```
+
+The output directory must be new. Requirements and expected outputs are in `analysis/REPRODUCE_DELIVERY.md`.
+
+## Observed reproduction summary
+
+The CI log records:
+- 5 narrated clips encoded and decoded.
+- 3 public paraphrase-manifest rows imported; 0 eligible for live evaluation.
+- 4 archived public first-post groups in the supplementary version-context audit.
+- 3 supporting observations and 1 counterexample for the version-context candidate.
+- 0 model trials in this offline run.
+- Document revision effect: NOT MEASURED.
+- Answer strategy effect: NOT MEASURED.
+- Evolutionary fitness: NOT RUN.
+- Human learning effect: NOT MEASURED.
+
+Two artifacts were retained:
+- `contextual-video-preview` — 1,612,204 bytes.
+- `narrated-answer-batch` — 2,376,200 bytes.
+
+These artifacts are CI outputs with limited retention, not permanent customer deliverables.
+
+A further run, [Actions run 45899988043](https://github.com/Tmkbs/zebra-evidence-framework/actions/runs/45899988043), passed both offline jobs after the campus endpoint auto-discovery change. The campus probe regression tests passed for 8080-first selection, automatic 8000 fallback, first-working-endpoint behavior, and advertised-model selection. These tests use mocked HTTP responses; they do not constitute a live campus API call.
+
+## Northwestern campus API configuration
+
+The earlier Harper connection example used `http://c3dgx0.cs.northwestern.edu:8080/v1/chat/completions` and Chat Completions (not the Responses API). The previously provided model identifiers included `Qwen3.8-Flash-Next-FP4-Local` and DeepSeek V4 variants. The project files had later drifted to port 8000 and a `nvidia/`-prefixed Qwen name; this has been corrected.
+
+The local server now tries the previously documented 8080 endpoint first, automatically falls back to 8000 when needed, reads `/v1/models`, and selects an advertised Qwen/DeepSeek model when no explicit model override is set. The smoke-test script uses a synthetic `READY` prompt only, through `/v1/chat/completions`, and records endpoint, model ID, HTTP response, latency and token count without printing credentials.
+
+**Live campus request status in this hosted session: NOT RUN.** The current chat execution environment cannot resolve/reach the campus-only hostname, and the user's desktop/browser is not attached to this execution context. The code and offline tests cover discovery/fallback; they do not substitute for an actual request from the connected campus machine.
+
+## What a successful reproduction proves
+
+It proves that the tested commit can run the offline regression suite, render and decode the included development videos, create evidence receipts and reproduce the annotated-case counts under the recorded environment.
+
+It does not prove:
+- that the live campus or enterprise model endpoint was called;
+- that an answer to a real case is correct;
+- that expert replies were isolated in every possible browsing path;
+- that a document revision improves answer quality;
+- that evolutionary strategies improve held-out performance;
+- that the videos improve user understanding;
+- that a device works or that a support ticket/forum post was prevented.
+
+## Next evidence to add
+
+For each live case run, save a separate immutable record with case ID, channel, origin review, exact question/context, product and installed version, documentation edition, official source URLs and hashes, provider/model identity, settings, full prompt and retrieval payload, raw output, timestamp, latency/usage when available, failure status, independent reviewer scores and critical-error decision. Keep private review keys and customer data outside the public repository.
