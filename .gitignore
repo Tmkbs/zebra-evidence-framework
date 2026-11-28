@@ -7,3 +7,10 @@ __pycache__/
 _lab_fixture.json
 _lab_test.png
 *.log
+# Keep real run artifacts, reviewer materials and hidden arm maps out of Git.
+runs/
+reviewed-public-input*.json
+batch-report.json
+review-key.private.json
+review-packet.json
+review-scores.json
