@@ -25,7 +25,11 @@ function chooseModel(available,env=process.env){
 }
 async function probeCampus({env=process.env,request=fetch}={}){
  const key=String(env.CAMPUS_QWEN_TOKEN||"token-is-ignored"),attempts=[];
- for(const base of endpoints(env)){
+ const bases=endpoints(env);
+ // Reject unsafe credential transport before discovery or generation, including
+ // every fallback endpoint. The public placeholder is not a credential.
+ if(key!=="token-is-ignored"&&bases.some(base=>new URL(base).protocol!=="https:"))throw Error("Real authentication tokens require HTTPS");
+ for(const base of bases){
   let available=[];
   try{
    const list=await request(base+"/models",{method:"GET",redirect:"error",headers:{Accept:"application/json",Authorization:"Bearer "+key},signal:AbortSignal.timeout(6000)});

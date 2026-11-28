@@ -26,3 +26,33 @@ test("selects only an advertised known model when discovery is available",async(
  const env={},request=async url=>url.endsWith("/models")?new Response(JSON.stringify({data:[{id:"DeepSeek-V4-Flash-0731"}]})):new Response(JSON.stringify({model:"DeepSeek-V4-Flash-0731",choices:[{message:{content:"READY"}}]}));
  const r=await probeCampus({env,request});assert.equal(r.requested_model,"DeepSeek-V4-Flash-0731");
 });
+test("requires HTTPS before any campus request for non-placeholder authentication",async()=>{
+ const cases=[
+  {CAMPUS_QWEN_TOKEN:"offline-test-token"},
+  {CAMPUS_QWEN_TOKEN:"offline-test-token",AI_BASE_URL:"http://c3dgx0.cs.northwestern.edu:8000/v1"},
+  {CAMPUS_QWEN_TOKEN:"offline-test-token",AI_BASE_URL:"http://c3dgx0.cs.northwestern.edu:8080/v1"}
+ ];
+ for(const env of cases){
+  let calls=0;
+  const request=async()=>{calls++;throw Error("No request expected")};
+  await assert.rejects(probeCampus({env,request}),/Real authentication tokens require HTTPS/);
+  assert.equal(calls,0);
+ }
+});
+test("permits authenticated HTTPS and keeps fallback on HTTPS",async()=>{
+ const env={CAMPUS_QWEN_TOKEN:"offline-test-token",AI_BASE_URL:"https://c3dgx0.cs.northwestern.edu:8080/v1"};
+ const calls=[];
+ const request=async(url,options)=>{
+  calls.push(url);
+  assert.equal(new URL(url).protocol,"https:");
+  assert.equal(options.headers.Authorization,"Bearer offline-test-token");
+  assert.equal(options.redirect,"error");
+  if(url.includes(":8080/"))return new Response("Unavailable",{status:503});
+  if(url.endsWith("/models"))return new Response(JSON.stringify({data:[{id:"Qwen3.8-Flash-Next-FP4-Local"}]}));
+  return new Response(JSON.stringify({model:"Qwen3.8-Flash-Next-FP4-Local",choices:[{message:{content:"READY"}}]}));
+ };
+ const r=await probeCampus({env,request});
+ assert.equal(r.port,"8000");
+ assert.equal(calls.length,4);
+ assert.ok(calls.every(url=>new URL(url).protocol==="https:"));
+});
